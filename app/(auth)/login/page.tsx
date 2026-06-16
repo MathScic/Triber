@@ -1,36 +1,44 @@
-"use client";
-import { useState } from "react";
-import { signIn } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { Nunito, Barlow_Condensed } from 'next/font/google'
+import { LoginForm } from '@/components/auth/LoginForm'
+
+const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
+const barlow = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['700', '800'],
+  variable: '--font-barlow',
+})
+
+export const metadata = { title: 'Connexion — Triber' }
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const router = useRouter();
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { error } = await signIn.email({ email, password });
-    if (!error) router.push("/dashboard");
-  };
-
   return (
-    <form onSubmit={handleLogin}>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        required
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Mot de passe"
-        required
-      />
-      <button type="submit">Se connecter</button>
-    </form>
-  );
+    <main
+      className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center px-4 py-12`}
+    >
+      <div className="w-full max-w-sm">
+        {/* En-tête marque */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#2A9D4E] mb-4 shadow-md">
+            <span className="text-white text-2xl font-[800] font-[family-name:var(--font-barlow)]">
+              T
+            </span>
+          </div>
+          <h1 className="text-4xl font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] tracking-tight uppercase">
+            Triber
+          </h1>
+          <p className="text-sm text-[#7A8070] mt-1 font-[family-name:var(--font-nunito)]">
+            Gérez votre club, depuis votre poche
+          </p>
+        </div>
+
+        {/* Carte formulaire */}
+        <div className="bg-white rounded-2xl shadow-sm border border-[#DDD8CE] p-6">
+          <h2 className="text-xl font-bold text-[#1A1F16] mb-6 font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+            Connexion
+          </h2>
+          <LoginForm />
+        </div>
+      </div>
+    </main>
+  )
 }

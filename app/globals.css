@@ -4,6 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-primary-light: var(--color-primary-light);
+  --color-secondary-light: var(--color-secondary-light);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -76,6 +78,15 @@
   --sidebar-accent-foreground: oklch(0.21 0.034 264.665);
   --sidebar-border: oklch(0.928 0.006 264.531);
   --sidebar-ring: oklch(0.707 0.022 261.325);
+}
+
+/* Couleurs dynamiques Triber — surchargent les valeurs shadcn par défaut */
+:root {
+  --color-primary: #2A9D4E;
+  --color-secondary: #E8622A;
+  --color-primary-light: #E8F5EE;
+  --color-secondary-light: #FDF0EB;
+  --color-primary-text: #FFFFFF;
 }
 
 .dark {
