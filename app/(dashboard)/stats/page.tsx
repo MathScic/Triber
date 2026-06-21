@@ -1,9 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { useStats, type MatchResult } from '@/lib/hooks/useStats'
 import { PlayerRanking } from '@/components/stats/PlayerRanking'
 import { MatchResultForm } from '@/components/stats/MatchResultForm'
+import { PageHeader } from '@/components/shared/PageHeader'
+
+const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
+const barlow = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-barlow' })
 
 type EventMeta = { title: string; start_at: string; opponent: string | null }
 
@@ -23,12 +28,12 @@ export default function StatsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FAF7F2] px-4 py-8">
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
       <div className="max-w-lg mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-extrabold text-[#1A1F16] uppercase tracking-tight">Stats</h1>
-          <p className="text-sm text-[#7A8070]">{matchResults.length} match{matchResults.length !== 1 ? 's' : ''} enregistrés</p>
-        </div>
+        <PageHeader
+          title="Stats"
+          subtitle={`${matchResults.length} match${matchResults.length !== 1 ? 's' : ''} enregistrés`}
+        />
 
         {error && <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2">{error}</p>}
 

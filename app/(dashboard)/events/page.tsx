@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useEvents, type AttendanceStatus, type CreateEventData } from '@/lib/hooks/useEvents'
 import { EventCard } from '@/components/events/EventCard'
 import { EventForm } from '@/components/events/EventForm'
+import { PageHeader } from '@/components/shared/PageHeader'
 import { Button } from '@/components/ui/button'
 
 type Score = { home: number; away: number }
@@ -18,10 +19,14 @@ export default function EventsPage() {
   const [showForm, setShowForm] = useState(false)
   const [matchScores, setMatchScores] = useState<Record<string, Score>>({})
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null)
 
   useEffect(() => {
     getEvents()
-    createClient().auth.getUser().then(({ data: { user } }) => setCurrentUserId(user?.id ?? null))
+    createClient().auth.getUser().then(({ data: { user } }) => {
+      setCurrentUserId(user?.id ?? null)
+      setCurrentUserName((user?.user_metadata?.full_name as string | undefined) ?? null)
+    })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -49,17 +54,11 @@ export default function EventsPage() {
     <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
       <div className="max-w-lg mx-auto space-y-6">
 
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
-              Événements
-            </h1>
-            <p className="text-sm text-[#7A8070] font-[family-name:var(--font-nunito)]">
-              {events.length} événement{events.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          {canCreate && !showForm && <Button onClick={() => setShowForm(true)} size="sm">+ Créer</Button>}
-        </div>
+        <PageHeader
+          title="Événements"
+          subtitle={`${events.length} événement${events.length !== 1 ? 's' : ''}`}
+          action={canCreate && !showForm ? <Button onClick={() => setShowForm(true)} size="sm">+ Créer</Button> : undefined}
+        />
 
         {error && <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2">{error}</p>}
         {showForm && <EventForm onSubmit={handleCreate} onCancel={() => setShowForm(false)} loading={loading} />}
@@ -84,6 +83,7 @@ export default function EventsPage() {
                 onScoreSaved={(id, h, a) => setMatchScores(s => ({ ...s, [id]: { home: h, away: a } }))}
                 isPendingAttendance={pendingEventId === event.id}
                 currentUserId={currentUserId ?? undefined}
+                currentUserName={currentUserName}
               />
             ))}
             {events.length === 0 && !showForm && (

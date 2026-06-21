@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { BrandingForm } from '@/components/settings/BrandingForm'
+import { LogoutButton } from '@/components/settings/LogoutButton'
+import { PageHeader } from '@/components/shared/PageHeader'
 
 type OrgRow = { id: string; name: string; type: string; plan: string }
 
@@ -35,12 +37,7 @@ export default async function SettingsPage() {
     <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
       <div className="max-w-lg mx-auto space-y-6">
 
-        <div>
-          <h1 className="text-3xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
-            Paramètres
-          </h1>
-          <p className="text-sm text-[#7A8070] font-[family-name:var(--font-nunito)] mt-0.5">{org.name}</p>
-        </div>
+        <PageHeader title="Paramètres" subtitle={org.name} />
 
         {/* Branding — admin uniquement */}
         {isAdmin && <BrandingForm />}
@@ -56,6 +53,9 @@ export default async function SettingsPage() {
             <div><p className="text-xs text-[#7A8070]">Plan</p><p className="text-sm font-semibold text-[#1A1F16]">{PLAN_LABELS[org.plan] ?? org.plan}</p></div>
           </div>
         </section>
+
+        {/* Déconnexion */}
+        <LogoutButton />
 
         {/* Zone de danger */}
         {isAdmin && (

@@ -20,9 +20,10 @@ interface Props {
   onScoreSaved?: (eventId: string, home: number, away: number) => void
   isPendingAttendance?: boolean
   currentUserId?: string
+  currentUserName?: string | null
 }
 
-export function EventCard({ event, currentStatus, onAttendance, canDelete, onDelete, score, onScoreSaved, isPendingAttendance, currentUserId }: Props) {
+export function EventCard({ event, currentStatus, onAttendance, canDelete, onDelete, score, onScoreSaved, isPendingAttendance, currentUserId, currentUserName }: Props) {
   const [showScore, setShowScore] = useState(false)
   const [showAttendees, setShowAttendees] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -75,6 +76,7 @@ export function EventCard({ event, currentStatus, onAttendance, canDelete, onDel
         isExpanded={showAttendees}
         onCounts={setCounts}
         currentUserId={currentUserId}
+        currentUserName={currentUserName}
         currentStatus={currentStatus}
       />
 

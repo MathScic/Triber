@@ -17,10 +17,11 @@ interface Props {
   isExpanded: boolean
   onCounts?: (c: AttendanceCounts) => void
   currentUserId?: string
+  currentUserName?: string | null
   currentStatus?: AttendanceStatus | null
 }
 
-export function AttendeesList({ eventId, organizationId, isExpanded, onCounts, currentUserId, currentStatus }: Props) {
+export function AttendeesList({ eventId, organizationId, isExpanded, onCounts, currentUserId, currentUserName, currentStatus }: Props) {
   const [attendees, setAttendees] = useState<Attendee[]>([])
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export function AttendeesList({ eventId, organizationId, isExpanded, onCounts, c
   const merged = useMemo(() => {
     if (!currentUserId || !currentStatus) return attendees
     const exists = attendees.some(a => a.user_id === currentUserId)
-    if (!exists) return [...attendees, { user_id: currentUserId, status: currentStatus, name: null, role: 'member' }]
+    if (!exists) return [...attendees, { user_id: currentUserId, status: currentStatus, name: currentUserName ?? null, role: 'member' }]
     return attendees.map(a => a.user_id === currentUserId ? { ...a, status: currentStatus } : a)
   }, [attendees, currentUserId, currentStatus])
 

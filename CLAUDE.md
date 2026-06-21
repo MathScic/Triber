@@ -19,7 +19,11 @@ Triber est une application mobile **tout-en-un** de gestion pour clubs sportifs 
 
 ### Priorité absolue : le mobile d'abord
 
-Triber est pensé et conçu **téléphone en premier**. L'écrasante majorité des utilisateurs — joueurs, parents, bénévoles — n'ouvriront jamais un ordinateur pour gérer leur club. Ils ont leur téléphone. L'application doit donc être parfaitement fluide, rapide et intuitive sur mobile et tablette. La version web (accessible via URL) est un complément pour les admins qui préfèrent un grand écran, pas le cœur du produit.
+Triber est pensé et conçu **téléphone en premier**. L'écrasante majorité des utilisateurs — joueurs, parents, bénévoles — n'ouvriront jamais un ordinateur pour gérer leur club. Ils ont leur téléphone. L'application doit donc être parfaitement fluide, rapide et intuitive sur mobile et tablette.
+
+La version web a **deux rôles complémentaires** :
+1. **Dashboard admin grand écran** — pour les présidents et trésoriers qui préfèrent l'ordinateur (gestion des membres, finances, paramètres)
+2. **Pages publiques** — accessibles sans compte, partageables par lien : page du club et match en direct pour les supporters, parents, journalistes qui n'ont pas l'app
 
 Chaque écran, chaque formulaire, chaque action doit être pensé pour **un pouce, un téléphone, 10 secondes maximum**.
 
@@ -174,6 +178,22 @@ L'application doit être **utilisable par un président de club de 65 ans**. Cha
 - Discussions internes par groupe
 - Notifications push sur mobile
 
+### Page publique du club (sans connexion)
+
+- URL partageable : `triber.app/[club-slug]`
+- Nom, logo et couleurs du club
+- Dernier résultat de match
+- Prochain événement
+- Accessible sans compte — pour recrutement, sponsors, supporters
+
+### Module Match en direct — web public (sans connexion)
+
+- URL partageable : `triber.app/match/[id]` — le coach envoie ce lien dans le groupe WhatsApp
+- Score mis à jour en temps réel via Supabase Realtime
+- Composition du match : titulaires et remplaçants avec numéro de maillot (ex : `9 - M.Scicluna`)
+- Événements au fil du match : buts, cartons
+- Accessible sans compte — supporters, parents, journalistes qui n'ont pas l'app mobile
+
 ### Module Branding (admin uniquement)
 
 - Upload du logo (format carré recommandé)
@@ -286,6 +306,9 @@ triber/
 │   │   ├── finances/page.tsx
 │   │   ├── media/page.tsx
 │   │   └── settings/page.tsx
+│   ├── (public)/              # Pages sans connexion requise
+│   │   ├── [club-slug]/page.tsx   # Page publique du club
+│   │   └── match/[id]/page.tsx    # Match en direct public
 │   ├── api/
 │   │   ├── webhooks/stripe/route.ts
 │   │   └── notifications/route.ts
@@ -471,7 +494,24 @@ create table messages (
   content text not null,
   sent_at timestamptz default now()
 );
+
+-- Composition d'un match (titulaires / remplaçants)
+-- Utilisée par triber-mobile et la page publique /match/[id]
+create table match_lineups (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid references events on delete cascade,
+  organization_member_id uuid references organization_members on delete cascade,
+  is_starter boolean not null default true,
+  unique(event_id, organization_member_id)
+);
 ```
+
+> **Note — Champs additionnels triber-mobile :** le projet `triber-mobile` a étendu certaines tables en production. Champs à connaître :
+> - `events` : `status text` ('upcoming' | 'ongoing' | 'finished'), `started_at timestamptz`
+> - `organization_members` : `jersey_number int`, `category text`
+> - `profiles` : `invite_code text`
+>
+> Ces champs existent déjà en base. Ne pas les recréer en migration — les référencer directement.
 
 ### RLS — pattern obligatoire sur toutes les tables
 
@@ -520,6 +560,12 @@ Mot de passe → jamais stocké
 ```
 
 Config Supabase : access token 3600s · refresh token 604800s (7 jours)
+
+### Auth partagée mobile ↔ web
+
+Mobile (`triber-mobile`) et web (`triber`) utilisent le **même projet Supabase**. Un compte créé sur l'app mobile fonctionne automatiquement sur le web avec les mêmes identifiants, et vice versa. Aucune synchronisation à implémenter — c'est natif à Supabase Auth.
+
+Les pages publiques (`/match/[id]`, `/[club-slug]`) ne nécessitent **aucune connexion**. Elles utilisent la clé `anon` Supabase avec des policies RLS en lecture seule sur les données publiques.
 
 ---
 
@@ -576,13 +622,18 @@ Paiement en ligne, webhook, argent sur le compte du club.
 Test Vitest : webhook met à jour le statut 'paid'.
 Validation : payer en mode test → statut passe à 'paid'. ✅
 
-**Étape 11 — Tests E2E Playwright**
-Parcours : inscription → org → membre / connexion → résultat → stats / paiement.
+**Étape 11 — Pages publiques**
+Page club (`/[club-slug]`) et match en direct (`/match/[id]`) sans connexion.
+Supabase Realtime pour le score et les événements en live.
+Validation : partager le lien → score se met à jour sans recharger la page. ✅
+
+**Étape 12 — Tests E2E Playwright**
+Parcours : inscription → org → membre / connexion → résultat → stats / paiement / page publique match.
 Validation : `npm run test:e2e` passe en vert. ✅
 
-**Étape 12 — Application mobile Expo**
-Même fonctionnalités, interface NativeWind, Face ID, notifications push.
-Validation : app visible sur téléphone via Expo Go. ✅
+---
+
+> **Note — Application mobile :** `triber-mobile` est un repo Expo séparé, déjà en développement actif. Il partage le même projet Supabase. Ne pas reconstruire la logique mobile ici — se concentrer sur le web et les pages publiques.
 
 ---
 
@@ -636,13 +687,14 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ## 12. CE QU'ON NE FAIT PAS
 
-- Pas d'API résultats temps réel (FFF/Scoreenco — hors MVP)
-- Pas de chat temps réel WebSocket (complexité inutile)
+- Pas d'API résultats temps réel externe (FFF/Scoreenco — hors MVP)
+- Pas de chat temps réel WebSocket dans la messagerie (complexité inutile — Supabase Realtime est autorisé uniquement pour le match en direct public)
 - Pas de multi-langue (français uniquement)
 - Pas de fichier > 100 lignes sans découpe
 - Pas de `any` TypeScript
 - Pas de logique métier dans les composants UI
 - Pas de clés API en dur dans le code
+- Pas de duplication des fonctionnalités mobiles — `triber-mobile` gère l'expérience quotidienne des membres
 
 ---
 

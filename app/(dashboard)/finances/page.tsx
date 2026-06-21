@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useFinances } from '@/lib/hooks/useFinances'
 import { ContributionList } from '@/components/finances/ContributionList'
 import { PaymentForm } from '@/components/finances/PaymentForm'
+import { PageHeader } from '@/components/shared/PageHeader'
 import { useState } from 'react'
 
 const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
@@ -39,11 +40,7 @@ export default function FinancesPage() {
     <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
       <div className="max-w-lg mx-auto space-y-6">
 
-        <div>
-          <h1 className="text-3xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
-            Finances
-          </h1>
-        </div>
+        <PageHeader title="Finances" />
 
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-4">

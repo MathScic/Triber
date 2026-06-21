@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { MemberList } from '@/components/members/MemberList'
 import { InviteForm } from '@/components/members/InviteForm'
+import { PageHeader } from '@/components/shared/PageHeader'
 
 const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
 const barlow = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-barlow' })
@@ -45,19 +46,10 @@ export default async function MembersPage() {
     <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
       <div className="max-w-lg mx-auto space-y-6">
 
-        {/* En-tête */}
-        <div>
-          <h1 className="text-3xl font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-tight">
-            Membres
-          </h1>
-          <p className="text-sm text-[#7A8070] font-[family-name:var(--font-nunito)] mt-0.5">
-            <span className="font-semibold text-[#1A1F16]">{membersCount ?? 0}</span>
-            {' / '}
-            <span className="font-semibold text-[#1A1F16]">{org.plan === 'free' ? '20' : '∞'}</span>
-            {' membres · '}
-            {org.name}
-          </p>
-        </div>
+        <PageHeader
+          title="Membres"
+          subtitle={`${membersCount ?? 0} / ${org.plan === 'free' ? '20' : '∞'} membres · ${org.name}`}
+        />
 
         {/* Formulaire d'invitation — admin uniquement */}
         {isAdmin && <InviteForm organizationId={org.id} />}
