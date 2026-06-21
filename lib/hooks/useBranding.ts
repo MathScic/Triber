@@ -15,7 +15,7 @@ export type OrgBranding = {
   slogan: string | null
 }
 
-type SaveInput = Partial<Pick<OrgBranding, 'logo_url' | 'cover_url' | 'primary_color' | 'secondary_color' | 'slogan'>>
+type SaveInput = Partial<Pick<OrgBranding, 'name' | 'logo_url' | 'cover_url' | 'primary_color' | 'secondary_color' | 'slogan'>>
 
 export function useBranding() {
   const [loading, setLoading] = useState(false)
