@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
@@ -9,8 +8,12 @@ function getAdmin() {
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // Authentification par token Bearer — compatible app mobile et dashboard web
+  const token = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
+  if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+
+  const admin = getAdmin()
+  const { data: { user } } = await admin.auth.getUser(token)
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
   const body = await request.json() as { invite_code?: string; role?: string }
@@ -19,8 +22,6 @@ export async function POST(request: Request) {
   if (!invite_code?.trim() || !['admin', 'member_active', 'member'].includes(role)) {
     return NextResponse.json({ error: 'Code invalide' }, { status: 400 })
   }
-
-  const admin = getAdmin()
 
   // Vérifie que l'appelant est admin de son organisation
   const { data: membership } = await admin
