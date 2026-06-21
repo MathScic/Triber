@@ -3,15 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { createClient } from '@/lib/supabase/client'
 import { OrgBanner } from '@/components/home/OrgBanner'
-import { ModuleGrid } from '@/components/home/ModuleGrid'
+import { LastMatchCard } from '@/components/home/LastMatchCard'
+import { NextEventCard } from '@/components/home/NextEventCard'
+import { TopScorerCard } from '@/components/home/TopScorerCard'
 
 type Org = { id: string; name: string; type: string; plan: string; logo_url?: string | null; cover_url?: string | null }
-
-const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
-const barlow = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-barlow' })
 
 export default function HomePage() {
   const router = useRouter()
@@ -49,39 +47,43 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] flex items-center justify-center`}>
+      <main className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
         <p className="text-sm text-[#7A8070] font-[family-name:var(--font-nunito)]">Chargement…</p>
       </main>
     )
   }
 
+  if (!org) {
+    return (
+      <main className="min-h-screen bg-[#FAF7F2] px-4 py-8 flex items-center justify-center">
+        <div className="bg-white rounded-2xl border border-[#DDD8CE] p-6 text-center max-w-sm w-full">
+          <p className="text-sm text-[#7A8070] mb-4 font-[family-name:var(--font-nunito)]">
+            Vous n'avez pas encore d'organisation.
+          </p>
+          <Link
+            href="/onboarding"
+            className="inline-flex items-center justify-center h-12 px-6 rounded-xl bg-[#2A9D4E] text-white font-[800] font-[family-name:var(--font-barlow)] uppercase tracking-wide text-sm hover:bg-[#238742] transition-colors"
+          >
+            Créer mon organisation
+          </Link>
+        </div>
+      </main>
+    )
+  }
+
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
-      <div className="max-w-lg mx-auto">
-        {org ? (
-          <>
-            <OrgBanner
-              name={org.name}
-              fullName={fullName}
-              logoUrl={org.logo_url}
-              coverUrl={org.cover_url}
-              initial={fullName.charAt(0).toUpperCase() || '?'}
-            />
-            <ModuleGrid />
-          </>
-        ) : (
-          <div className="bg-white rounded-2xl border border-[#DDD8CE] p-6 text-center">
-            <p className="text-sm text-[#7A8070] mb-4 font-[family-name:var(--font-nunito)]">
-              Vous n'avez pas encore d'organisation.
-            </p>
-            <Link
-              href="/onboarding"
-              className="inline-flex items-center justify-center h-12 px-6 rounded-xl bg-[#2A9D4E] text-white font-[800] font-[family-name:var(--font-barlow)] uppercase tracking-wide text-sm hover:bg-[#238742] transition-colors"
-            >
-              Créer mon organisation
-            </Link>
-          </div>
-        )}
+    <main className="min-h-screen bg-[#FAF7F2] px-4 py-8">
+      <div className="max-w-lg mx-auto space-y-4">
+        <OrgBanner
+          name={org.name}
+          fullName={fullName}
+          logoUrl={org.logo_url}
+          coverUrl={org.cover_url}
+          initial={fullName.charAt(0).toUpperCase() || '?'}
+        />
+        <LastMatchCard organizationId={org.id} />
+        <NextEventCard organizationId={org.id} />
+        <TopScorerCard organizationId={org.id} />
       </div>
     </main>
   )
