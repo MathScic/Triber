@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { Zap } from 'lucide-react'
 import type { TriberEvent, AttendanceStatus } from '@/lib/hooks/useEvents'
 import { AttendanceButton } from './AttendanceButton'
 import { AttendeesList, type AttendanceCounts } from './AttendeesList'
@@ -46,6 +48,14 @@ export function EventCard({ event, currentStatus, onAttendance, canDelete, onDel
 
       {/* Séparateur + actions bas */}
       <div className="flex items-center justify-end gap-4 pt-2 border-t border-[#DDD8CE]">
+        {event.type === 'match' && canDelete && (
+          <Link
+            href={`/events/${event.id}/live`}
+            className="flex items-center gap-1 text-xs font-semibold text-[#2A9D4E] hover:underline font-[family-name:var(--font-nunito)]"
+          >
+            <Zap className="w-3 h-3" /> Direct
+          </Link>
+        )}
         {event.type === 'match' && canDelete && (
           <button onClick={() => setShowScore(v => !v)} className="text-xs text-[#7A8070] hover:text-primary transition-colors font-[family-name:var(--font-nunito)]">
             {showScore ? 'Score ▲' : 'Score ▼'}
