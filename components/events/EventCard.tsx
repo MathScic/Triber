@@ -46,26 +46,35 @@ export function EventCard({ event, currentStatus, onAttendance, canDelete, onDel
         )}
       </div>
 
-      {/* Séparateur + actions bas */}
-      <div className="flex items-center justify-end gap-4 pt-2 border-t border-[#DDD8CE]">
+      {/* Actions bas : boutons visibles */}
+      <div className="flex items-center gap-2 pt-2 border-t border-[#DDD8CE] flex-wrap">
         {event.type === 'match' && canDelete && (
           <Link
             href={`/events/${event.id}/live`}
-            className="flex items-center gap-1 text-xs font-semibold text-[#2A9D4E] hover:underline font-[family-name:var(--font-nunito)]"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2A9D4E] text-white text-xs font-bold hover:bg-[#238742] transition-colors font-[family-name:var(--font-nunito)]"
           >
-            <Zap className="w-3 h-3" /> Direct
+            <Zap className="w-3.5 h-3.5" /> Direct
           </Link>
         )}
+        <button
+          onClick={() => setShowAttendees(v => !v)}
+          className="flex items-center px-3 py-1.5 rounded-lg bg-[#F0EBE1] text-[#1A1F16] text-xs font-semibold hover:bg-[#DDD8CE] transition-colors font-[family-name:var(--font-nunito)]"
+        >
+          Présences {showAttendees ? '▲' : '▼'}
+        </button>
         {event.type === 'match' && canDelete && (
-          <button onClick={() => setShowScore(v => !v)} className="text-xs text-[#7A8070] hover:text-primary transition-colors font-[family-name:var(--font-nunito)]">
-            {showScore ? 'Score ▲' : 'Score ▼'}
+          <button
+            onClick={() => setShowScore(v => !v)}
+            className="flex items-center px-3 py-1.5 rounded-lg bg-[#F0EBE1] text-[#1A1F16] text-xs font-semibold hover:bg-[#DDD8CE] transition-colors font-[family-name:var(--font-nunito)]"
+          >
+            Score {showScore ? '▲' : '▼'}
           </button>
         )}
-        <button onClick={() => setShowAttendees(v => !v)} className="text-xs text-[#7A8070] hover:text-primary transition-colors font-[family-name:var(--font-nunito)]">
-          {showAttendees ? 'Présences ▲' : 'Présences ▼'}
-        </button>
         {canDelete && (
-          <button onClick={() => setShowDeleteModal(true)} className="text-xs text-secondary hover:text-secondary/80 transition-colors font-[family-name:var(--font-nunito)]">
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="ml-auto flex items-center px-3 py-1.5 rounded-lg text-[#E8622A] text-xs font-semibold hover:bg-[#FDF0EB] transition-colors font-[family-name:var(--font-nunito)]"
+          >
             Supprimer
           </button>
         )}

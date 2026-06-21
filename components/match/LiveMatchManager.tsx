@@ -1,121 +1,105 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { MatchEvent, MatchEventType, OrgMember } from '@/lib/match/types'
+import { useState } from 'react'
+import type { MatchEventType, OrgMember } from '@/lib/match/types'
+import { useMatchLive } from '@/lib/hooks/useMatchLive'
+import { LiveTimer } from './LiveTimer'
+import { MatchControls } from './MatchControls'
+import { LineupEditor, type FullMember, type LineupEntry } from './LineupEditor'
 import { AddEventForm } from './AddEventForm'
 import { EventTimeline } from './EventTimeline'
 
-type MatchStatus = 'upcoming' | 'ongoing' | 'finished' | null
+type MatchStatus = 'upcoming' | 'ongoing' | 'half_time' | 'finished' | null
 
 interface Props {
   eventId: string
-  orgId: string
   opponent: string | null
   isHome: boolean | null
   initialStatus: MatchStatus
   initialStartedAt: string | null
+  initialElapsedMinutes: number
   orgName: string
+  allMembers: FullMember[]
+  initialLineup: LineupEntry[]
 }
 
-function elapsedMin(startedAt: string | null): number {
-  if (!startedAt) return 1
-  return Math.max(1, Math.floor((Date.now() - new Date(startedAt).getTime()) / 60000))
-}
-
-export function LiveMatchManager({ eventId, orgId, opponent, isHome, initialStatus, initialStartedAt, orgName }: Props) {
+export function LiveMatchManager({ eventId, opponent, isHome, initialStatus, initialStartedAt, initialElapsedMinutes, orgName, allMembers, initialLineup }: Props) {
   const [status, setStatus] = useState<MatchStatus>(initialStatus)
   const [startedAt, setStartedAt] = useState<string | null>(initialStartedAt)
-  const [events, setEvents] = useState<MatchEvent[]>([])
-  const [members, setMembers] = useState<OrgMember[]>([])
-  const [score, setScore] = useState({ home: 0, away: 0 })
+  const [elapsedMinutes, setElapsedMinutes] = useState(initialElapsedMinutes)
+  const [lineup, setLineup] = useState<LineupEntry[]>(initialLineup)
   const [loading, setLoading] = useState(false)
+  const { events, score } = useMatchLive(eventId)
 
-  useEffect(() => {
-    const s = createClient()
-    s.from('organization_members').select('user_id, jersey_number, profiles(full_name)')
-      .eq('organization_id', orgId).then(({ data }) => {
-        setMembers((data ?? []).map(row => {
-          const raw = row.profiles
-          const p = (Array.isArray(raw) ? raw[0] : raw) as { full_name: string | null } | null
-          return { user_id: row.user_id as string, name: p?.full_name ?? 'Inconnu', jersey: row.jersey_number as number | null }
-        }).sort((a, b) => (a.jersey ?? 99) - (b.jersey ?? 99)))
-      })
+  const post = (path: string, body: object) =>
+    fetch(`/api/match/${eventId}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+  const del = (path: string, body: object) =>
+    fetch(`/api/match/${eventId}/${path}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 
-    s.from('match_events').select('id, type, minute, player_id, assist_player_id')
-      .eq('event_id', eventId).then(({ data }) => setEvents((data ?? []) as MatchEvent[]))
-
-    s.from('match_results').select('score_home, score_away').eq('event_id', eventId).maybeSingle()
-      .then(({ data }) => { if (data) setScore({ home: data.score_home as number, away: data.score_away as number }) })
-
-    const ch = s.channel(`manager-${eventId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_events', filter: `event_id=eq.${eventId}` },
-        p => setEvents(prev => [...prev, p.new as MatchEvent]))
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'match_events', filter: `event_id=eq.${eventId}` },
-        p => setEvents(prev => prev.filter(e => e.id !== (p.old as { id: string }).id)))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'match_results', filter: `event_id=eq.${eventId}` },
-        p => { const r = p.new as { score_home: number; score_away: number }; setScore({ home: r.score_home, away: r.score_away }) })
-      .subscribe()
-
-    return () => { void s.removeChannel(ch) }
-  }, [eventId, orgId])
-
-  const control = async (action: 'start' | 'end') => {
+  const control = async (action: 'start' | 'half_time' | 'resume' | 'end') => {
     setLoading(true)
-    const res = await fetch(`/api/match/${eventId}/control`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }) })
-    if (res.ok) { const now = new Date().toISOString(); setStatus(action === 'start' ? 'ongoing' : 'finished'); if (action === 'start') setStartedAt(now) }
+    const res = await post('control', { action })
+    if (res.ok) {
+      const now = new Date().toISOString()
+      if (action === 'start') { setStatus('ongoing'); setStartedAt(now); setElapsedMinutes(0) }
+      else if (action === 'half_time') {
+        const curr = startedAt ? Math.min(90, elapsedMinutes + Math.floor((Date.now() - new Date(startedAt).getTime()) / 60000)) : elapsedMinutes
+        setStatus('half_time'); setElapsedMinutes(curr)
+      }
+      else if (action === 'resume') { setStatus('ongoing'); setStartedAt(now) }
+      else { setStatus('finished') }
+    }
     setLoading(false)
   }
 
-  const addEvent = async (type: MatchEventType, minute: number, playerId?: string, assistId?: string) => {
-    await fetch(`/api/match/${eventId}/event`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, minute, playerId, assistPlayerId: assistId }) })
+  const addToLineup = async (orgMemberId: string, isStarter: boolean) => {
+    setLineup(prev => [...prev.filter(l => l.org_member_id !== orgMemberId), { org_member_id: orgMemberId, is_starter: isStarter }])
+    await post('lineup', { orgMemberId, isStarter })
   }
 
-  const removeEvent = async (matchEventId: string) => {
-    await fetch(`/api/match/${eventId}/event`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ matchEventId }) })
+  const removeFromLineup = async (orgMemberId: string) => {
+    setLineup(prev => prev.filter(l => l.org_member_id !== orgMemberId))
+    await del('lineup', { orgMemberId })
   }
+
+  const addEvent = async (type: MatchEventType, minute: number, playerId?: string, assistId?: string, playerNameFree?: string) => {
+    await post('event', { type, minute, playerId, assistPlayerId: assistId, playerNameFree })
+  }
+
+  const removeEvent = async (id: string) => { await del('event', { matchEventId: id }) }
 
   const us = isHome !== false ? score.home : score.away
   const them = isHome !== false ? score.away : score.home
+  const lineupMembers: OrgMember[] = allMembers.filter(m => lineup.some(l => l.org_member_id === m.org_member_id))
+  const currentMin = status === 'ongoing' && startedAt
+    ? Math.min(90, elapsedMinutes + Math.floor((Date.now() - new Date(startedAt).getTime()) / 60000))
+    : elapsedMinutes
 
   return (
     <div className="space-y-4">
-      {/* Score */}
-      <div className="bg-[#2A9D4E] rounded-2xl p-4 text-white text-center">
-        <p className="text-xs opacity-80 mb-1 font-[family-name:var(--font-nunito)]">{orgName} vs {opponent ?? 'Adversaire'}</p>
-        <div className="text-6xl font-[800] font-[family-name:var(--font-barlow)] tabular-nums">{us} – {them}</div>
-        <p className="text-sm opacity-80 mt-1 font-[family-name:var(--font-nunito)]">
-          {status === 'ongoing' ? `⚡ En cours — ${elapsedMin(startedAt)}'` : status === 'finished' ? '✅ Terminé' : '⏳ À venir'}
+      <div className="bg-[#2A9D4E] rounded-2xl p-5 text-white text-center space-y-2 shadow-sm">
+        <p className="text-sm font-semibold opacity-80 font-[family-name:var(--font-nunito)]">
+          {orgName} vs {opponent ?? 'Adversaire'}
         </p>
+        <div className="text-7xl font-[800] font-[family-name:var(--font-barlow)] tabular-nums leading-none">
+          {us} – {them}
+        </div>
+        <LiveTimer startedAt={startedAt} status={status} elapsedMinutes={elapsedMinutes} />
       </div>
 
-      {/* Contrôles */}
-      <div className="flex gap-2">
-        {status !== 'ongoing' && status !== 'finished' && (
-          <button onClick={() => void control('start')} disabled={loading}
-            className="flex-1 h-11 rounded-xl bg-[#2A9D4E] text-white font-[800] text-sm font-[family-name:var(--font-barlow)] uppercase tracking-wide hover:bg-[#238742] transition-colors disabled:opacity-50">
-            ▶ Démarrer le match
-          </button>
-        )}
-        {status === 'ongoing' && (
-          <button onClick={() => void control('end')} disabled={loading}
-            className="flex-1 h-11 rounded-xl bg-[#E8622A] text-white font-[800] text-sm font-[family-name:var(--font-barlow)] uppercase tracking-wide hover:bg-[#d4541e] transition-colors disabled:opacity-50">
-            ⏸ Terminer le match
-          </button>
-        )}
-      </div>
+      <MatchControls status={status} loading={loading} onControl={action => void control(action)} />
+      <LineupEditor allMembers={allMembers} lineup={lineup} onAdd={addToLineup} onRemove={removeFromLineup} />
 
-      {/* Formulaire d'ajout d'action */}
       {status === 'ongoing' && (
-        <AddEventForm members={members} defaultMinute={elapsedMin(startedAt)} onAdd={addEvent} />
+        <AddEventForm members={lineupMembers} defaultMinute={currentMin} onAdd={addEvent} />
       )}
 
-      {/* Chronologie */}
       {events.length > 0 && (
         <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-4 space-y-2">
-          <p className="text-xs font-semibold text-[#7A8070] uppercase tracking-wide font-[family-name:var(--font-nunito)]">Chronologie</p>
-          <EventTimeline events={events} members={members} onRemove={removeEvent} opponentName={opponent ?? 'Adversaire'} />
+          <p className="text-xs font-semibold text-[#7A8070] uppercase tracking-wide font-[family-name:var(--font-nunito)]">
+            Chronologie
+          </p>
+          <EventTimeline events={events} members={lineupMembers} onRemove={removeEvent} opponentName={opponent ?? 'Adversaire'} />
         </div>
       )}
     </div>

@@ -1,6 +1,5 @@
 import { Trash2 } from 'lucide-react'
-import type { MatchEvent, OrgMember } from '@/lib/match/types'
-import { EVENT_ICONS } from '@/lib/match/types'
+import type { MatchEvent, MatchEventType, OrgMember } from '@/lib/match/types'
 
 interface Props {
   events: MatchEvent[]
@@ -9,7 +8,23 @@ interface Props {
   opponentName?: string
 }
 
-function resolveName(userId: string | null, members: OrgMember[]): string | null {
+function MatchIcon({ type }: { type: MatchEventType }) {
+  if (type === 'yellow_card') return <span className="inline-block w-3 h-4 bg-yellow-400 rounded-[2px] flex-shrink-0" />
+  if (type === 'red_card') return <span className="inline-block w-3 h-4 bg-red-600 rounded-[2px] flex-shrink-0" />
+  const color = type === 'goal' ? '#2A9D4E' : type === 'own_goal' ? '#E8622A' : '#dc2626'
+  return <span className="inline-block w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+}
+
+function resolvePlayerName(ev: MatchEvent, members: OrgMember[], opponentName: string): string {
+  if (ev.player_name_free) return ev.player_name_free
+  if (!ev.player_id) return ev.type === 'opponent_goal' ? opponentName : '—'
+  const m = members.find(m => m.user_id === ev.player_id)
+  if (!m) return '—'
+  const parts = m.name.split(' ')
+  return parts.length > 1 ? `${parts[0][0]}.${parts.slice(1).join(' ')}` : m.name
+}
+
+function resolveAssistName(userId: string | null, members: OrgMember[]): string | null {
   if (!userId) return null
   const m = members.find(m => m.user_id === userId)
   if (!m) return null
@@ -31,22 +46,21 @@ export function EventTimeline({ events, members, onRemove, opponentName = 'Adver
   return (
     <div className="space-y-1">
       {sorted.map(ev => {
-        const icon = EVENT_ICONS[ev.type]
         const isOpp = ev.type === 'opponent_goal'
-        const playerName = resolveName(ev.player_id, members) ?? (isOpp ? opponentName : '—')
-        const assistName = resolveName(ev.assist_player_id, members)
+        const playerName = resolvePlayerName(ev, members, opponentName)
+        const assistName = resolveAssistName(ev.assist_player_id, members)
 
         return (
           <div
             key={ev.id}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-[family-name:var(--font-nunito)] ${
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-[family-name:var(--font-nunito)] ${
               isOpp ? 'bg-[#FDF0EB]' : 'bg-[#E8F5EE]'
             }`}
           >
-            <span className="w-10 text-right flex-shrink-0 font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] tabular-nums">
-              {ev.minute}'
+            <span className="w-8 text-right flex-shrink-0 font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] tabular-nums text-xs">
+              {ev.minute}&apos;
             </span>
-            <span className="text-base">{icon}</span>
+            <MatchIcon type={ev.type} />
             <span className={`flex-1 font-semibold ${isOpp ? 'text-[#E8622A]' : 'text-[#1A1F16]'}`}>
               {playerName}
               {assistName && (
