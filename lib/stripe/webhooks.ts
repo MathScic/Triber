@@ -3,12 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 
 const STRIPE_API_VERSION = '2026-02-25.clover' as const
 
-function getAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
-}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION })
+const admin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+)
 
 async function safeUpdate(label: string, op: PromiseLike<{ error: { message: string } | null }>) {
   const { error } = await op
@@ -16,12 +15,10 @@ async function safeUpdate(label: string, op: PromiseLike<{ error: { message: str
 }
 
 export function verifyWebhookSignature(body: string, signature: string): Stripe.Event {
-  const s = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: STRIPE_API_VERSION })
-  return s.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
+  return stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
 }
 
 export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
-  const admin = getAdmin()
 
   switch (event.type) {
     case 'payment_intent.succeeded': {

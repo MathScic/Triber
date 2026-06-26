@@ -4,22 +4,9 @@ import { useState, useMemo } from 'react'
 import { ChevronRight, Trash2, ArrowUpDown, CheckCircle } from 'lucide-react'
 import type { OrgMemberForPayment, ContributionPayment } from '@/lib/hooks/useContributionPayments'
 import { isAwaitingValidation } from '@/lib/hooks/useContributionPayments'
+import { avatarColor, initials } from '@/lib/utils/avatar'
 
 type SortKey = 'name' | 'date' | 'status'
-
-const AVATAR_COLORS = [
-  { bg: '#DBEAFE', text: '#1D4ED8' }, { bg: '#FEE2E2', text: '#B91C1C' },
-  { bg: '#D1FAE5', text: '#065F46' }, { bg: '#FEF3C7', text: '#92400E' },
-  { bg: '#EDE9FE', text: '#5B21B6' }, { bg: '#FCE7F3', text: '#9D174D' },
-  { bg: '#CFFAFE', text: '#0E7490' }, { bg: '#FFF7ED', text: '#9A3412' },
-]
-function avatarColor(name: string) {
-  return AVATAR_COLORS[name.split('').reduce((s, c) => s + c.charCodeAt(0), 0) % AVATAR_COLORS.length]
-}
-function initials(name: string) {
-  const p = name.trim().split(' ').filter(Boolean)
-  return p.length >= 2 ? (p[0][0] + p[p.length - 1][0]).toUpperCase() : name.slice(0, 2).toUpperCase()
-}
 function fmtDate(iso: string) {
   const d = new Date(iso)
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`
@@ -105,26 +92,23 @@ export function PaymentMemberList({ members, manualMembers, onClickMember, onCli
   const filteredManual = q ? manualMembers.filter(m => (m.manual_name ?? '').toLowerCase().includes(q)) : manualMembers
 
   const totalCount = members.length + manualMembers.length
-  const paidCount = members.filter(m => {
-    if (m.payment?.status !== 'paid') return false
-    const exp = getExpectedAmount?.(m.category) ?? 0
-    return exp === 0 || (m.payment.amount_cents ?? 0) >= exp
-  }).length + manualMembers.filter(m => {
-    if (m.status !== 'paid') return false
-    const exp = getExpectedAmount?.(m.category) ?? 0
-    return exp === 0 || m.amount_cents >= exp
-  }).length
-  const partialCount = members.filter(m => {
-    if (m.payment?.status !== 'paid') return false
-    const exp = getExpectedAmount?.(m.category) ?? 0
-    return exp > 0 && (m.payment.amount_cents ?? 0) < exp
-  }).length + manualMembers.filter(m => {
-    if (m.status !== 'paid') return false
-    const exp = getExpectedAmount?.(m.category) ?? 0
-    return exp > 0 && m.amount_cents < exp
-  }).length
-  const paidCents = members.reduce((s, m) => s + (m.payment?.status === 'paid' ? (m.payment.amount_cents ?? 0) : 0), 0)
-    + manualMembers.filter(m => m.status === 'paid').reduce((s, m) => s + m.amount_cents, 0)
+  const { paidCount, partialCount, paidCents } = useMemo(() => {
+    let paid = 0, partial = 0, cents = 0
+    for (const m of members) {
+      if (m.payment?.status !== 'paid') continue
+      const exp = getExpectedAmount?.(m.category) ?? 0
+      const got = m.payment.amount_cents ?? 0
+      cents += got
+      if (exp > 0 && got < exp) partial++; else paid++
+    }
+    for (const m of manualMembers) {
+      if (m.status !== 'paid') continue
+      const exp = getExpectedAmount?.(m.category) ?? 0
+      cents += m.amount_cents
+      if (exp > 0 && m.amount_cents < exp) partial++; else paid++
+    }
+    return { paidCount: paid, partialCount: partial, paidCents: cents }
+  }, [members, manualMembers, getExpectedAmount])
 
   const sortFn = (statusA: string, statusB: string, nameA: string, nameB: string, dateA?: string | null, dateB?: string | null) => {
     if (sort === 'name') return nameA.localeCompare(nameB, 'fr')

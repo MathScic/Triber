@@ -4,34 +4,13 @@ import { useState } from 'react'
 import { X, ArrowUpRight, ArrowLeftRight, Plus } from 'lucide-react'
 import type { MatchActionType, OrgMember } from '@/lib/match/types'
 import { Button } from '@/components/ui/button'
+import { BallIcon, CardRect } from '@/components/match/MatchIcons'
 
 interface Props {
   members: OrgMember[]
-  allMembers?: OrgMember[]
   defaultMinute: number
   onAdd: (type: MatchActionType, minute: number, isOwnTeam: boolean, userId?: string, assistUserId?: string) => Promise<void>
   onClose?: () => void
-}
-
-function BallIcon({ active }: { active: boolean }) {
-  const c = active ? '#ffffff' : '#6B7280'
-  const shade = active ? 'rgba(0,0,0,0.28)' : '#D1D1D6'
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="10" fill={c} stroke={shade} strokeWidth="1.5"/>
-      <polygon points="12,5.5 16.5,8.5 15,14 9,14 7.5,8.5" fill={shade}/>
-      <line x1="12" y1="2" x2="12" y2="5.5" stroke={shade} strokeWidth="1.2"/>
-      <line x1="20.5" y1="8" x2="16.5" y2="8.5" stroke={shade} strokeWidth="1.2"/>
-      <line x1="18.5" y1="18.5" x2="15" y2="14" stroke={shade} strokeWidth="1.2"/>
-      <line x1="5.5" y1="18.5" x2="9" y2="14" stroke={shade} strokeWidth="1.2"/>
-      <line x1="3.5" y1="8" x2="7.5" y2="8.5" stroke={shade} strokeWidth="1.2"/>
-    </svg>
-  )
-}
-
-function CardRect({ color, active }: { color: 'yellow' | 'red'; active: boolean }) {
-  const bg = color === 'yellow' ? (active ? '#FBBF24' : '#FDE68A') : (active ? '#DC2626' : '#FCA5A5')
-  return <span className="inline-block w-4 h-5 rounded-[3px] flex-shrink-0" style={{ backgroundColor: bg }} />
 }
 
 type TileType = 'goal' | 'assist' | 'yellow_card' | 'red_card' | 'substitution'
@@ -52,7 +31,7 @@ function TileIcon({ type, active }: { type: TileType; active: boolean }) {
   return <ArrowLeftRight className={`w-5 h-5 ${active ? 'text-white' : 'text-[#6B7280]'}`} />
 }
 
-export function AddEventForm({ members, allMembers, defaultMinute, onAdd, onClose }: Props) {
+export function AddEventForm({ members, defaultMinute, onAdd, onClose }: Props) {
   const [tileType, setTileType] = useState<TileType>('goal')
   const [isOwnTeam, setIsOwnTeam] = useState(true)
   const [userId, setUserId] = useState('')
@@ -64,7 +43,7 @@ export function AddEventForm({ members, allMembers, defaultMinute, onAdd, onClos
   const isGoal = tileType === 'goal'
   const isSubst = tileType === 'substitution'
   const needsPlayer = isOwnTeam && tileType !== 'substitution'
-  const available = members.length > 0 ? members : (allMembers ?? [])
+  const available = members
   const canSubmit = !needsPlayer || !!userId
 
   const handleSubmit = async () => {

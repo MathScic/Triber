@@ -67,8 +67,10 @@ export function LiveMatchManager({ eventId, opponent, isHome, initialStatus, ini
 
   const us = actions.filter(a => a.type === 'goal' && a.is_own_team).length
   const them = actions.filter(a => a.type === 'goal' && !a.is_own_team).length
-  const lineupMembers: OrgMember[] = allMembers.filter(m => initialLineup.some(l => l.org_member_id === m.org_member_id))
   const timelineMembers: OrgMember[] = allMembers.map(m => ({ user_id: m.user_id, name: m.name, jersey: m.jersey }))
+  const lineupMembers: OrgMember[] = allMembers.filter(m => initialLineup.some(l => l.org_member_id === m.org_member_id)).length > 0
+    ? allMembers.filter(m => initialLineup.some(l => l.org_member_id === m.org_member_id))
+    : timelineMembers
   const currentMin = (() => {
     if (!startedAt) return 0
     const ref = status === 'ongoing' ? Date.now() : (pausedAt ? new Date(pausedAt).getTime() : Date.now())
@@ -129,7 +131,7 @@ export function LiveMatchManager({ eventId, opponent, isHome, initialStatus, ini
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={() => setShowForm(false)}>
           <div className="bg-white rounded-t-2xl w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
-            <AddEventForm members={lineupMembers} allMembers={allMembers} defaultMinute={Math.floor(currentMin)} onAdd={addEvent} onClose={() => setShowForm(false)} />
+            <AddEventForm members={lineupMembers} defaultMinute={Math.floor(currentMin)} onAdd={addEvent} onClose={() => setShowForm(false)} />
           </div>
         </div>
       )}

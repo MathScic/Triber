@@ -84,9 +84,10 @@ export function useStats() {
       const { data: profiles } = uids.length
         ? await client.from('profiles').select('id, full_name').in('id', uids)
         : { data: [] }
+      const profileMap = new Map((profiles ?? []).map(p => [p.id, p]))
       const rows: PlayerStatRow[] = Array.from(map.values())
         .map(({ uid, playerName, ...stats }) => {
-          const profile = uid ? (profiles ?? []).find(p => p.id === uid) ?? null : null
+          const profile = uid ? (profileMap.get(uid) ?? null) : null
           const displayName = profile?.full_name ?? playerName ?? null
           return { user_id: uid ?? playerName ?? 'unknown', ...stats, minutes_played: 0, profiles: { full_name: displayName } }
         })

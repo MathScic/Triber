@@ -1,6 +1,7 @@
 import { Trash2 } from 'lucide-react'
 import type { MatchAction, OrgMember } from '@/lib/match/types'
 import { pairActionsWithAssists } from '@/lib/utils/match'
+import { BallSvg, CardRect } from '@/components/match/MatchIcons'
 
 interface Props {
   actions: MatchAction[]
@@ -9,24 +10,6 @@ interface Props {
   opponentName?: string
   isHome?: boolean | null
   orgName?: string
-}
-
-function BallSvg({ color }: { color: string }) {
-  const s = 'rgba(255,255,255,0.78)'
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" className="flex-shrink-0">
-      <circle cx="12" cy="12" r="10" fill={color}/>
-      <polygon points="12,5.5 16.5,8.5 15,14 9,14 7.5,8.5" fill={s}/>
-      <line x1="12" y1="2" x2="12" y2="5.5" stroke={s} strokeWidth="1.2"/>
-      <line x1="20.5" y1="8" x2="16.5" y2="8.5" stroke={s} strokeWidth="1.2"/>
-      <line x1="18.5" y1="18.5" x2="15" y2="14" stroke={s} strokeWidth="1.2"/>
-      <line x1="5.5" y1="18.5" x2="9" y2="14" stroke={s} strokeWidth="1.2"/>
-      <line x1="3.5" y1="8" x2="7.5" y2="8.5" stroke={s} strokeWidth="1.2"/>
-    </svg>
-  )
-}
-function CardRect({ color }: { color: 'yellow' | 'red' }) {
-  return <span className={`inline-block w-2.5 h-4 rounded-[2px] flex-shrink-0 ${color === 'yellow' ? 'bg-yellow-400' : 'bg-red-600'}`} />
 }
 function BootSvg() {
   return (
