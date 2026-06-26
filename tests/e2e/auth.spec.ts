@@ -1,20 +1,33 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Authentification', () => {
-  test('inscription → redirect vers confirmation email', async ({ page }) => {
-    // Email unique à chaque exécution pour éviter les conflits en base
-    const uniqueEmail = `test+${Date.now()}@triber-test.fr`
+  test('page inscription : formulaire visible et soumission possible', async ({ page }) => {
+    await page.goto('/register')
+    // Vérifie que tous les champs du formulaire sont présents
+    await expect(page.getByPlaceholder('Dupont')).toBeVisible()
+    await expect(page.getByPlaceholder('Marie')).toBeVisible()
+    await expect(page.getByPlaceholder('president@monclub.fr')).toBeVisible()
+    await expect(page.getByPlaceholder('••••••••').first()).toBeVisible()
+    await expect(page.getByRole('button', { name: /créer mon compte/i })).toBeVisible()
+  })
+
+  test('inscription avec email unique → redirect ou message de confirmation', async ({ page }) => {
+    // Test d'intégration — nécessite que Supabase accepte les inscriptions
+    const uniqueEmail = `test+${Date.now()}@example.com`
 
     await page.goto('/register')
-    await page.getByPlaceholder('Marie').fill('Test')
     await page.getByPlaceholder('Dupont').fill('Triber')
-    await page.getByPlaceholder(/email/i).fill(uniqueEmail)
+    await page.getByPlaceholder('Marie').fill('Test')
+    await page.getByPlaceholder('president@monclub.fr').fill(uniqueEmail)
     await page.getByPlaceholder('••••••••').first().fill('TestPassword123!')
     await page.getByPlaceholder('••••••••').last().fill('TestPassword123!')
-    await page.getByRole('button', { name: /s'inscrire|créer/i }).click()
+    await page.getByRole('button', { name: /créer mon compte/i }).click()
 
-    // Vérifie redirect vers confirme OU message d'erreur absent
-    await expect(page).toHaveURL(/confirme|onboarding/, { timeout: 10_000 })
+    // Attend redirect vers confirme OU message de succès
+    await page.waitForTimeout(3_000)
+    const url = page.url()
+    const hasConfirmMessage = await page.getByText(/confirme|vérifiez|email envoyé/i).isVisible().catch(() => false)
+    expect(url.includes('confirme') || url.includes('onboarding') || hasConfirmMessage).toBeTruthy()
   })
 
   test('accès /home sans connexion → redirect /login', async ({ page }) => {

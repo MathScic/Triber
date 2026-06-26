@@ -8,7 +8,7 @@ export function LogoutButton() {
   return (
     <button
       onClick={() => void logout()}
-      className="flex items-center gap-2 w-full px-4 py-3 text-sm font-semibold text-[#E8622A] bg-[#FDF0EB] rounded-xl hover:bg-[#fae3d9] transition-colors font-[family-name:var(--font-nunito)]"
+      className="flex items-center gap-2 w-full px-4 py-3 text-sm font-semibold text-red-600 bg-red-50 rounded-xl hover:bg-red-100 transition-colors font-[family-name:var(--font-nunito)]"
     >
       <LogOut className="w-4 h-4" />
       Déconnexion

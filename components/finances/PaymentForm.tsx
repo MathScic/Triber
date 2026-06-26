@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js'
@@ -51,7 +51,7 @@ export function PaymentForm({ onCreated }: Props) {
 
   if (clientSecret) {
     return (
-      <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-5 space-y-4">
+      <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-5 space-y-4">
         <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">Payer — {label}</p>
         <div id="stripe-payment-element" />
         {payError && <p className="text-xs text-red-500">{payError}</p>}
@@ -63,18 +63,18 @@ export function PaymentForm({ onCreated }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-5 space-y-4">
+    <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-5 space-y-4">
       <h2 className="font-[700] text-[#1A1F16] text-base uppercase tracking-tight font-[family-name:var(--font-barlow)]">
         Nouvelle cotisation
       </h2>
       <input value={label} onChange={e => setLabel(e.target.value)}
         placeholder="ex : Cotisation 2026-2027"
-        className="w-full h-10 px-3 rounded-xl border border-[#DDD8CE] text-sm bg-[#FAF7F2] focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]" />
+        className="w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]" />
       <div className="flex items-center gap-2">
         <input type="number" min="1" value={amount} onChange={e => setAmount(e.target.value)}
           placeholder="80"
-          className="w-28 h-10 px-3 rounded-xl border border-[#DDD8CE] text-sm bg-[#FAF7F2] focus:outline-none focus:border-primary" />
-        <span className="text-sm text-[#7A8070]">€</span>
+          className="w-28 h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-primary" />
+        <span className="text-sm text-[#6B7280]">€</span>
       </div>
       {error && <p className="text-xs text-red-500">{error}</p>}
       <Button type="button" onClick={handleCreate} disabled={loading} className="w-full">

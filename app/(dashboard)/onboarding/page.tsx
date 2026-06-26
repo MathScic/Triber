@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+﻿import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { CreateOrgForm } from '@/components/onboarding/CreateOrgForm'
@@ -27,18 +27,18 @@ export default async function OnboardingPage() {
 
   return (
     <main
-      className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center px-4 py-12`}
+      className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] flex flex-col items-center justify-center px-4 py-12`}
     >
       <div className="w-full max-w-sm">
         {/* Logo Triber */}
         <div className="flex justify-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-[#2A9D4E] flex items-center justify-center shadow-md">
+          <div className="w-12 h-12 rounded-xl bg-[#2A9D4E] flex items-center justify-center shadow-md">
             <span className="text-white text-xl font-[800] font-[family-name:var(--font-barlow)]">T</span>
           </div>
         </div>
 
         {/* Carte formulaire */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#DDD8CE] p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-[#D1D1D6] p-6">
           <CreateOrgForm />
         </div>
       </div>

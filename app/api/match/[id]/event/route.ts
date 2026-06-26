@@ -28,22 +28,39 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const ev = await verifyCoach(user.id, id)
   if (!ev) return NextResponse.json({ error: 'Non autorisé' }, { status: 403 })
 
-  const { type, minute, playerId, assistPlayerId, playerNameFree } = await req.json() as {
-    type: string; minute: number; playerId?: string; assistPlayerId?: string; playerNameFree?: string
+  const { type, minute, userId, assistUserId, isOwnTeam } = await req.json() as {
+    type: string; minute: number; userId?: string; assistUserId?: string; isOwnTeam: boolean
   }
 
   const admin = getAdmin()
-  const { error } = await admin.from('match_events').insert({
-    event_id: id, type, minute,
-    player_id: playerId ?? null,
-    assist_player_id: assistPlayerId ?? null,
-    player_name_free: playerNameFree ?? null,
+
+  // Récupère les noms pour compatibilité mobile (player_name lu en priorité par le mobile)
+  const profileIds = [userId, assistUserId].filter(Boolean) as string[]
+  const profileMap = new Map<string, string>()
+  if (profileIds.length > 0) {
+    const { data: profiles } = await admin.from('profiles').select('id, full_name').in('id', profileIds)
+    for (const p of profiles ?? []) profileMap.set(p.id as string, (p.full_name as string | null) ?? '')
+  }
+
+  const { error } = await admin.from('match_actions').insert({
+    event_id: id, type, minute, is_own_team: isOwnTeam,
+    user_id: userId ?? null,
+    player_name: userId ? (profileMap.get(userId) ?? null) : null,
   })
   if (error) return NextResponse.json({ error: 'Erreur insertion' }, { status: 500 })
 
+  // Passe décisive : action séparée
+  if (assistUserId && type === 'goal' && isOwnTeam) {
+    await admin.from('match_actions').insert({
+      event_id: id, type: 'assist', minute, is_own_team: true,
+      user_id: assistUserId,
+      player_name: profileMap.get(assistUserId) ?? null,
+    })
+  }
+
   await recomputeScore(admin, id, ev.is_home)
-  if (playerId) await recomputePlayerStats(admin, id, playerId)
-  if (assistPlayerId && assistPlayerId !== playerId) await recomputePlayerStats(admin, id, assistPlayerId)
+  if (userId) await recomputePlayerStats(admin, id, userId)
+  if (assistUserId && assistUserId !== userId) await recomputePlayerStats(admin, id, assistUserId)
 
   return NextResponse.json({ success: true })
 }
@@ -57,17 +74,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const ev = await verifyCoach(user.id, id)
   if (!ev) return NextResponse.json({ error: 'Non autorisé' }, { status: 403 })
 
-  const { matchEventId } = await req.json() as { matchEventId: string }
+  const { matchActionId } = await req.json() as { matchActionId: string }
   const admin = getAdmin()
-
-  const { data: me } = await admin.from('match_events').select('player_id, assist_player_id').eq('id', matchEventId).maybeSingle()
-  await admin.from('match_events').delete().eq('id', matchEventId)
+  const { data: ma } = await admin.from('match_actions').select('user_id, type').eq('id', matchActionId).maybeSingle()
+  await admin.from('match_actions').delete().eq('id', matchActionId)
 
   await recomputeScore(admin, id, ev.is_home)
-  const pid = me?.player_id as string | null
-  const aid = me?.assist_player_id as string | null
-  if (pid) await recomputePlayerStats(admin, id, pid)
-  if (aid && aid !== pid) await recomputePlayerStats(admin, id, aid)
+  const uid = ma?.user_id as string | null
+  if (uid) await recomputePlayerStats(admin, id, uid)
 
   return NextResponse.json({ success: true })
 }

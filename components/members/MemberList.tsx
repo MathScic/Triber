@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect } from 'react'
 import { useMembers, type MemberRole } from '@/lib/hooks/useMembers'
@@ -26,7 +26,7 @@ export function MemberList({ organizationId, currentUserId }: Props) {
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
-            className="bg-white rounded-2xl border border-[#DDD8CE] h-[66px] animate-pulse"
+            className="bg-white rounded-xl border border-[#D1D1D6] h-[66px] animate-pulse"
           />
         ))}
       </div>
@@ -41,7 +41,7 @@ export function MemberList({ organizationId, currentUserId }: Props) {
 
   if (members.length === 0) {
     return (
-      <p className="text-sm text-center text-[#7A8070] py-6">
+      <p className="text-sm text-center text-[#6B7280] py-6">
         Aucun membre pour l'instant.
       </p>
     )

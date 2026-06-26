@@ -1,4 +1,4 @@
-import { Nunito, Barlow_Condensed } from 'next/font/google'
+﻿import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { LoginForm } from '@/components/auth/LoginForm'
 
 const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
@@ -13,7 +13,7 @@ export const metadata = { title: 'Connexion — Triber' }
 export default function LoginPage() {
   return (
     <main
-      className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center px-4 py-12`}
+      className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] flex flex-col items-center justify-center px-4 py-12`}
     >
       <div className="w-full max-w-sm">
         {/* En-tête marque */}
@@ -26,13 +26,13 @@ export default function LoginPage() {
           <h1 className="text-4xl font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] tracking-tight uppercase">
             Triber
           </h1>
-          <p className="text-sm text-[#7A8070] mt-1 font-[family-name:var(--font-nunito)]">
+          <p className="text-sm text-[#6B7280] mt-1 font-[family-name:var(--font-nunito)]">
             Gérez votre club, depuis votre poche
           </p>
         </div>
 
         {/* Carte formulaire */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#DDD8CE] p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-[#D1D1D6] p-6">
           <h2 className="text-xl font-bold text-[#1A1F16] mb-6 font-[family-name:var(--font-barlow)] uppercase tracking-wide">
             Connexion
           </h2>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useOrganization } from '@/lib/hooks/useOrganization'
@@ -33,12 +33,12 @@ export function CreateOrgForm() {
             <div
               key={s}
               className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
-                s <= step ? 'bg-[#2A9D4E]' : 'bg-[#DDD8CE]'
+                s <= step ? 'bg-[#2A9D4E]' : 'bg-[#D1D1D6]'
               }`}
             />
           ))}
         </div>
-        <p className="text-xs text-[#7A8070] text-right">Étape {step} / 2</p>
+        <p className="text-xs text-[#6B7280] text-right">Étape {step} / 2</p>
       </div>
 
       {/* Erreur globale */}

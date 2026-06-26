@@ -24,8 +24,17 @@ export async function GET(request: NextRequest) {
     },
   )
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
   if (error) return NextResponse.redirect(`${origin}/login`)
+
+  // Enregistre le nom saisi lors de l'inscription dans la table profiles
+  const fullName = (data.user?.user_metadata?.full_name as string) ?? null
+  if (fullName && data.user?.id) {
+    await supabase.from('profiles').upsert(
+      { id: data.user.id, full_name: fullName, updated_at: new Date().toISOString() },
+      { onConflict: 'id' },
+    )
+  }
 
   return NextResponse.redirect(`${origin}${next}`)
 }

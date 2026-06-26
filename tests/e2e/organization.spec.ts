@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Organisation', () => {
-  // Ces tests vérifient les redirections sans compte connecté
   test('accès /onboarding sans connexion → redirect /login', async ({ page }) => {
     await page.goto('/onboarding')
     await expect(page).toHaveURL(/login/)
@@ -19,16 +18,12 @@ test.describe('Organisation', () => {
 
   test('page login : lien vers inscription visible', async ({ page }) => {
     await page.goto('/login')
-    // Vérifie qu'il existe un lien ou bouton vers /register
-    const registerLink = page.getByRole('link', { name: /inscription|s'inscrire|créer/i })
-      .or(page.locator('a[href*="register"]'))
-    await expect(registerLink).toBeVisible()
+    await expect(page.locator('a[href*="register"]').first()).toBeVisible({ timeout: 5_000 })
   })
 
   test('page register : lien vers connexion visible', async ({ page }) => {
     await page.goto('/register')
-    const loginLink = page.getByRole('link', { name: /connexion|se connecter|déjà/i })
-      .or(page.locator('a[href*="login"]'))
-    await expect(loginLink).toBeVisible()
+    // Deux liens vers /login existent : "Retour à la connexion" et "Se connecter"
+    await expect(page.locator('a[href*="login"]').first()).toBeVisible({ timeout: 8_000 })
   })
 })

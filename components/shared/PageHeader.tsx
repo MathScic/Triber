@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 interface Props {
@@ -14,16 +14,16 @@ export function PageHeader({ title, subtitle, backHref = '/home', action }: Prop
       <div className="flex items-center gap-3 min-w-0">
         <Link
           href={backHref}
-          className="w-9 h-9 rounded-xl border border-[#DDD8CE] flex items-center justify-center flex-shrink-0 hover:bg-[#F0EBE1] transition-colors"
+          className="w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center flex-shrink-0 hover:bg-[#E8E8EA] transition-colors"
         >
-          <ArrowLeft className="w-4 h-4 text-[#7A8070]" />
+          <ArrowLeft className="w-4 h-4 text-[#6B7280]" />
         </Link>
         <div className="min-w-0">
           <h1 className="text-3xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)] leading-none">
             {title}
           </h1>
           {subtitle && (
-            <p className="text-sm text-[#7A8070] font-[family-name:var(--font-nunito)] mt-0.5 truncate">{subtitle}</p>
+            <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)] mt-0.5 truncate">{subtitle}</p>
           )}
         </div>
       </div>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -7,7 +7,7 @@ import type { AttendanceStatus } from '@/lib/hooks/useEvents'
 type Attendee = { user_id: string; status: AttendanceStatus; name: string | null; role: string }
 export type AttendanceCounts = { confirmed: number; declined: number; pending: number }
 
-const COLORS: Record<AttendanceStatus, string> = { confirmed: '#2A9D4E', declined: '#E8622A', pending: '#7A8070' }
+const COLORS: Record<AttendanceStatus, string> = { confirmed: '#2A9D4E', declined: '#E8622A', pending: '#6B7280' }
 const LABELS: Record<AttendanceStatus, string> = { confirmed: 'Présents', declined: 'Absents', pending: 'En attente' }
 const ROLES: Record<string, string> = { admin: 'Admin', member_active: 'Actif', member: 'Membre' }
 
@@ -63,7 +63,7 @@ export function AttendeesList({ eventId, organizationId, isExpanded, onCounts, c
   if (!isExpanded) return null
 
   return (
-    <div className="space-y-3 pt-2 border-t border-[#DDD8CE]">
+    <div className="space-y-3 pt-2 border-t border-[#D1D1D6]">
       {(['confirmed', 'declined', 'pending'] as AttendanceStatus[]).map(status => {
         const group = merged.filter(a => a.status === status)
         if (!group.length) return null
@@ -76,14 +76,14 @@ export function AttendeesList({ eventId, organizationId, isExpanded, onCounts, c
                 <div key={a.user_id} className="flex items-center gap-2 py-0.5">
                   <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: COLORS[status] }}>{init}</div>
                   <span className="text-sm text-[#1A1F16] flex-1 truncate">{a.name ?? '—'}</span>
-                  <span className="text-xs text-[#7A8070]">{ROLES[a.role] ?? a.role}</span>
+                  <span className="text-xs text-[#6B7280]">{ROLES[a.role] ?? a.role}</span>
                 </div>
               )
             })}
           </div>
         )
       })}
-      {merged.length === 0 && <p className="text-xs text-[#7A8070]">Aucune réponse pour l'instant.</p>}
+      {merged.length === 0 && <p className="text-xs text-[#6B7280]">Aucune réponse pour l'instant.</p>}
     </div>
   )
 }

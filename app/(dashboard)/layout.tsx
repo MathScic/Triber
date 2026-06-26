@@ -6,7 +6,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <ThemeProvider>
       <AppNav />
       {/* Offset : sidebar fixe 208px sur desktop, espace nav basse sur mobile */}
-      <div className="lg:ml-52 pb-20 lg:pb-0">
+      <div className="lg:ml-56 pb-20 lg:pb-0">
         {children}
       </div>
     </ThemeProvider>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -13,31 +13,45 @@ const EVENT_TYPES = [
   { value: 'other' as EventType, label: 'Autre' },
 ]
 
-const SELECT_CLS = 'flex h-11 w-full rounded-xl border border-[#DDD8CE] px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
-const DATE_CLS = 'accent-[#2A9D4E] [color-scheme:light]'
+const CATEGORIES = ['Senior', 'U18', 'U16', 'U15', 'U14', 'U13', 'U12', 'Vétérans', 'Féminine', 'Futsal']
+const TEAMS = ['A', 'B', 'C']
 
-interface FormFields { title: string; type: EventType; date: string; time: string; location: string; opponent: string; is_home: boolean }
+const SEL = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
+const DATE = 'accent-[#2A9D4E] [color-scheme:light]'
+
+interface FormFields {
+  title: string; type: EventType; date: string; time: string
+  location: string; opponent: string; is_home: boolean
+  category: string; team_label: string
+}
 interface Props { onSubmit: (data: CreateEventData) => Promise<boolean>; onCancel: () => void; loading: boolean }
 
 export function EventForm({ onSubmit, onCancel, loading }: Props) {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormFields>({
-    defaultValues: { type: 'match', is_home: true },
+    defaultValues: { type: 'match', is_home: true, category: 'Senior', team_label: 'A' },
   })
   const type = watch('type')
 
   const handleFormSubmit = async (fields: FormFields) => {
     await onSubmit({
-      title: fields.title, type: fields.type,
+      title: fields.title,
+      type: fields.type,
       start_at: `${fields.date}T${fields.time}:00`,
       ...(fields.location ? { location: fields.location } : {}),
-      ...(fields.type === 'match' && fields.opponent ? { opponent: fields.opponent } : {}),
-      ...(fields.type === 'match' ? { is_home: fields.is_home } : {}),
+      ...(fields.type === 'match' ? {
+        opponent: fields.opponent || undefined,
+        is_home: fields.is_home,
+        category: fields.category || undefined,
+        team_label: fields.team_label || undefined,
+      } : {}),
     })
   }
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="bg-white rounded-2xl border border-[#DDD8CE] p-5 space-y-4">
-      <h3 className="font-bold text-[#1A1F16]">Nouvel événement</h3>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="bg-white rounded-xl border border-[#D1D1D6] p-5 space-y-4">
+      <h3 className="font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+        Nouvel événement
+      </h3>
 
       <div className="space-y-1">
         <Label htmlFor="ev-title">Titre</Label>
@@ -48,7 +62,7 @@ export function EventForm({ onSubmit, onCancel, loading }: Props) {
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
           <Label htmlFor="ev-type">Type</Label>
-          <select id="ev-type" {...register('type')} className={SELECT_CLS}>
+          <select id="ev-type" {...register('type')} className={SEL}>
             {EVENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </div>
@@ -57,27 +71,43 @@ export function EventForm({ onSubmit, onCancel, loading }: Props) {
           <Input id="ev-location" placeholder="Stade Municipal" {...register('location')} />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="ev-date">📅 Date</Label>
-          <Input id="ev-date" type="date" className={DATE_CLS} {...register('date', { required: 'Date requise' })} />
+          <Label htmlFor="ev-date">Date</Label>
+          <Input id="ev-date" type="date" className={DATE} {...register('date', { required: 'Date requise' })} />
           {errors.date && <p className="text-xs text-[#E8622A]">{errors.date.message}</p>}
         </div>
         <div className="space-y-1">
-          <Label htmlFor="ev-time">🕐 Heure</Label>
-          <Input id="ev-time" type="time" className={DATE_CLS} {...register('time', { required: 'Heure requise' })} />
+          <Label htmlFor="ev-time">Heure</Label>
+          <Input id="ev-time" type="time" className={DATE} {...register('time', { required: 'Heure requise' })} />
         </div>
       </div>
 
       {type === 'match' && (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label htmlFor="ev-opponent">Adversaire</Label>
-            <Input id="ev-opponent" placeholder="FC Caen" {...register('opponent')} />
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="ev-category">Catégorie</Label>
+              <select id="ev-category" {...register('category')} className={SEL}>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="ev-team">Équipe</Label>
+              <select id="ev-team" {...register('team_label')} className={SEL}>
+                {TEAMS.map(t => <option key={t} value={t}>Équipe {t}</option>)}
+              </select>
+            </div>
           </div>
-          <div className="flex items-end pb-2 gap-2">
-            <input type="checkbox" id="ev-is-home" {...register('is_home')} className="h-4 w-4 rounded accent-[#2A9D4E]" />
-            <Label htmlFor="ev-is-home">Domicile</Label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="ev-opponent">Adversaire</Label>
+              <Input id="ev-opponent" placeholder="FC Caen" {...register('opponent')} />
+            </div>
+            <div className="flex items-end pb-2 gap-2">
+              <input type="checkbox" id="ev-is-home" {...register('is_home')} className="h-4 w-4 rounded accent-[#2A9D4E]" />
+              <Label htmlFor="ev-is-home">Domicile</Label>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       <div className="flex gap-2 pt-1">

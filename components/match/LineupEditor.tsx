@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import type { OrgMember } from '@/lib/match/types'
 
@@ -30,16 +30,16 @@ export function LineupEditor({ allMembers, lineup, onAdd, onRemove }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-4 space-y-3">
+    <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold text-[#7A8070] uppercase tracking-wide font-[family-name:var(--font-nunito)]">
+        <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide font-[family-name:var(--font-nunito)]">
           Composition
         </p>
-        <span className="text-xs text-[#7A8070] font-[family-name:var(--font-nunito)]">
+        <span className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">
           {starters}/11 tit · {subs}/8 rempl
         </span>
       </div>
-      <p className="text-xs text-[#7A8070] italic font-[family-name:var(--font-nunito)]">
+      <p className="text-xs text-[#6B7280] italic font-[family-name:var(--font-nunito)]">
         Appuyer : ajouter → <span className="text-[#2A9D4E] font-semibold not-italic">T</span>itulaire →{' '}
         <span className="text-[#E8622A] font-semibold not-italic">R</span>emplaçant → retirer
       </p>
@@ -51,10 +51,10 @@ export function LineupEditor({ allMembers, lineup, onAdd, onRemove }: Props) {
               key={m.org_member_id}
               onClick={() => handleTap(m.org_member_id)}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-colors ${
-                state === true ? 'bg-[#E8F5EE]' : state === false ? 'bg-[#FDF0EB]' : 'hover:bg-[#F0EBE1]'
+                state === true ? 'bg-[#E8F5EE]' : state === false ? 'bg-[#FDF0EB]' : 'hover:bg-[#E8E8EA]'
               }`}
             >
-              <span className="w-6 text-sm font-[800] text-[#7A8070] tabular-nums text-center flex-shrink-0 font-[family-name:var(--font-barlow)]">
+              <span className="w-6 text-sm font-[800] text-[#6B7280] tabular-nums text-center flex-shrink-0 font-[family-name:var(--font-barlow)]">
                 {m.jersey ?? '·'}
               </span>
               <span className="flex-1 text-sm font-medium text-[#1A1F16] font-[family-name:var(--font-nunito)]">

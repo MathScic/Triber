@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 
 const SPORTS = ['Football', 'Basketball', 'Tennis', 'Rugby', 'Handball', 'Volleyball', 'Pêche', 'Autre']
 const SIZES = ['Moins de 20', '20 à 50', '50 à 150', 'Plus de 150']
-const sel = 'flex h-11 w-full rounded-xl border border-[#DDD8CE] bg-white px-3 text-sm text-[#1A1F16] focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
+const sel = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] bg-white px-3 text-sm text-[#1A1F16] focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
 
 interface ClubFields {
   name: string
@@ -60,7 +60,7 @@ export function StepClub({ onSubmit, onBack, loading }: Props) {
 
       <div className="space-y-1.5">
         <Label htmlFor="slogan">
-          Slogan <span className="text-[#7A8070] font-normal">(optionnel)</span>
+          Slogan <span className="text-[#6B7280] font-normal">(optionnel)</span>
         </Label>
         <Input id="slogan" placeholder="Le slogan de votre club"
           {...register('slogan', { maxLength: { value: 60, message: '60 caractères max' } })} />

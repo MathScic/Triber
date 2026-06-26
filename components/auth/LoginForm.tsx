@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useForm } from 'react-hook-form'
 import Link from 'next/link'
@@ -65,7 +65,7 @@ export function LoginForm() {
         {loading ? 'Connexion…' : 'Se connecter'}
       </Button>
 
-      <p className="text-center text-sm text-[#7A8070]">
+      <p className="text-center text-sm text-[#6B7280]">
         Pas encore de compte ?{' '}
         <Link
           href="/register"

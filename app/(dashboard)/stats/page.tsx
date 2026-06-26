@@ -1,94 +1,102 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Nunito, Barlow_Condensed } from 'next/font/google'
-import { useStats, type MatchResult } from '@/lib/hooks/useStats'
-import { PlayerRanking } from '@/components/stats/PlayerRanking'
-import { MatchResultForm } from '@/components/stats/MatchResultForm'
-import { PageHeader } from '@/components/shared/PageHeader'
+import { useStats } from '@/lib/hooks/useStats'
+import { SeasonBilan } from '@/components/stats/SeasonBilan'
+import { PlayerStatsTable } from '@/components/stats/PlayerStatsTable'
+import { MatchResultsTable } from '@/components/stats/MatchResultsTable'
+import { StandingsTable } from '@/components/stats/StandingsTable'
+import { StandingsForm } from '@/components/stats/StandingsForm'
+import { useStandings } from '@/lib/hooks/useStandings'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { ChevronDown, ChevronUp, ExternalLink, Trophy } from 'lucide-react'
 
 const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
 const barlow = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-barlow' })
 
-type EventMeta = { title: string; start_at: string; opponent: string | null }
-
 export default function StatsPage() {
-  const { matchResults, playerStats, getSeasonStats, loading, error } = useStats()
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const { matchResults, playerStats, loading, error, organizationId, primaryColor, userRole } = useStats()
+  const standings = useStandings(organizationId ?? '')
+  const [editStandings, setEditStandings] = useState(false)
+  const [scoreencoUrl, setScoreEncoUrl] = useState<string | null>(null)
+  const canEdit = userRole === 'admin' || userRole === 'member_active'
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { getSeasonStats() }, [])
-
-  const toggle = (eventId: string) => setSelectedId(prev => prev === eventId ? null : eventId)
-
-  const getResult = (r: MatchResult): { scoreWon: boolean; label: string } => {
-    const won = r.score_home > r.score_away
-    const draw = r.score_home === r.score_away
-    return { scoreWon: won, label: draw ? 'Nul' : won ? 'Victoire' : 'Défaite' }
-  }
+  useEffect(() => {
+    if (!organizationId) return
+    createClient().from('organizations').select('scoreenco_url').eq('id', organizationId).maybeSingle()
+      .then(({ data }) => setScoreEncoUrl((data as { scoreenco_url: string | null } | null)?.scoreenco_url ?? null), () => null)
+  }, [organizationId])
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
-      <div className="max-w-lg mx-auto space-y-6">
-        <PageHeader
-          title="Stats"
-          subtitle={`${matchResults.length} match${matchResults.length !== 1 ? 's' : ''} enregistrés`}
-        />
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-6 py-8`}>
+      <div className="max-w-5xl mx-auto space-y-6">
+
+        <div>
+          <h1 className="text-2xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+            Statistiques
+          </h1>
+          <p className="text-sm text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
+            {matchResults.length} match{matchResults.length !== 1 ? 's' : ''} enregistrés
+          </p>
+        </div>
 
         {error && <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2">{error}</p>}
 
-        {/* Classement buteurs / passeurs */}
-        <PlayerRanking playerStats={playerStats} />
+        {loading
+          ? <div className="h-28 bg-white rounded-2xl border border-[#D1D1D6] animate-pulse" />
+          : <SeasonBilan matchResults={matchResults} />
+        }
 
-        {/* Liste des résultats */}
-        <div className="space-y-2">
-          <p className="text-sm font-bold text-[#1A1F16]">Résultats</p>
+        {/* Tableau stats joueurs */}
+        {loading
+          ? <div className="h-48 bg-white rounded-2xl border border-[#D1D1D6] animate-pulse" />
+          : <PlayerStatsTable rows={playerStats} />
+        }
 
-          {loading && [...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-[#DDD8CE] h-16 animate-pulse" />
-          ))}
-
-          {matchResults.map(r => {
-            const event = r.events as EventMeta | null
-            const date = event?.start_at
-              ? new Date(event.start_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-              : ''
-            const { scoreWon, label } = getResult(r)
-            const isOpen = selectedId === r.event_id
-            return (
-              <div key={r.id}>
-                <button onClick={() => toggle(r.event_id)}
-                  className="w-full bg-white rounded-2xl border border-[#DDD8CE] p-4 flex items-center justify-between hover:border-[#2A9D4E] transition-colors text-left">
-                  <div>
-                    <p className="text-sm font-bold text-[#1A1F16]">{event?.title ?? 'Match'}</p>
-                    <p className="text-xs text-[#7A8070]">{date}{event?.opponent ? ` · vs ${event.opponent}` : ''}</p>
-                    <span className={`text-xs font-semibold ${scoreWon ? 'text-[#2A9D4E]' : 'text-[#E8622A]'}`}>{label}</span>
-                  </div>
-                  <span className="text-2xl font-extrabold text-[#1A1F16] tabular-nums">
-                    {r.score_home} — {r.score_away}
-                  </span>
-                </button>
-
-                {isOpen && (
-                  <div className="mt-2">
-                    <MatchResultForm
-                      eventId={r.event_id}
-                      initialHome={r.score_home}
-                      initialAway={r.score_away}
-                      onSaved={() => { getSeasonStats(); setSelectedId(null) }}
-                    />
-                  </div>
+        {/* Classement championnat */}
+        {organizationId && (
+          <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#F4F4F6]">
+              <div className="flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-[#E8622A]" />
+                <h2 className="text-base font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+                  Classement
+                </h2>
+              </div>
+              <div className="flex items-center gap-3">
+                {scoreencoUrl && (
+                  <a href={scoreencoUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-[#9CA3AF] hover:text-[#2A9D4E] transition-colors font-[family-name:var(--font-nunito)]">
+                    <ExternalLink className="w-3 h-3" /> Score'n'co
+                  </a>
+                )}
+                {!scoreencoUrl && canEdit && (
+                  <button onClick={() => setEditStandings(v => !v)}
+                    className="flex items-center gap-1 text-xs font-semibold text-[#6B7280] hover:text-[#2A9D4E] transition-colors font-[family-name:var(--font-nunito)]">
+                    {editStandings ? <><ChevronUp className="w-3.5 h-3.5" /> Terminer</> : <><ChevronDown className="w-3.5 h-3.5" /> Modifier</>}
+                  </button>
                 )}
               </div>
-            )
-          })}
+            </div>
+            <div className="px-5 py-4">
+              {editStandings && canEdit
+                ? <StandingsForm rows={standings.rows} season="2025-2026" onUpsert={standings.upsert} onRemove={standings.remove} />
+                : standings.rows.length > 0
+                  ? <StandingsTable rows={standings.rows} primaryColor={primaryColor} />
+                  : <p className="text-sm text-center text-[#9CA3AF] py-4 font-[family-name:var(--font-nunito)]">
+                      {canEdit ? 'Cliquez sur "Modifier" pour saisir le classement.' : 'Classement non encore renseigné.'}
+                    </p>
+              }
+            </div>
+          </div>
+        )}
 
-          {!loading && !matchResults.length && (
-            <p className="text-sm text-center text-[#7A8070] py-6">
-              Aucun résultat. Saisissez les scores depuis la page Événements.
-            </p>
-          )}
-        </div>
+        {/* Tableau résultats */}
+        {loading
+          ? <div className="h-36 bg-white rounded-2xl border border-[#D1D1D6] animate-pulse" />
+          : <MatchResultsTable results={matchResults} />
+        }
       </div>
     </main>
   )

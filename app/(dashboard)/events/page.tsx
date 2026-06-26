@@ -3,20 +3,32 @@
 import { useState, useEffect } from 'react'
 import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { createClient } from '@/lib/supabase/client'
-import { useEvents, type AttendanceStatus, type CreateEventData } from '@/lib/hooks/useEvents'
+import { useEvents, type AttendanceStatus, type TriberEvent } from '@/lib/hooks/useEvents'
 import { EventCard } from '@/components/events/EventCard'
 import { EventForm } from '@/components/events/EventForm'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { Button } from '@/components/ui/button'
 
-type Score = { home: number; away: number }
-
 const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
 const barlow = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-barlow' })
+
+type Score = { home: number; away: number }
+
+function groupByMonth(events: TriberEvent[]): [string, TriberEvent[]][] {
+  const map = new Map<string, TriberEvent[]>()
+  for (const e of events) {
+    const key = new Date(e.start_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+    const cap = key.charAt(0).toUpperCase() + key.slice(1)
+    if (!map.has(cap)) map.set(cap, [])
+    map.get(cap)!.push(e)
+  }
+  return Array.from(map.entries())
+}
 
 export default function EventsPage() {
   const { events, attendanceMap, pendingEventId, userRole, getEvents, createEvent, updateAttendance, deleteEvent, loading, error } = useEvents()
   const [showForm, setShowForm] = useState(false)
+  const [showPast, setShowPast] = useState(false)
   const [matchScores, setMatchScores] = useState<Record<string, Score>>({})
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [currentUserName, setCurrentUserName] = useState<string | null>(null)
@@ -30,11 +42,10 @@ export default function EventsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Charge les scores existants après chargement des événements
   useEffect(() => {
-    const matchIds = events.filter(e => e.type === 'match').map(e => e.id)
-    if (!matchIds.length) return
-    createClient().from('match_results').select('event_id, score_home, score_away').in('event_id', matchIds)
+    const ids = events.filter(e => e.type === 'match').map(e => e.id)
+    if (!ids.length) return
+    createClient().from('match_results').select('event_id,score_home,score_away').in('event_id', ids)
       .then(({ data }) => {
         if (data) setMatchScores(Object.fromEntries(
           data.map(r => [r.event_id as string, { home: r.score_home as number, away: r.score_away as number }])
@@ -43,57 +54,82 @@ export default function EventsPage() {
   }, [events])
 
   const canCreate = userRole === 'admin' || userRole === 'member_active'
+  const now = Date.now()
 
-  const handleCreate = async (data: CreateEventData) => {
-    const ok = await createEvent(data)
-    if (ok) setShowForm(false)
-    return ok
-  }
+  const upcoming = events
+    .filter(e => new Date(e.start_at).getTime() >= now || e.status === 'ongoing' || e.status === 'half_time')
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
+
+  const past = events
+    .filter(e => new Date(e.start_at).getTime() < now && e.status !== 'ongoing' && e.status !== 'half_time')
+    .sort((a, b) => new Date(b.start_at).getTime() - new Date(a.start_at).getTime())
+
+  const upcomingByMonth = groupByMonth(upcoming)
+
+  const cardProps = (event: TriberEvent) => ({
+    event, currentStatus: (attendanceMap[event.id] as AttendanceStatus) ?? null,
+    onAttendance: updateAttendance, canDelete: canCreate, onDelete: deleteEvent,
+    score: matchScores[event.id] ?? null,
+    onScoreSaved: (id: string, h: number, a: number) => setMatchScores(s => ({ ...s, [id]: { home: h, away: a } })),
+    isPendingAttendance: pendingEventId === event.id,
+    currentUserId: currentUserId ?? undefined, currentUserName,
+  })
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
-      <div className="max-w-lg mx-auto space-y-6">
-
-        <PageHeader
-          title="Événements"
-          subtitle={`${events.length} événement${events.length !== 1 ? 's' : ''}`}
-          action={canCreate && !showForm ? <Button onClick={() => setShowForm(true)} size="sm">+ Créer</Button> : undefined}
-        />
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-4 py-8`}>
+      <div className="max-w-lg lg:max-w-4xl mx-auto space-y-5">
+        <PageHeader title="Événements" subtitle={`${events.length} événement${events.length !== 1 ? 's' : ''}`}
+          action={canCreate && !showForm ? <Button onClick={() => setShowForm(true)} size="sm">+ Créer</Button> : undefined} />
 
         {error && <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2">{error}</p>}
-        {showForm && <EventForm onSubmit={handleCreate} onCancel={() => setShowForm(false)} loading={loading} />}
+        {showForm && <EventForm onSubmit={async d => { const ok = await createEvent(d); if (ok) setShowForm(false); return ok }} onCancel={() => setShowForm(false)} loading={loading} />}
 
         {loading && !showForm && (
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-2xl border border-[#DDD8CE] h-28 animate-pulse" />)}
-          </div>
+          <div className="space-y-3">{[...Array(3)].map((_, i) => <div key={i} className="bg-white rounded-xl border border-[#D1D1D6] h-32 animate-pulse" />)}</div>
         )}
 
         {!loading && (
-          <div className="space-y-3">
-            {events.map(event => (
-              <EventCard
-                key={event.id}
-                event={event}
-                currentStatus={(attendanceMap[event.id] as AttendanceStatus) ?? null}
-                onAttendance={updateAttendance}
-                canDelete={canCreate}
-                onDelete={deleteEvent}
-                score={matchScores[event.id] ?? null}
-                onScoreSaved={(id, h, a) => setMatchScores(s => ({ ...s, [id]: { home: h, away: a } }))}
-                isPendingAttendance={pendingEventId === event.id}
-                currentUserId={currentUserId ?? undefined}
-                currentUserName={currentUserName}
-              />
+          <div className="space-y-6">
+            {/* À venir — groupés par mois */}
+            {upcomingByMonth.length > 0 && upcomingByMonth.map(([month, monthEvents]) => (
+              <div key={month} className="space-y-3">
+                <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest px-1 font-[family-name:var(--font-nunito)]">
+                  {month} · {monthEvents.length}
+                </p>
+                {monthEvents.map(e => <EventCard key={e.id} {...cardProps(e)} />)}
+              </div>
             ))}
+
+            {/* Passés */}
+            {past.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest font-[family-name:var(--font-nunito)]">
+                    Passés · {past.length}
+                  </p>
+                  {!showPast && (
+                    <button onClick={() => setShowPast(true)}
+                      className="text-xs text-[#2A9D4E] font-semibold font-[family-name:var(--font-nunito)]">
+                      Voir tout
+                    </button>
+                  )}
+                </div>
+                {showPast && past.map(e => <EventCard key={e.id} {...cardProps(e)} />)}
+              </div>
+            )}
+
             {events.length === 0 && !showForm && (
-              <p className="text-center text-sm text-[#7A8070] py-8 font-[family-name:var(--font-nunito)]">
-                Aucun événement pour l'instant.
-              </p>
+              <div className="text-center py-12">
+                <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">Aucun événement pour l&apos;instant.</p>
+                {canCreate && (
+                  <button onClick={() => setShowForm(true)} className="mt-3 text-sm text-[#2A9D4E] font-semibold font-[family-name:var(--font-nunito)]">
+                    + Créer le premier événement
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}
-
       </div>
     </main>
   )

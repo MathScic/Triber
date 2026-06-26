@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useStats, type PlayerStatsInput } from '@/lib/hooks/useStats'
@@ -9,12 +9,12 @@ type StatsMap = Record<string, PlayerStatsInput>
 
 const EMPTY: PlayerStatsInput = { goals: 0, assists: 0, minutes_played: 0, yellow_cards: 0, red_cards: 0 }
 
-const FIELDS: { key: keyof PlayerStatsInput; short: string; label: string }[] = [
-  { key: 'goals', short: '⚽', label: 'Buts' },
-  { key: 'assists', short: '🅰️', label: 'Passes décisives' },
-  { key: 'minutes_played', short: '⏱', label: 'Minutes jouées' },
-  { key: 'yellow_cards', short: '🟡', label: 'Cartons jaunes' },
-  { key: 'red_cards', short: '🔴', label: 'Cartons rouges' },
+const FIELDS: { key: keyof PlayerStatsInput; short: string; label: string; cls: string }[] = [
+  { key: 'goals', short: 'B', label: 'Buts', cls: 'text-[#2A9D4E] font-bold' },
+  { key: 'assists', short: 'PD', label: 'Passes décisives', cls: 'text-[#2A9D4E] font-bold' },
+  { key: 'minutes_played', short: 'min', label: 'Minutes jouées', cls: 'text-[#6B7280]' },
+  { key: 'yellow_cards', short: 'J', label: 'Cartons jaunes', cls: 'text-yellow-500 font-bold' },
+  { key: 'red_cards', short: 'R', label: 'Cartons rouges', cls: 'text-[#E8622A] font-bold' },
 ]
 
 interface Props { eventId: string; members: MemberForStats[]; onSaved?: () => void }
@@ -38,15 +38,15 @@ export function PlayerStatsForm({ eventId, members, onSaved }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] p-4 space-y-3">
+    <div className="bg-white rounded-xl border border-[#D1D1D6] p-4 space-y-3">
       <h3 className="text-sm font-bold text-[#1A1F16]">Stats des joueurs</h3>
       {error && <p className="text-xs text-[#E8622A]">{error}</p>}
 
       {/* En-tête colonnes */}
       <div className="grid gap-1 items-center" style={{ gridTemplateColumns: '1fr repeat(5, 40px)' }}>
-        <span className="text-xs text-[#7A8070]">Joueur</span>
+        <span className="text-xs text-[#6B7280]">Joueur</span>
         {FIELDS.map(f => (
-          <span key={f.key} className="text-center text-sm" title={f.label}>{f.short}</span>
+          <span key={f.key} className={`text-center text-[10px] ${f.cls}`} title={f.label}>{f.short}</span>
         ))}
       </div>
 
@@ -67,7 +67,7 @@ export function PlayerStatsForm({ eventId, members, onSaved }: Props) {
                 value={s[f.key] === 0 ? '' : s[f.key]}
                 placeholder="0"
                 onChange={e => update(m.user_id, f.key, e.target.value)}
-                className="h-8 w-full text-center text-sm border border-[#DDD8CE] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2A9D4E]"
+                className="h-8 w-full text-center text-sm border border-[#D1D1D6] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2A9D4E]"
               />
             ))}
           </div>
@@ -75,7 +75,7 @@ export function PlayerStatsForm({ eventId, members, onSaved }: Props) {
       })}
 
       {!members.length && (
-        <p className="text-xs text-[#7A8070] text-center py-2">Aucun membre dans cette organisation.</p>
+        <p className="text-xs text-[#6B7280] text-center py-2">Aucun membre dans cette organisation.</p>
       )}
 
       <Button onClick={handleSave} className="w-full" disabled={loading || !Object.keys(statsMap).length}>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 
 const SECTORS = ['Commerce', 'Restauration', 'Artisanat', 'Services', 'Santé', 'Autre']
 const SIZES = ['1 à 5', '6 à 20', '21 à 50', 'Plus de 50']
-const sel = 'flex h-11 w-full rounded-xl border border-[#DDD8CE] bg-white px-3 text-sm text-[#1A1F16] focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
+const sel = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] bg-white px-3 text-sm text-[#1A1F16] focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
 
 interface EnterpriseFields {
   name: string
@@ -60,7 +60,7 @@ export function StepEnterprise({ onSubmit, onBack, loading }: Props) {
 
       <div className="space-y-1.5">
         <Label htmlFor="website">
-          Site web <span className="text-[#7A8070] font-normal">(optionnel)</span>
+          Site web <span className="text-[#6B7280] font-normal">(optionnel)</span>
         </Label>
         <Input id="website" type="url" placeholder="https://monentreprise.fr"
           {...register('website')} />

@@ -26,16 +26,27 @@ async function findOrgByCode(admin: AdminClient, code: string): Promise<OrgRow |
 
 const PLAN_LIMITS: Record<string, number> = { free: 20, club: 999999 }
 
-export async function GET(_req: Request, { params }: { params: Promise<{ code: string }> }) {
+async function resolveOrg(admin: AdminClient, code: string, orgId: string | null): Promise<OrgRow | null> {
+  if (orgId) {
+    // orgId fourni directement dans l'URL → on l'utilise (plus précis, évite l'ambiguïté multi-org)
+    const { data } = await admin.from('organizations').select('id, name, type, plan').eq('id', orgId).single()
+    return (data as OrgRow) ?? null
+  }
+  return findOrgByCode(admin, code.toUpperCase())
+}
+
+export async function GET(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params
+  const orgId = new URL(req.url).searchParams.get('org')
   const admin = getAdmin()
-  const org = await findOrgByCode(admin, code.toUpperCase())
+  const org = await resolveOrg(admin, code, orgId)
   if (!org) return NextResponse.json({ error: 'Lien invalide ou organisation introuvable' }, { status: 404 })
   return NextResponse.json({ org: { id: org.id, name: org.name, type: org.type } })
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params
+  const orgId = new URL(req.url).searchParams.get('org')
   const token = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
   if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
@@ -43,7 +54,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ code: s
   const { data: { user } } = await admin.auth.getUser(token)
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
-  const org = await findOrgByCode(admin, code.toUpperCase())
+  const org = await resolveOrg(admin, code, orgId)
   if (!org) return NextResponse.json({ error: 'Code invalide' }, { status: 404 })
 
   // Vérifie les limites de plan en comptant les membres actuels

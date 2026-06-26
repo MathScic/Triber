@@ -1,12 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Calendar } from 'lucide-react'
 
 type Event = { title: string; type: string; start_at: string; location: string | null; opponent: string | null }
-
-const TYPE_ICONS: Record<string, string> = { match: '⚽', training: '🏃', meeting: '📋', other: '📌' }
 
 export function NextEventCard({ organizationId }: { organizationId: string }) {
   const [event, setEvent] = useState<Event | null | undefined>(undefined)
@@ -25,25 +23,30 @@ export function NextEventCard({ organizationId }: { organizationId: string }) {
     })()
   }, [organizationId])
 
-  if (event === undefined) return <div className="bg-white rounded-2xl border border-[#DDD8CE] h-20 animate-pulse" />
+  if (event === undefined) return <div className="bg-white rounded-xl border border-[#D1D1D6] h-20 animate-pulse" />
   if (!event) return null
 
   const date = new Date(event.start_at)
   const dateStr = date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
   const timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  const TYPE_COLOR: Record<string, string> = { match: '#2A9D4E', training: '#E8622A', meeting: '#3B82F6', other: '#D1D1D6' }
+  const accent = TYPE_COLOR[event.type] ?? '#D1D1D6'
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-4 flex items-center gap-3">
+    <div
+      className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4 flex items-center gap-3"
+      style={{ borderLeft: `3px solid ${accent}` }}
+    >
       <div className="w-9 h-9 rounded-xl bg-[#E8F5EE] flex items-center justify-center flex-shrink-0">
         <Calendar className="w-4 h-4 text-[#2A9D4E]" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-[#7A8070] font-[family-name:var(--font-nunito)]">Prochain événement</p>
+        <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Prochain événement</p>
         <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)] truncate">
-          {TYPE_ICONS[event.type] ?? '📌'} {event.title}
+          {event.title}
           {event.opponent ? ` · vs ${event.opponent}` : ''}
         </p>
-        <p className="text-xs text-[#7A8070] font-[family-name:var(--font-nunito)]">
+        <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">
           {dateStr} à {timeStr}{event.location ? ` · ${event.location}` : ''}
         </p>
       </div>

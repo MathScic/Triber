@@ -1,87 +1,82 @@
-import { createClient } from '@supabase/supabase-js'
-import { Resend } from 'resend'
+﻿import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import { sendInviteEmail } from '@/lib/email'
 
 function getAdmin() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function generateCode(): string {
+  return Math.random().toString(36).substring(2, 8).toUpperCase()
+}
 
-// Wrapper debug : log la réponse complète de Resend et expose l'erreur si présente
-async function sendEmail(payload: Parameters<typeof resend.emails.send>[0]): Promise<string | null> {
-  const result = await resend.emails.send(payload)
-  console.log('RESEND RESPONSE:', JSON.stringify(result, null, 2))
-  if (result.error) {
-    console.error('RESEND ERROR:', result.error)
-    return JSON.stringify(result.error)
+async function getOrCreateInviteCode(admin: ReturnType<typeof getAdmin>, userId: string): Promise<string> {
+  const { data } = await admin.from('profiles').select('invite_code').eq('id', userId).maybeSingle()
+  const existing = (data?.invite_code as string) ?? null
+  if (existing) return existing
+  // Génère et sauvegarde un code s'il n'existe pas
+  const code = generateCode()
+  await admin.from('profiles').upsert({ id: userId, invite_code: code }, { onConflict: 'id' })
+  return code
+}
+
+async function getInviteCode(admin: ReturnType<typeof getAdmin>, token: string | null, orgId: string): Promise<string | null> {
+  if (token) {
+    const { data: { user } } = await admin.auth.getUser(token)
+    if (user) return getOrCreateInviteCode(admin, user.id)
   }
-  return null
+  const { data: member } = await admin
+    .from('organization_members').select('user_id')
+    .eq('organization_id', orgId).eq('role', 'admin').limit(1).maybeSingle()
+  if (!member) return null
+  return getOrCreateInviteCode(admin, member.user_id as string)
 }
 
-async function sendOnboardingEmail(to: string, orgName: string) {
-  return sendEmail({
-    from: 'Triber <noreply@triber-app.fr>',
-    to,
-    subject: `Invitation à rejoindre ${orgName} sur Triber`,
-    html: `<p>Bonjour,</p>
-      <p>Vous avez été invité(e) à rejoindre <strong>${orgName}</strong> sur Triber.</p>
-      <p>Pour nous rejoindre :</p>
-      <ol>
-        <li>Téléchargez l'app Triber</li>
-        <li>Créez votre compte avec cette adresse email</li>
-        <li>Une fois connecté(e), allez dans <strong>Profil &gt; Mon code</strong></li>
-        <li>Communiquez ce code à votre administrateur</li>
-      </ol>
-      <p>À bientôt sur Triber !</p>`,
-  })
-}
-
-async function sendCodeEmail(to: string, orgName: string, inviteCode: string) {
-  return sendEmail({
-    from: 'Triber <noreply@triber-app.fr>',
-    to,
-    subject: `Invitation à rejoindre ${orgName} sur Triber`,
-    html: `<p>Bonjour,</p>
-      <p>Vous avez été invité(e) à rejoindre <strong>${orgName}</strong> sur Triber.</p>
-      <p>Votre code d'accès : <strong style="font-size:22px;letter-spacing:4px">${inviteCode}</strong></p>
-      <p>Communiquez ce code à votre administrateur dans l'app Triber.</p>
-      <p>À bientôt sur Triber !</p>`,
-  })
+async function getOrgBranding(admin: ReturnType<typeof getAdmin>, orgId: string) {
+  const { data } = await admin
+    .from('organizations').select('name, primary_color').eq('id', orgId).maybeSingle()
+  return { name: (data?.name as string) ?? '', primaryColor: (data?.primary_color as string) ?? '#2A9D4E' }
 }
 
 export async function POST(request: Request) {
-  const body = await request.json() as { contact?: string; orgName?: string; orgId?: string }
-  const { contact, orgName, orgId } = body
+  const body = await request.json() as { contact?: string; email?: string; orgName?: string; orgId?: string }
+  const email = ((body.email ?? body.contact) ?? '').trim()
+  const { orgName, orgId } = body
 
-  if (!contact?.trim() || !orgName || !orgId) {
+  if (!email || !orgName || !orgId) {
     return NextResponse.json({ error: 'Paramètres manquants' }, { status: 400 })
   }
 
-  if (!contact.includes('@')) {
-    return NextResponse.json({ success: true, contact, method: 'sms' })
+  if (!email.includes('@')) {
+    return NextResponse.json({ success: true, contact: email, method: 'sms' })
   }
 
+  const token = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim() || null
   const admin = getAdmin()
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '')
 
-  const { data: list } = await admin.auth.admin.listUsers()
-  const found = list?.users.find(u => u.email?.toLowerCase() === contact.trim().toLowerCase())
+  const [inviteCode, branding] = await Promise.all([
+    getInviteCode(admin, token, orgId),
+    getOrgBranding(admin, orgId),
+  ])
 
-  let resendError: string | null = null
-
-  if (!found) {
-    resendError = await sendOnboardingEmail(contact, orgName)
-  } else {
-    const { data: profile } = await admin.from('profiles').select('invite_code').eq('id', found.id).maybeSingle()
-    const inviteCode = profile?.invite_code as string | undefined
-    resendError = inviteCode
-      ? await sendCodeEmail(contact, orgName, inviteCode)
-      : await sendOnboardingEmail(contact, orgName)
+  if (!inviteCode) {
+    return NextResponse.json({ error: 'Organisation introuvable' }, { status: 404 })
   }
 
-  if (resendError) {
-    return NextResponse.json({ success: false, error: `Resend: ${resendError}` }, { status: 500 })
+  const joinUrl = `${appUrl}/join/${inviteCode}?org=${orgId}`
+  const { error } = await sendInviteEmail(email, {
+    orgName: branding.name || orgName,
+    inviterName: 'L\'équipe Triber',
+    inviteUrl: joinUrl,
+    primaryColor: branding.primaryColor,
+  })
+
+  if (error) {
+    console.error('RESEND ERROR:', error)
+    const msg = (error as { message?: string })?.message ?? 'Erreur envoi email'
+    return NextResponse.json({ success: false, error: msg }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true, contact, method: 'email' })
+  return NextResponse.json({ success: true, contact: email, method: 'email' })
 }

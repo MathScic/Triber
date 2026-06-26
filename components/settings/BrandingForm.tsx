@@ -1,13 +1,15 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import { useBranding } from '@/lib/hooks/useBranding'
 import { injectTheme } from '@/lib/utils/theme'
+import { useBrandingContext } from '@/lib/contexts/BrandingContext'
 import { ColorPicker } from './ColorPicker'
 import { UploadZone } from './UploadZone'
 import { Button } from '@/components/ui/button'
 
 export function BrandingForm() {
+  const { setPrimaryColor } = useBrandingContext()
   const [orgName, setOrgName] = useState('')
   const [primary, setPrimary] = useState('#2A9D4E')
   const [secondary, setSecondary] = useState('#E8622A')
@@ -49,26 +51,26 @@ export function BrandingForm() {
         primary_color: primary, secondary_color: secondary,
         slogan: slogan || null, logo_url: logo ?? null, cover_url: cover ?? null,
       })
-      if (ok) setSuccess(true)
+      if (ok) { setSuccess(true); injectTheme(primary, secondary); setPrimaryColor(primary) }
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-5 space-y-5">
+    <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-5 space-y-5">
       <h2 className="font-[700] text-[#1A1F16] text-base uppercase tracking-tight font-[family-name:var(--font-barlow)]">
         Personnalisation
       </h2>
 
       {/* Nom de l'organisation */}
       <div>
-        <p className="text-xs font-semibold text-[#7A8070] mb-1.5 font-[family-name:var(--font-nunito)]">Nom de l'organisation</p>
+        <p className="text-xs font-semibold text-[#6B7280] mb-1.5 font-[family-name:var(--font-nunito)]">Nom de l'organisation</p>
         <input
           type="text" maxLength={80} value={orgName}
           onChange={e => setOrgName(e.target.value)}
           placeholder="ex : FC Normandie"
-          className="w-full h-10 px-3 rounded-xl border border-[#DDD8CE] text-sm text-[#1A1F16] bg-[#FAF7F2] focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]"
+          className="w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm text-[#1A1F16] bg-[#F4F4F6] focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]"
         />
       </div>
 
@@ -78,28 +80,23 @@ export function BrandingForm() {
       </div>
 
       <div className="space-y-3">
-        <ColorPicker label="Couleur primaire" value={primary} onChange={setPrimary} />
-        <ColorPicker label="Couleur secondaire" value={secondary} onChange={setSecondary} />
+        <ColorPicker label="Couleur primaire" value={primary} onChange={v => { setPrimary(v); setPrimaryColor(v); injectTheme(v, secondary) }} />
+        <ColorPicker label="Couleur secondaire" value={secondary} onChange={v => { setSecondary(v); injectTheme(primary, v) }} />
       </div>
 
       <div>
         <input type="text" maxLength={60} value={slogan} onChange={e => setSlogan(e.target.value)}
           placeholder="ex : Ensemble, on est plus forts"
-          className="w-full h-10 px-3 rounded-xl border border-[#DDD8CE] text-sm text-[#1A1F16] bg-[#FAF7F2] focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]" />
-        <p className="text-right text-xs text-[#7A8070] mt-1">{slogan.length}/60</p>
+          className="w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm text-[#1A1F16] bg-[#F4F4F6] focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]" />
+        <p className="text-right text-xs text-[#6B7280] mt-1">{slogan.length}/60</p>
       </div>
 
       {error && <p className="text-xs text-[#E8622A] bg-[#FDF0EB] rounded-lg px-3 py-2">{error}</p>}
       {success && <p className="text-xs text-primary bg-primary-light rounded-lg px-3 py-2">Paramètres sauvegardés ✓</p>}
 
-      <div className="flex gap-3">
-        <Button variant="outline" type="button" onClick={() => injectTheme(primary, secondary)}>
-          Aperçu en direct
-        </Button>
-        <Button type="button" disabled={saving} onClick={() => { void handleSave() }}>
-          {saving ? 'Sauvegarde…' : 'Sauvegarder'}
-        </Button>
-      </div>
+      <Button className="w-full" type="button" disabled={saving} onClick={() => { void handleSave() }}>
+        {saving ? 'Sauvegarde…' : 'Sauvegarder'}
+      </Button>
     </div>
   )
 }

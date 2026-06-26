@@ -6,8 +6,15 @@ const barlow = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], va
 
 export const metadata = { title: 'Rejoindre une organisation — Triber' }
 
-export default async function JoinPage({ params }: { params: Promise<{ code: string }> }) {
+export default async function JoinPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ code: string }>
+  searchParams: Promise<{ org?: string; confirmed?: string }>
+}) {
   const { code } = await params
+  const { org, confirmed } = await searchParams
 
   return (
     <main
@@ -27,7 +34,7 @@ export default async function JoinPage({ params }: { params: Promise<{ code: str
           </p>
         </div>
 
-        <JoinOrgCard code={code} />
+        <JoinOrgCard code={code} orgId={org} confirmed={confirmed === '1'} />
       </div>
     </main>
   )

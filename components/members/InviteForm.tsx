@@ -1,68 +1,81 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
-import { useMembers } from '@/lib/hooks/useMembers'
+import { X } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
 
 interface Props {
   organizationId: string
+  orgName: string
+  onClose?: () => void
 }
 
-export function InviteForm({ organizationId }: Props) {
+export function InviteForm({ organizationId, orgName, onClose }: Props) {
   const [email, setEmail] = useState('')
-  const [role, setRole] = useState('member')
-  const { inviteMember, loading, error, success } = useMembers(organizationId)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
-    const ok = await inviteMember(email.trim(), role)
-    if (ok) setEmail('')
+    setLoading(true); setError(null); setSuccess(null)
+
+    const { data: { session } } = await createClient().auth.getSession()
+    const res = await fetch('/api/members/send-invite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session?.access_token ?? ''}`,
+      },
+      body: JSON.stringify({ email: email.trim(), orgName, orgId: organizationId }),
+    })
+
+    const data = await res.json() as { error?: string }
+    if (!res.ok) {
+      setError(data.error ?? "Erreur lors de l'invitation.")
+    } else {
+      setSuccess(`Invitation envoyée à ${email} ✓`)
+      setEmail('')
+      setTimeout(() => onClose?.(), 1500)
+    }
+    setLoading(false)
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] p-5 space-y-4">
-      <h3 className="text-base font-bold text-[#1A1F16]">Inviter un membre</h3>
-
-      {error && (
-        <p className="text-xs text-[#E8622A] bg-[#FDF0EB] rounded-lg px-3 py-2">{error}</p>
-      )}
-      {success && (
-        <p className="text-xs text-[#2A9D4E] bg-[#E8F5EE] rounded-lg px-3 py-2">{success}</p>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-3">
+    <div className="bg-white rounded-xl border border-[#D1D1D6] p-5 space-y-4">
+      <div className="flex items-start justify-between">
         <div>
-          <Label htmlFor="invite-email">Email</Label>
-          <Input
-            id="invite-email"
-            type="email"
-            placeholder="joueur@exemple.fr"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            className="mt-1"
-          />
+          <h3 className="text-base font-bold text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+            Inviter un membre
+          </h3>
+          <p className="text-xs text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
+            Un email avec un lien d'accès direct sera envoyé
+          </p>
         </div>
+        {onClose && (
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-[#F4F4F6] transition-colors flex-shrink-0">
+            <X className="w-4 h-4 text-[#6B7280]" />
+          </button>
+        )}
+      </div>
 
-        <div>
-          <Label htmlFor="invite-role">Rôle</Label>
-          <select
-            id="invite-role"
-            value={role}
-            onChange={e => setRole(e.target.value)}
-            className="mt-1 flex h-11 w-full rounded-xl border border-[#DDD8CE] px-3 text-sm text-[#1A1F16] bg-white focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]"
-          >
-            <option value="member">Membre — lecture seule</option>
-            <option value="member_active">Actif — peut saisir résultats</option>
-            <option value="admin">Admin — accès complet</option>
-          </select>
-        </div>
+      {error && <p className="text-xs text-[#E8622A] bg-[#FDF0EB] rounded-lg px-3 py-2">{error}</p>}
+      {success && <p className="text-xs text-[#2A9D4E] bg-[#E8F5EE] rounded-lg px-3 py-2">{success}</p>}
 
-        <Button type="submit" className="w-full" disabled={loading || !email.trim()}>
-          {loading ? 'Envoi...' : "Envoyer l'invitation"}
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <Input
+          type="email"
+          placeholder="joueur@exemple.fr"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+          className="flex-1"
+        />
+        <Button type="submit" disabled={loading || !email.trim()}>
+          {loading ? '…' : 'Inviter'}
         </Button>
       </form>
     </div>

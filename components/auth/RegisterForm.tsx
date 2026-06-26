@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useForm } from 'react-hook-form'
 import Link from 'next/link'
@@ -120,12 +120,16 @@ export function RegisterForm() {
         {loading ? 'Création…' : 'Créer mon compte'}
       </Button>
 
-      <p className="text-center text-sm text-[#7A8070]">
+      <p className="text-center text-xs text-[#9CA3AF]">
+        En créant un compte, vous acceptez nos{' '}
+        <Link href="/cgu" className="underline hover:text-[#6B7280]">CGU</Link>
+        {' '}et notre{' '}
+        <Link href="/mentions-legales" className="underline hover:text-[#6B7280]">politique de confidentialité</Link>.
+      </p>
+
+      <p className="text-center text-sm text-[#6B7280]">
         Déjà un compte ?{' '}
-        <Link
-          href="/login"
-          className="text-[#E8622A] font-semibold hover:underline"
-        >
+        <Link href="/login" className="text-[#E8622A] font-semibold hover:underline">
           Se connecter
         </Link>
       </p>

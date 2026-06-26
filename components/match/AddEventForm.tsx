@@ -1,117 +1,185 @@
 'use client'
 
 import { useState } from 'react'
-import type { MatchEventType, OrgMember } from '@/lib/match/types'
-import { EVENT_LABELS } from '@/lib/match/types'
+import { X, ArrowUpRight, ArrowLeftRight, Plus } from 'lucide-react'
+import type { MatchActionType, OrgMember } from '@/lib/match/types'
 import { Button } from '@/components/ui/button'
 
 interface Props {
   members: OrgMember[]
+  allMembers?: OrgMember[]
   defaultMinute: number
-  onAdd: (type: MatchEventType, minute: number, playerId?: string, assistId?: string, playerNameFree?: string) => Promise<void>
+  onAdd: (type: MatchActionType, minute: number, isOwnTeam: boolean, userId?: string, assistUserId?: string) => Promise<void>
+  onClose?: () => void
 }
 
-const TYPES: MatchEventType[] = ['goal', 'own_goal', 'opponent_goal', 'yellow_card', 'red_card']
-const NEEDS_PLAYER: MatchEventType[] = ['goal', 'own_goal', 'yellow_card', 'red_card']
-
-function TypeIcon({ type }: { type: MatchEventType }) {
-  if (type === 'yellow_card') return <span className="inline-block w-3 h-4 bg-yellow-400 rounded-[2px]" />
-  if (type === 'red_card') return <span className="inline-block w-3 h-4 bg-red-600 rounded-[2px]" />
-  const color = type === 'goal' ? '#2A9D4E' : type === 'own_goal' ? '#E8622A' : '#dc2626'
-  return <span className="inline-block w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
+function BallIcon({ active }: { active: boolean }) {
+  const c = active ? '#ffffff' : '#6B7280'
+  const shade = active ? 'rgba(0,0,0,0.28)' : '#D1D1D6'
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" fill={c} stroke={shade} strokeWidth="1.5"/>
+      <polygon points="12,5.5 16.5,8.5 15,14 9,14 7.5,8.5" fill={shade}/>
+      <line x1="12" y1="2" x2="12" y2="5.5" stroke={shade} strokeWidth="1.2"/>
+      <line x1="20.5" y1="8" x2="16.5" y2="8.5" stroke={shade} strokeWidth="1.2"/>
+      <line x1="18.5" y1="18.5" x2="15" y2="14" stroke={shade} strokeWidth="1.2"/>
+      <line x1="5.5" y1="18.5" x2="9" y2="14" stroke={shade} strokeWidth="1.2"/>
+      <line x1="3.5" y1="8" x2="7.5" y2="8.5" stroke={shade} strokeWidth="1.2"/>
+    </svg>
+  )
 }
 
-export function AddEventForm({ members, defaultMinute, onAdd }: Props) {
-  const [type, setType] = useState<MatchEventType>('goal')
-  const [playerId, setPlayerId] = useState('')
-  const [assistId, setAssistId] = useState('')
-  const [playerNameFree, setPlayerNameFree] = useState('')
+function CardRect({ color, active }: { color: 'yellow' | 'red'; active: boolean }) {
+  const bg = color === 'yellow' ? (active ? '#FBBF24' : '#FDE68A') : (active ? '#DC2626' : '#FCA5A5')
+  return <span className="inline-block w-4 h-5 rounded-[3px] flex-shrink-0" style={{ backgroundColor: bg }} />
+}
+
+type TileType = 'goal' | 'assist' | 'yellow_card' | 'red_card' | 'substitution'
+
+const TILES: { type: TileType; label: string }[] = [
+  { type: 'goal', label: 'But' },
+  { type: 'assist', label: 'Passe' },
+  { type: 'yellow_card', label: 'J. jaune' },
+  { type: 'red_card', label: 'J. rouge' },
+  { type: 'substitution', label: 'Remplac.' },
+]
+
+function TileIcon({ type, active }: { type: TileType; active: boolean }) {
+  if (type === 'goal') return <BallIcon active={active} />
+  if (type === 'yellow_card') return <CardRect color="yellow" active={active} />
+  if (type === 'red_card') return <CardRect color="red" active={active} />
+  if (type === 'assist') return <ArrowUpRight className={`w-5 h-5 ${active ? 'text-white' : 'text-[#6B7280]'}`} />
+  return <ArrowLeftRight className={`w-5 h-5 ${active ? 'text-white' : 'text-[#6B7280]'}`} />
+}
+
+export function AddEventForm({ members, allMembers, defaultMinute, onAdd, onClose }: Props) {
+  const [tileType, setTileType] = useState<TileType>('goal')
+  const [isOwnTeam, setIsOwnTeam] = useState(true)
+  const [userId, setUserId] = useState('')
+  const [assistUserId, setAssistUserId] = useState('')
+  const [addAssist, setAddAssist] = useState(false)
   const [minute, setMinute] = useState(defaultMinute)
   const [loading, setLoading] = useState(false)
 
-  const needsPlayer = NEEDS_PLAYER.includes(type)
-  const isGoal = type === 'goal'
-  const isOppGoal = type === 'opponent_goal'
-
-  const canSubmit = isOppGoal || (needsPlayer ? !!playerId : true)
+  const isGoal = tileType === 'goal'
+  const isSubst = tileType === 'substitution'
+  const needsPlayer = isOwnTeam && tileType !== 'substitution'
+  const available = members.length > 0 ? members : (allMembers ?? [])
+  const canSubmit = !needsPlayer || !!userId
 
   const handleSubmit = async () => {
     if (!canSubmit) return
     setLoading(true)
     await onAdd(
-      type, minute,
-      needsPlayer ? playerId : undefined,
-      isGoal && assistId ? assistId : undefined,
-      isOppGoal && playerNameFree ? playerNameFree : undefined,
+      tileType as MatchActionType,
+      minute,
+      isOwnTeam,
+      isOwnTeam && userId ? userId : undefined,
+      isGoal && isOwnTeam && assistUserId ? assistUserId : undefined,
     )
     setLoading(false)
-    setPlayerId(''); setAssistId(''); setPlayerNameFree('')
+    setUserId(''); setAssistUserId('')
   }
 
-  const memberOptions = members.map(m => (
+  const opts = available.map(m => (
     <option key={m.user_id} value={m.user_id}>
       {m.jersey != null ? `${m.jersey} - ` : ''}{m.name}
     </option>
   ))
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-4 space-y-3">
-      <p className="text-xs font-semibold text-[#7A8070] uppercase tracking-wide font-[family-name:var(--font-nunito)]">
-        Ajouter une action
-      </p>
-      <div className="grid grid-cols-5 gap-1.5">
-        {TYPES.map(t => (
-          <button key={t} onClick={() => { setType(t); setPlayerId(''); setAssistId(''); setPlayerNameFree('') }}
-            className={`flex flex-col items-center gap-1 py-2 rounded-xl text-center transition-colors ${
-              type === t ? 'bg-[#1A1F16] text-white' : 'bg-[#F0EBE1] text-[#7A8070] hover:bg-[#DDD8CE]'
-            }`}
-            title={EVENT_LABELS[t]}
-          >
-            <TypeIcon type={t} />
-            <span className="text-[10px] font-semibold leading-tight font-[family-name:var(--font-nunito)]">
-              {EVENT_LABELS[t]}
-            </span>
+    <div className="space-y-4 p-4 pb-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+          Action
+        </h3>
+        {onClose && (
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-[#F4F4F6] transition-colors text-[#6B7280]">
+            <X className="w-4 h-4" />
           </button>
-        ))}
+        )}
       </div>
+
+      {/* 5 tuiles action */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        {TILES.map(({ type, label }) => {
+          const active = tileType === type
+          return (
+            <button key={type} onClick={() => { setTileType(type); setUserId(''); setAssistUserId(''); setAddAssist(false) }}
+              className={`flex-shrink-0 w-[68px] flex flex-col items-center justify-center gap-2 py-3 rounded-2xl transition-colors border ${
+                active ? 'bg-[#2A9D4E] border-[#2A9D4E]' : 'bg-white border-[#E8E8EA] hover:border-[#D1D1D6]'
+              }`}>
+              <TileIcon type={type} active={active} />
+              <span className={`text-[10px] font-bold leading-tight text-center font-[family-name:var(--font-nunito)] ${active ? 'text-white' : 'text-[#6B7280]'}`}>
+                {label}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Notre équipe / Adversaire */}
+      {!isSubst && (
+        <div className="grid grid-cols-2 gap-2">
+          {([true, false] as const).map(own => (
+            <button key={String(own)} onClick={() => { setIsOwnTeam(own); setUserId(''); setAssistUserId(''); setAddAssist(false) }}
+              className={`h-10 rounded-xl text-sm font-semibold transition-colors font-[family-name:var(--font-nunito)] border ${
+                isOwnTeam === own
+                  ? own ? 'bg-[#2A9D4E] text-white border-[#2A9D4E]' : 'bg-[#1A1F16] text-white border-[#1A1F16]'
+                  : 'bg-white text-[#6B7280] border-[#D1D1D6] hover:border-[#9CA3AF]'
+              }`}>
+              {own ? 'Notre équipe' : 'Adversaire'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Minute + Joueur */}
       <div className="flex gap-2 items-end">
         <div className="w-20 flex-shrink-0">
-          <p className="text-xs text-[#7A8070] mb-1 font-[family-name:var(--font-nunito)]">Minute</p>
+          <p className="text-[11px] text-[#6B7280] mb-1 uppercase font-[family-name:var(--font-nunito)] tracking-wide font-bold">Minute</p>
           <input type="number" min={0} max={200} value={minute} onChange={e => setMinute(Number(e.target.value))}
-            className="w-full h-10 px-2 rounded-xl border border-[#DDD8CE] text-sm text-center font-[800] text-[#1A1F16] bg-[#FAF7F2] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-barlow)]"
-          />
+            className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm text-center font-[800] bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-barlow)]" />
         </div>
-        {needsPlayer && (
+        {needsPlayer && available.length > 0 && (
           <div className="flex-1">
-            <p className="text-xs text-[#7A8070] mb-1 font-[family-name:var(--font-nunito)]">Joueur</p>
-            <select value={playerId} onChange={e => setPlayerId(e.target.value)}
-              className="w-full h-10 px-2 rounded-xl border border-[#DDD8CE] text-sm text-[#1A1F16] bg-[#FAF7F2] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]">
+            <p className="text-[11px] text-[#6B7280] mb-1 uppercase font-[family-name:var(--font-nunito)] tracking-wide font-bold">Joueur</p>
+            <select value={userId} onChange={e => setUserId(e.target.value)}
+              className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]">
               <option value="">— Choisir —</option>
-              {memberOptions}
+              {opts}
             </select>
           </div>
         )}
-        {isOppGoal && (
-          <div className="flex-1">
-            <p className="text-xs text-[#7A8070] mb-1 font-[family-name:var(--font-nunito)]">Buteur (facultatif)</p>
-            <input type="text" placeholder="Nom libre…" value={playerNameFree} onChange={e => setPlayerNameFree(e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-[#DDD8CE] text-sm text-[#1A1F16] bg-[#FAF7F2] focus:outline-none focus:border-[#dc2626] font-[family-name:var(--font-nunito)]"
-            />
-          </div>
-        )}
       </div>
-      {isGoal && (
-        <div>
-          <p className="text-xs text-[#7A8070] mb-1 font-[family-name:var(--font-nunito)]">Passeur (facultatif)</p>
-          <select value={assistId} onChange={e => setAssistId(e.target.value)}
-            className="w-full h-10 px-2 rounded-xl border border-[#DDD8CE] text-sm text-[#1A1F16] bg-[#FAF7F2] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]">
-            <option value="">— Aucun —</option>
-            {memberOptions}
-          </select>
-        </div>
+
+      {/* Passeur — but + notre équipe — opt-in */}
+      {isGoal && isOwnTeam && available.length > 0 && (
+        !addAssist ? (
+          <button onClick={() => setAddAssist(true)}
+            className="flex items-center gap-1.5 text-xs text-[#2A9D4E] font-semibold font-[family-name:var(--font-nunito)] hover:text-[#238742] transition-colors">
+            <Plus className="w-3.5 h-3.5" /> Ajouter une passe décisive
+          </button>
+        ) : (
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[11px] text-[#6B7280] uppercase font-bold font-[family-name:var(--font-nunito)] tracking-wide">Passeur</p>
+              <button onClick={() => { setAddAssist(false); setAssistUserId('') }}
+                className="text-[11px] text-[#9CA3AF] hover:text-[#6B7280] font-[family-name:var(--font-nunito)]">
+                Annuler
+              </button>
+            </div>
+            <select value={assistUserId} onChange={e => setAssistUserId(e.target.value)}
+              className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]">
+              <option value="">— Choisir le passeur —</option>
+              {opts}
+            </select>
+          </div>
+        )
       )}
-      <Button className="w-full" onClick={() => void handleSubmit()} disabled={loading || !canSubmit}>
-        {loading ? 'Ajout…' : `+ ${EVENT_LABELS[type]}`}
+
+      <Button className="w-full h-12 text-sm font-bold" onClick={() => void handleSubmit()} disabled={loading || !canSubmit}>
+        {loading ? 'Enregistrement…' : 'Valider'}
       </Button>
     </div>
   )

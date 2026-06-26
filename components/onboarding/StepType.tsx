@@ -1,5 +1,7 @@
 'use client'
 
+import { Shield, Building2 } from 'lucide-react'
+
 type OrgType = 'club' | 'enterprise'
 
 interface Props {
@@ -9,13 +11,13 @@ interface Props {
 const TYPES = [
   {
     value: 'club' as OrgType,
-    icon: '⚽',
+    Icon: Shield,
     label: 'Club / Association',
     desc: 'Sports, loisirs, associations',
   },
   {
     value: 'enterprise' as OrgType,
-    icon: '🏢',
+    Icon: Building2,
     label: 'Entreprise',
     desc: 'PME, équipes commerciales',
   },
@@ -26,24 +28,24 @@ export function StepType({ onSelect }: Props) {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-[800] text-[#1A1F16] uppercase tracking-tight mb-1">
-          Bienvenue sur Triber 👋
+          Bienvenue sur Triber
         </h2>
-        <p className="text-sm text-[#7A8070]">
+        <p className="text-sm text-[#6B7280]">
           Quel type d'organisation gérez-vous ?
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {TYPES.map(({ value, icon, label, desc }) => (
+        {TYPES.map(({ value, Icon, label, desc }) => (
           <button
             key={value}
             type="button"
             onClick={() => onSelect(value)}
-            className="rounded-2xl border-2 border-[#DDD8CE] bg-white p-5 text-left hover:border-[#2A9D4E] hover:bg-[#E8F5EE] active:scale-95 transition-all cursor-pointer"
+            className="rounded-2xl border-2 border-[#D1D1D6] bg-white p-5 text-left hover:border-[#2A9D4E] hover:bg-[#E8F5EE] active:scale-95 transition-all cursor-pointer"
           >
-            <span className="text-3xl block mb-3">{icon}</span>
+            <Icon className="w-8 h-8 text-[#2A9D4E] mb-3" />
             <span className="block text-sm font-bold text-[#1A1F16]">{label}</span>
-            <span className="text-xs text-[#7A8070] mt-0.5 block">{desc}</span>
+            <span className="text-xs text-[#6B7280] mt-0.5 block">{desc}</span>
           </button>
         ))}
       </div>

@@ -1,8 +1,8 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { MatchEvent, OrgMember } from '@/lib/match/types'
+import type { MatchAction, OrgMember } from '@/lib/match/types'
 import { ScoreCard } from './ScoreCard'
 import { LineupDisplay } from './LineupDisplay'
 import { EventTimeline } from './EventTimeline'
@@ -14,6 +14,8 @@ type EventInfo = {
   organizations: { name: string; logo_url: string | null; primary_color: string } | null
 }
 type Player = { user_id: string; jersey: number | null; name: string; is_starter: boolean }
+type MemberRow = { user_id: string; jersey_number: number | null }
+type ProfileRow = { id: string; full_name: string | null }
 
 function elapsed(startedAt: string | null, status: string | null): string {
   if (status !== 'ongoing' || !startedAt) return ''
@@ -22,33 +24,51 @@ function elapsed(startedAt: string | null, status: string | null): string {
 
 export function MatchLiveCard({ eventId, initialEvent, initialScore }: { eventId: string; initialEvent: EventInfo; initialScore: Score }) {
   const [score, setScore] = useState<Score>(initialScore)
-  const [matchEvents, setMatchEvents] = useState<MatchEvent[]>([])
+  const [matchActions, setMatchActions] = useState<MatchAction[]>([])
   const [players, setPlayers] = useState<Player[]>([])
   const [, setTick] = useState(0)
 
   useEffect(() => {
     const s = createClient()
-    // Charge composition + events initiaux
-    s.from('match_lineups').select('is_starter, organization_members(user_id, jersey_number, profiles(full_name))').eq('event_id', eventId)
-      .then(({ data }) => setPlayers((data ?? []).map(row => {
-        type M = { user_id: string; jersey_number: number | null; profiles: { full_name: string | null } | null }
-        const rawM = row.organization_members
-        const m = (Array.isArray(rawM) ? rawM[0] : rawM) as unknown as M | null
-        const rawP = m?.profiles
-        const p = (Array.isArray(rawP) ? rawP[0] : rawP) as { full_name: string | null } | null
-        return { user_id: m?.user_id ?? '', jersey: m?.jersey_number ?? null, name: p?.full_name ?? 'Inconnu', is_starter: row.is_starter as boolean }
-      }).sort((a, b) => (a.jersey ?? 99) - (b.jersey ?? 99))))
 
-    s.from('match_events').select('id, type, minute, player_id, assist_player_id').eq('event_id', eventId)
-      .then(({ data }) => setMatchEvents((data ?? []) as MatchEvent[]))
+    // Composition : fetch members et profiles séparément (RLS)
+    s.from('match_lineups').select('is_starter, organization_member_id').eq('event_id', eventId)
+      .then(async ({ data: lineupRows }) => {
+        if (!lineupRows?.length) return
+        const orgMemberIds = lineupRows.map(r => r.organization_member_id as string)
+        const { data: mData } = await s.from('organization_members')
+          .select('id, user_id, jersey_number').in('id', orgMemberIds)
+        const rows = (mData ?? []) as MemberRow[]
+        const userIds = rows.map(r => r.user_id as string)
+        let profileMap = new Map<string, string | null>()
+        if (userIds.length) {
+          const { data: pData } = await s.from('profiles').select('id, full_name').in('id', userIds)
+          profileMap = new Map((pData ?? []).map((p: ProfileRow) => [p.id, p.full_name]))
+        }
+        const memberMap = new Map((mData ?? []).map((m: MemberRow & { id?: string }) => [m.id ?? '', m]))
+        setPlayers(lineupRows.map(lr => {
+          const m = memberMap.get(lr.organization_member_id as string)
+          return {
+            user_id: (m as MemberRow & { user_id: string })?.user_id ?? '',
+            jersey: (m as MemberRow)?.jersey_number ?? null,
+            name: profileMap.get((m as MemberRow & { user_id: string })?.user_id ?? '') ?? 'Inconnu',
+            is_starter: lr.is_starter as boolean,
+          }
+        }).sort((a, b) => (a.jersey ?? 99) - (b.jersey ?? 99)))
+      })
+
+    s.from('match_actions')
+      .select('id, type, minute, is_own_team, user_id, player_name, player_in_id, player_in_name')
+      .eq('event_id', eventId)
+      .then(({ data }) => setMatchActions((data ?? []) as MatchAction[]))
 
     const ch = s.channel(`live-public-${eventId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'match_results', filter: `event_id=eq.${eventId}` },
         p => { const r = p.new as { score_home: number; score_away: number }; setScore({ home: r.score_home, away: r.score_away }) })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_events', filter: `event_id=eq.${eventId}` },
-        p => setMatchEvents(prev => [...prev, p.new as MatchEvent]))
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'match_events', filter: `event_id=eq.${eventId}` },
-        p => setMatchEvents(prev => prev.filter(e => e.id !== (p.old as { id: string }).id)))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_actions', filter: `event_id=eq.${eventId}` },
+        p => setMatchActions(prev => [...prev, p.new as MatchAction]))
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'match_actions', filter: `event_id=eq.${eventId}` },
+        p => setMatchActions(prev => prev.filter(a => a.id !== (p.old as { id: string }).id)))
       .subscribe()
 
     const interval = setInterval(() => setTick(t => t + 1), 30_000)
@@ -74,10 +94,10 @@ export function MatchLiveCard({ eventId, initialEvent, initialScore }: { eventId
         location={initialEvent.location}
         primaryColor={org?.primary_color ?? '#2A9D4E'}
       />
-      {matchEvents.length > 0 && (
-        <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-4 space-y-2">
-          <p className="text-xs font-semibold text-[#7A8070] uppercase tracking-wide font-[family-name:var(--font-nunito)]">Chronologie</p>
-          <EventTimeline events={matchEvents} members={members} opponentName={initialEvent.opponent ?? 'Adversaire'} />
+      {matchActions.filter(a => a.type === 'goal' || a.type === 'yellow_card' || a.type === 'red_card').length > 0 && (
+        <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4 space-y-2">
+          <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide font-[family-name:var(--font-nunito)]">Chronologie</p>
+          <EventTimeline actions={matchActions} members={members} opponentName={initialEvent.opponent ?? 'Adversaire'} />
         </div>
       )}
       <LineupDisplay starters={players.filter(p => p.is_starter)} subs={players.filter(p => !p.is_starter)} />

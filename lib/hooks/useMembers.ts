@@ -6,7 +6,13 @@ import { createClient } from '@/lib/supabase/client'
 export type MemberRole = 'admin' | 'member_active' | 'member'
 
 export type Member = {
-  id: string; user_id: string; role: MemberRole; joined_at: string
+  id: string
+  user_id: string
+  role: MemberRole
+  joined_at: string
+  category: string | null
+  jersey_number: number | null
+  payment_status: 'paid' | 'pending' | null
   profiles: { id: string | null; full_name: string | null; avatar_url: string | null; phone: string | null } | null
 }
 
@@ -19,24 +25,35 @@ export function useMembers(organizationId: string) {
   const getMembers = async () => {
     if (!organizationId) return
     setLoading(true)
-    const supabase = createClient()
+    const s = createClient()
 
-    // Récupère les membres sans join (pas de FK directe vers profiles)
-    const { data: rows, error: fetchError } = await supabase
+    const { data: rows, error: fetchError } = await s
       .from('organization_members')
-      .select('id, role, joined_at, user_id')
+      .select('id, role, joined_at, user_id, category, jersey_number')
       .eq('organization_id', organizationId)
 
     if (fetchError) { setError('Impossible de charger les membres.'); setLoading(false); return }
 
-    // Récupère chaque profil séparément (profiles.id = user_id)
+    const { data: payments } = await s
+      .from('contribution_payments')
+      .select('user_id, status')
+      .eq('organization_id', organizationId)
+      .eq('status', 'paid')
+
+    const paidUserIds = new Set((payments ?? []).map(p => p.user_id as string))
+
     const profileResults = await Promise.all(
-      (rows ?? []).map(m => supabase.from('profiles').select('id, full_name, avatar_url, phone').eq('id', m.user_id).single())
+      (rows ?? []).map(m => s.from('profiles').select('id, full_name, avatar_url, phone').eq('id', m.user_id).single())
     )
 
     setMembers((rows ?? []).map((m, i) => ({
-      id: m.id as string, user_id: m.user_id as string,
-      role: m.role as MemberRole, joined_at: m.joined_at as string,
+      id: m.id as string,
+      user_id: m.user_id as string,
+      role: m.role as MemberRole,
+      joined_at: m.joined_at as string,
+      category: (m.category as string | null) ?? null,
+      jersey_number: (m.jersey_number as number | null) ?? null,
+      payment_status: payments ? (paidUserIds.has(m.user_id as string) ? 'paid' : 'pending') : null,
       profiles: profileResults[i]?.data ?? null,
     })))
     setLoading(false)
@@ -58,16 +75,14 @@ export function useMembers(organizationId: string) {
   }
 
   const updateMemberRole = async (userId: string, role: MemberRole): Promise<boolean> => {
-    const supabase = createClient()
-    const { error: err } = await supabase.from('organization_members')
+    const { error: err } = await createClient().from('organization_members')
       .update({ role }).eq('user_id', userId).eq('organization_id', organizationId)
     if (err) { setError('Impossible de modifier le rôle.'); return false }
     await getMembers(); return true
   }
 
   const removeMember = async (userId: string): Promise<boolean> => {
-    const supabase = createClient()
-    const { error: err } = await supabase.from('organization_members')
+    const { error: err } = await createClient().from('organization_members')
       .delete().eq('user_id', userId).eq('organization_id', organizationId)
     if (err) { setError('Impossible de supprimer le membre.'); return false }
     await getMembers(); return true

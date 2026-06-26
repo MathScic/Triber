@@ -2,19 +2,26 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { OrgBanner } from '@/components/home/OrgBanner'
+import { LiveMatchBanner } from '@/components/home/LiveMatchBanner'
 import { LastMatchCard } from '@/components/home/LastMatchCard'
 import { NextEventCard } from '@/components/home/NextEventCard'
 import { TopScorerCard } from '@/components/home/TopScorerCard'
+import { AnnouncementSection } from '@/components/home/AnnouncementSection'
+import { StandingsCard } from '@/components/home/StandingsCard'
 
-type Org = { id: string; name: string; type: string; plan: string; logo_url?: string | null; cover_url?: string | null }
+type Org = {
+  id: string; name: string; type: string; plan: string
+  logo_url?: string | null; cover_url?: string | null; primary_color?: string | null
+}
 
 export default function HomePage() {
   const router = useRouter()
   const [org, setOrg] = useState<Org | null | undefined>(undefined)
   const [fullName, setFullName] = useState('')
+  const [userId, setUserId] = useState<string | null>(null)
+  const [role, setRole] = useState<string>('member')
   const [isLoading, setIsLoading] = useState(true)
   const fetched = useRef(false)
 
@@ -26,16 +33,19 @@ export default function HomePage() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { router.push('/login'); return }
       setFullName((user.user_metadata?.full_name as string | undefined) ?? user.email ?? 'Utilisateur')
+      setUserId(user.id)
 
       supabase
         .from('organization_members')
-        .select('organizations(id, name, type, plan, logo_url, cover_url)')
+        .select('role, organizations(id, name, type, plan, logo_url, cover_url, primary_color)')
         .eq('user_id', user.id)
         .maybeSingle()
-        .then(({ data }) => {
+        .then(({ data, error }) => {
+          if (error) { console.error('home org fetch:', error); setIsLoading(false); return }
           const raw = data?.organizations
           const resolved = Array.isArray(raw) ? (raw[0] ?? null) : (raw ?? null)
           setOrg(resolved as Org | null)
+          setRole((data?.role as string | undefined) ?? 'member')
           setIsLoading(false)
         })
     })
@@ -47,43 +57,41 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#FAF7F2] flex items-center justify-center">
-        <p className="text-sm text-[#7A8070] font-[family-name:var(--font-nunito)]">Chargement…</p>
+      <main className="min-h-screen bg-[#F4F4F6] flex items-center justify-center">
+        <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">Chargement…</p>
       </main>
     )
   }
 
-  if (!org) {
-    return (
-      <main className="min-h-screen bg-[#FAF7F2] px-4 py-8 flex items-center justify-center">
-        <div className="bg-white rounded-2xl border border-[#DDD8CE] p-6 text-center max-w-sm w-full">
-          <p className="text-sm text-[#7A8070] mb-4 font-[family-name:var(--font-nunito)]">
-            Vous n'avez pas encore d'organisation.
-          </p>
-          <Link
-            href="/onboarding"
-            className="inline-flex items-center justify-center h-12 px-6 rounded-xl bg-[#2A9D4E] text-white font-[800] font-[family-name:var(--font-barlow)] uppercase tracking-wide text-sm hover:bg-[#238742] transition-colors"
-          >
-            Créer mon organisation
-          </Link>
-        </div>
-      </main>
-    )
-  }
+  if (!org) return null
 
   return (
-    <main className="min-h-screen bg-[#FAF7F2] px-4 py-8">
-      <div className="max-w-lg mx-auto space-y-4">
+    <main className="min-h-screen bg-[#F4F4F6] px-4 py-8">
+      <div className="max-w-lg lg:max-w-4xl mx-auto space-y-4">
         <OrgBanner
           name={org.name}
           fullName={fullName}
           logoUrl={org.logo_url}
           coverUrl={org.cover_url}
           initial={fullName.charAt(0).toUpperCase() || '?'}
+          primaryColor={org.primary_color ?? '#2A9D4E'}
+          organizationId={org.id}
         />
+        <LiveMatchBanner organizationId={org.id} />
         <LastMatchCard organizationId={org.id} />
         <NextEventCard organizationId={org.id} />
         <TopScorerCard organizationId={org.id} />
+        <StandingsCard
+          organizationId={org.id}
+          primaryColor={org.primary_color ?? '#2A9D4E'}
+        />
+        {userId && (
+          <AnnouncementSection
+            organizationId={org.id}
+            canCreate={role === 'admin' || role === 'member_active'}
+            currentUserId={userId}
+          />
+        )}
       </div>
     </main>
   )

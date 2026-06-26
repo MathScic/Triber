@@ -1,66 +1,144 @@
 'use client'
 
-import { useEffect } from 'react'
-import { Nunito, Barlow_Condensed } from 'next/font/google'
-import { createClient } from '@/lib/supabase/client'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useFinances } from '@/lib/hooks/useFinances'
-import { ContributionList } from '@/components/finances/ContributionList'
-import { PaymentForm } from '@/components/finances/PaymentForm'
+import { Nunito, Barlow_Condensed } from 'next/font/google'
+import { Plus, Receipt, Beer } from 'lucide-react'
+import { useContributions } from '@/lib/hooks/useContributions'
+import type { ContributionTemplate } from '@/lib/hooks/useContributions'
+import { ContributionCard } from '@/components/finances/ContributionCard'
+import { CreateContributionModal } from '@/components/finances/CreateContributionModal'
+import { EditContributionModal } from '@/components/finances/EditContributionModal'
 import { PageHeader } from '@/components/shared/PageHeader'
-import { useState } from 'react'
 
 const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
 const barlow = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-barlow' })
 
+function SectionLabel({ icon, label, count }: { icon: React.ReactNode; label: string; count: number }) {
+  return (
+    <div className="flex items-center gap-2 px-1">
+      {icon}
+      <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest font-[family-name:var(--font-nunito)]">
+        {label} · {count}
+      </p>
+    </div>
+  )
+}
+
 export default function FinancesPage() {
   const router = useRouter()
-  const [canCreate, setCanCreate] = useState(false)
-  const { contributions, getContributions, loading } = useFinances()
+  const { templates, loading, orgId, role, init, fetchTemplates, createTemplate, updateTemplate, deleteTemplate, toggleActive } = useContributions()
+  const [showCreate, setShowCreate] = useState(false)
+  const [editing, setEditing] = useState<ContributionTemplate | null>(null)
 
   useEffect(() => {
-    const s = createClient()
-    s.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.push('/login'); return }
-      s.from('organization_members').select('role').eq('user_id', user.id).maybeSingle()
-        .then(({ data }) => {
-          if (!data) { router.push('/onboarding'); return }
-          const role = data.role as string
-          setCanCreate(role === 'admin' || role === 'member_active')
-          getContributions()
-        })
+    init().then(mem => {
+      if (!mem) { router.push('/login'); return }
+      if (mem.role === 'member') { router.push('/home'); return }
+      fetchTemplates(mem.organization_id)
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const totalPaid = contributions.filter(c => c.status === 'paid').reduce((s, c) => s + c.amount, 0)
-  const totalPending = contributions.filter(c => c.status === 'pending').reduce((s, c) => s + c.amount, 0)
+  const canManage = role === 'admin' || role === 'member_active'
+  const cotisations = templates.filter(t => !t.is_buvette)
+  const buvettes = templates.filter(t => t.is_buvette)
+  const activeCotisations = cotisations.filter(t => t.is_active)
+  const archivedCotisations = cotisations.filter(t => !t.is_active)
+
+  const totalPaid = cotisations.reduce((s, t) => s + t.total_paid_cents, 0)
+  const totalExpected = cotisations.reduce((s, t) => s + t.total_expected_cents, 0)
+  const totalPending = totalExpected - totalPaid
+  const recoveryRate = totalExpected > 0 ? Math.round((totalPaid / totalExpected) * 100) : 0
+  const buvettesTotal = buvettes.reduce((s, t) => s + t.total_paid_cents, 0)
+
+  const cardProps = (t: ContributionTemplate) => ({
+    template: t,
+    onClick: () => router.push(`/finances/${t.id}`),
+    onEdit: () => setEditing(t),
+    onDelete: () => { if (orgId) void deleteTemplate(t.id, orgId) },
+    onToggleActive: () => { if (orgId) void toggleActive(t.id, !t.is_active, orgId) },
+  })
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-8`}>
-      <div className="max-w-lg mx-auto space-y-6">
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-4 py-8`}>
+      <div className="max-w-lg lg:max-w-4xl mx-auto space-y-6">
+        <PageHeader title="Finances" subtitle="Réservé aux administrateurs"
+          action={canManage ? (
+            <button onClick={() => setShowCreate(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-[family-name:var(--font-nunito)]">
+              <Plus className="w-4 h-4" /> Nouvelle
+            </button>
+          ) : undefined}
+        />
 
-        <PageHeader title="Finances" />
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-4">
-            <p className="text-xs text-[#7A8070] font-[family-name:var(--font-nunito)]">Encaissé</p>
-            <p className="text-2xl font-[800] text-[#2A9D4E] tabular-nums font-[family-name:var(--font-barlow)]">
-              {(totalPaid / 100).toFixed(0)} €
-            </p>
+        {/* KPIs — cotisations uniquement */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4">
+            <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Encaissé</p>
+            <p className="text-xl font-[800] text-[#2A9D4E] tabular-nums font-[family-name:var(--font-barlow)]">{(totalPaid / 100).toFixed(0)} €</p>
           </div>
-          <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm p-4">
-            <p className="text-xs text-[#7A8070] font-[family-name:var(--font-nunito)]">En attente</p>
-            <p className="text-2xl font-[800] text-[#E8622A] tabular-nums font-[family-name:var(--font-barlow)]">
-              {(totalPending / 100).toFixed(0)} €
+          <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4">
+            <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">En attente</p>
+            <p className="text-xl font-[800] text-[#E8622A] tabular-nums font-[family-name:var(--font-barlow)]">{(totalPending / 100).toFixed(0)} €</p>
+          </div>
+          <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4">
+            <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Recouvrement</p>
+            <p className={`text-xl font-[800] tabular-nums font-[family-name:var(--font-barlow)] ${recoveryRate >= 80 ? 'text-[#2A9D4E]' : recoveryRate >= 50 ? 'text-amber-500' : 'text-[#E8622A]'}`}>
+              {recoveryRate} %
             </p>
           </div>
         </div>
 
-        {canCreate && <PaymentForm onCreated={getContributions} />}
+        {loading && (
+          <div className="space-y-3">
+            {[...Array(2)].map((_, i) => <div key={i} className="h-32 bg-white rounded-xl border border-[#D1D1D6] animate-pulse" />)}
+          </div>
+        )}
 
-        <ContributionList contributions={contributions} loading={loading} />
+        {!loading && templates.length === 0 && (
+          <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-10 text-center space-y-2">
+            <Receipt className="w-8 h-8 text-[#D1D1D6] mx-auto" />
+            <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">Aucune cotisation</p>
+            <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">
+              {canManage ? 'Cliquez sur "Nouvelle" pour créer votre première cotisation.' : 'Aucune cotisation créée.'}
+            </p>
+          </div>
+        )}
 
+        {/* Cotisations actives */}
+        {!loading && activeCotisations.length > 0 && (
+          <div className="space-y-3">
+            <SectionLabel icon={<Receipt className="w-3.5 h-3.5 text-[#9CA3AF]" />} label="Actives" count={activeCotisations.length} />
+            {activeCotisations.map(t => <ContributionCard key={t.id} {...cardProps(t)} />)}
+          </div>
+        )}
+
+        {/* Buvettes */}
+        {!loading && buvettes.length > 0 && (
+          <div className="space-y-3">
+            <SectionLabel icon={<Beer className="w-3.5 h-3.5 text-[#9CA3AF]" />} label={`Buvette · ${(buvettesTotal / 100).toFixed(0)} € encaissés`} count={buvettes.length} />
+            {buvettes.map(t => <ContributionCard key={t.id} {...cardProps(t)} />)}
+          </div>
+        )}
+
+        {/* Archivées */}
+        {!loading && archivedCotisations.length > 0 && (
+          <div className="space-y-3">
+            <SectionLabel icon={<Receipt className="w-3.5 h-3.5 text-[#9CA3AF]" />} label="Terminées" count={archivedCotisations.length} />
+            {archivedCotisations.map(t => <ContributionCard key={t.id} {...cardProps(t)} />)}
+          </div>
+        )}
+
+        {showCreate && orgId && (
+          <CreateContributionModal onClose={() => setShowCreate(false)}
+            onCreate={async (payload) => { await createTemplate(orgId, payload); setShowCreate(false) }} />
+        )}
+
+        {editing && orgId && (
+          <EditContributionModal template={editing} onClose={() => setEditing(null)}
+            onSave={async (payload) => { await updateTemplate(editing.id, orgId, payload); setEditing(null) }} />
+        )}
       </div>
     </main>
   )

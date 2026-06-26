@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 interface Props {
   isOpen: boolean
@@ -16,7 +16,7 @@ export function DeleteConfirmModal({ isOpen, onConfirm, onCancel, eventTitle }: 
         <h3 className="font-bold text-[#1A1F16] text-base">
           Supprimer cet événement ?
         </h3>
-        <p className="text-sm text-[#7A8070]">
+        <p className="text-sm text-[#6B7280]">
           <span className="font-semibold text-[#1A1F16]">&ldquo;{eventTitle}&rdquo;</span>
           {' '}sera définitivement supprimé.
           <br />Cette action est irréversible.
@@ -24,7 +24,7 @@ export function DeleteConfirmModal({ isOpen, onConfirm, onCancel, eventTitle }: 
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 h-10 rounded-xl border border-[#DDD8CE] text-sm font-semibold text-[#1A1F16] hover:bg-[#F0EBE1] transition-colors"
+            className="flex-1 h-10 rounded-xl border border-[#D1D1D6] text-sm font-semibold text-[#1A1F16] hover:bg-[#E8E8EA] transition-colors"
           >
             Annuler
           </button>

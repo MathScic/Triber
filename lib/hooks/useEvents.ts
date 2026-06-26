@@ -9,12 +9,16 @@ export type AttendanceStatus = 'confirmed' | 'declined' | 'pending'
 export type TriberEvent = {
   id: string; organization_id: string; title: string; type: EventType
   start_at: string; location: string | null; opponent: string | null
-  is_home: boolean | null; created_by: string | null; created_at: string
+  is_home: boolean | null; category: string | null; team_label: string | null
+  created_by: string | null; created_at: string
+  status: 'upcoming' | 'ongoing' | 'half_time' | 'finished' | null
+  started_at: string | null
 }
 
 export type CreateEventData = {
   title: string; type: EventType; start_at: string
   location?: string; opponent?: string; is_home?: boolean
+  category?: string; team_label?: string
 }
 
 export function useEvents() {
@@ -63,10 +67,7 @@ export function useEvents() {
   }
 
   const updateAttendance = async (eventId: string, status: AttendanceStatus): Promise<boolean> => {
-    // Sauvegarde du statut précédent pour rollback éventuel
     const prevStatus = attendanceMap[eventId]
-
-    // 1. Mise à jour optimiste immédiate — avant la requête
     setAttendanceMap(prev => ({ ...prev, [eventId]: status }))
     setPendingEventId(eventId)
 
@@ -77,7 +78,6 @@ export function useEvents() {
 
     setPendingEventId(null)
     if (err) {
-      // 3. Rollback si échec de la requête
       setError('Impossible de mettre à jour la présence.')
       setAttendanceMap(prev => {
         const next = { ...prev }

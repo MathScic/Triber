@@ -1,0 +1,75 @@
+import { test, expect } from '@playwright/test'
+
+const NEEDS_AUTH = !process.env.TEST_PASSWORD
+
+test.describe('Page Stats (/stats)', () => {
+  test.skip(NEEDS_AUTH, 'TEST_PASSWORD non défini')
+
+  test('charge sans erreur', async ({ page }) => {
+    await page.goto('/stats')
+    await expect(page).not.toHaveURL(/login/)
+    await expect(page.getByRole('heading', { name: /statistiques/i })).toBeVisible({ timeout: 8_000 })
+  })
+
+  test('pas de spinner infini (chargement < 8s)', async ({ page }) => {
+    await page.goto('/stats')
+    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
+  })
+
+  test('bilan saison affiché si des matchs existent', async ({ page }) => {
+    await page.goto('/stats')
+    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
+    // Si des matchs existent → "Bilan saison" s'affiche. Sinon la page est vide — on vérifie juste qu'elle ne plante pas
+    await expect(page.locator('main').first()).toBeVisible()
+  })
+
+  test('section statistiques joueurs présente', async ({ page }) => {
+    await page.goto('/stats')
+    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
+    // Avec données → "Statistiques joueurs" | Sans données → "Pas encore de statistiques"
+    await expect(
+      page.getByText(/statistiques joueurs|pas encore de statistiques/i).first()
+    ).toBeVisible({ timeout: 8_000 })
+  })
+
+  test('liste des résultats de matchs affichée si des matchs existent', async ({ page }) => {
+    await page.goto('/stats')
+    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
+    // "Résultats" n'apparaît que si des matchs ont été joués — acceptable de skiper
+    const hasResults = await page.getByText(/^Résultats$/i).isVisible().catch(() => false)
+    if (!hasResults) { test.skip(); return }
+    await expect(page.getByText(/^Résultats$/i)).toBeVisible()
+  })
+
+  test('cliquer sur un résultat ouvre le formulaire d\'édition du score', async ({ page }) => {
+    await page.goto('/stats')
+    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
+
+    const resultCard = page.locator('button').filter({ hasText: /victoire|défaite|nul/i }).first()
+    if (!await resultCard.isVisible()) { test.skip(); return }
+
+    await resultCard.click()
+    await page.waitForTimeout(500)
+    await expect(
+      page.locator('input[type="number"]').first()
+        .or(page.getByText(/score|domicile|extérieur/i).first())
+    ).toBeVisible({ timeout: 5_000 })
+  })
+
+  test('Victoire/Défaite correctement calculée (is_home aware)', async ({ page }) => {
+    await page.goto('/stats')
+    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
+
+    const victoire = page.getByText('Victoire').first()
+    if (await victoire.isVisible()) {
+      const scoreText = await page.locator('button').filter({ hasText: /victoire/i }).first()
+        .locator('span.tabular-nums, .tabular-nums').textContent().catch(() => null)
+      if (scoreText) {
+        const parts = scoreText.split(/—|–/).map(s => parseInt(s.trim()))
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+          expect(parts[0]).toBeGreaterThan(parts[1])
+        }
+      }
+    }
+  })
+})

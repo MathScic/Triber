@@ -4,27 +4,33 @@ import { useEffect, useState } from 'react'
 
 interface Props {
   startedAt: string | null
+  pausedAt: string | null
+  totalPausedSeconds: number
   status: string | null
-  elapsedMinutes: number
 }
 
-function calcSec(startedAt: string | null, status: string | null, base: number): number {
-  if (status === 'ongoing' && startedAt) {
-    const from = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)
-    return Math.min(90 * 60, base * 60 + from)
-  }
-  return base * 60
+// Aligné avec la formule mobile :
+// elapsed = (ref - started_at) / 1000 - total_paused_seconds
+// ref = paused_at si en pause, sinon now()
+function calcSec(startedAt: string | null, pausedAt: string | null, totalPausedSec: number, status: string | null): number {
+  if (!startedAt) return 0
+  const startMs = new Date(startedAt).getTime()
+  const refMs = (status === 'half_time' || status === 'finished') && pausedAt
+    ? new Date(pausedAt).getTime()
+    : Date.now()
+  return Math.min(90 * 60, Math.max(0, Math.floor((refMs - startMs) / 1000) - totalPausedSec))
 }
 
-export function LiveTimer({ startedAt, status, elapsedMinutes }: Props) {
-  const [totalSec, setTotalSec] = useState(() => calcSec(startedAt, status, elapsedMinutes))
+export function LiveTimer({ startedAt, pausedAt, totalPausedSeconds, status }: Props) {
+  const [totalSec, setTotalSec] = useState(() => calcSec(startedAt, pausedAt, totalPausedSeconds, status))
 
   useEffect(() => {
-    setTotalSec(calcSec(startedAt, status, elapsedMinutes))
+    const update = () => setTotalSec(calcSec(startedAt, pausedAt, totalPausedSeconds, status))
+    update()
     if (status !== 'ongoing') return
-    const id = setInterval(() => setTotalSec(calcSec(startedAt, status, elapsedMinutes)), 1000)
+    const id = setInterval(update, 1000)
     return () => clearInterval(id)
-  }, [startedAt, status, elapsedMinutes])
+  }, [startedAt, pausedAt, totalPausedSeconds, status])
 
   const min = Math.floor(totalSec / 60)
   const sec = totalSec % 60

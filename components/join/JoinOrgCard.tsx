@@ -2,23 +2,28 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import JoinAuthForm from './JoinAuthForm'
 
 type Org = { id: string; name: string; type: string }
 
-export default function JoinOrgCard({ code }: { code: string }) {
+interface Props {
+  code: string
+  orgId?: string
+  confirmed?: boolean  // true = retour depuis confirmation email → auto-join
+}
+
+export default function JoinOrgCard({ code, orgId, confirmed }: Props) {
   const router = useRouter()
   const [org, setOrg] = useState<Org | null>(null)
   const [loadErr, setLoadErr] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [hasSession, setHasSession] = useState<boolean | null>(null)
-  const [joining, setJoining] = useState(false)
-  const [joinErr, setJoinErr] = useState<string | null>(null)
+  const [autoJoining, setAutoJoining] = useState(false)
 
   useEffect(() => {
-    // Charge les infos de l'organisation via le code
-    fetch(`/api/join/${code}`)
+    const qs = orgId ? `?org=${orgId}` : ''
+    fetch(`/api/join/${code}${qs}`)
       .then(r => r.json())
       .then((d: { org?: Org; error?: string }) => {
         if (d.error) setLoadErr(d.error)
@@ -26,77 +31,66 @@ export default function JoinOrgCard({ code }: { code: string }) {
       })
       .catch(() => setLoadErr('Erreur réseau'))
       .finally(() => setLoading(false))
+  }, [code, orgId])
 
-    // Détecte la session (y compris après retour depuis la confirmation email)
+  // Retour après confirmation email → rejoindre automatiquement avec la session fraîche
+  useEffect(() => {
+    if (!confirmed || !org) return
+    setAutoJoining(true)
     const supabase = createClient()
-    supabase.auth.getSession().then(({ data: { session } }) => setHasSession(!!session))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setHasSession(!!session)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) { setAutoJoining(false); return }
+      const qs = orgId ? `?org=${orgId}` : ''
+      const resp = await fetch(`/api/join/${code}${qs}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      if (resp.ok || resp.status === 409) {
+        router.push('/home')
+      } else {
+        setAutoJoining(false)
+      }
     })
-    return () => subscription.unsubscribe()
-  }, [code])
+  }, [confirmed, org, code, orgId, router])
 
-  const join = async () => {
-    setJoining(true); setJoinErr(null)
-    const { data: { session } } = await createClient().auth.getSession()
-    const resp = await fetch(`/api/join/${code}`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${session?.access_token ?? ''}` },
-    })
-    const d = await resp.json() as { success?: boolean; error?: string }
-    if (d.success) router.push('/home')
-    else { setJoinErr(d.error ?? 'Erreur serveur'); setJoining(false) }
-  }
+  // Première visite (pas de confirmed) → déconnecter toute session existante
+  useEffect(() => {
+    if (!confirmed) {
+      void createClient().auth.signOut()
+    }
+  }, [confirmed])
 
-  if (loading) {
+  if (loading || autoJoining) {
     return (
-      <div className="bg-white rounded-2xl border border-[#DDD8CE] p-8 text-center text-sm text-[#7A8070]">
-        Chargement…
+      <div className="bg-white rounded-xl border border-[#D1D1D6] p-8 text-center text-sm text-[#6B7280]">
+        {autoJoining ? 'Finalisation de votre adhésion…' : 'Chargement…'}
       </div>
     )
   }
 
   if (loadErr) {
     return (
-      <div className="bg-white rounded-2xl border border-[#DDD8CE] p-8 text-center space-y-2">
-        <p className="text-3xl">❌</p>
+      <div className="bg-white rounded-xl border border-[#D1D1D6] p-8 text-center space-y-2">
+        <AlertCircle className="w-8 h-8 text-[#E8622A] mx-auto mb-2" />
         <p className="font-semibold text-[#E8622A]">{loadErr}</p>
-        <p className="text-sm text-[#7A8070]">Ce lien d'invitation est invalide ou a expiré.</p>
+        <p className="text-sm text-[#6B7280]">Ce lien d'invitation est invalide ou a expiré.</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] p-6 space-y-6">
-      {/* Nom de l'organisation */}
-      <div className="text-center pb-4 border-b border-[#DDD8CE]">
-        <p className="text-xs text-[#7A8070] uppercase tracking-widest mb-2">Invitation à rejoindre</p>
+    <div className="bg-white rounded-xl border border-[#D1D1D6] p-6 space-y-6">
+      <div className="text-center pb-4 border-b border-[#D1D1D6]">
+        <p className="text-xs text-[#6B7280] uppercase tracking-widest mb-2">Invitation à rejoindre</p>
         <h2 className="text-2xl font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-tight">
           {org?.name}
         </h2>
-        <p className="text-sm text-[#7A8070] mt-1">
-          {org?.type === 'club' ? '⚽ Club sportif' : '🏢 Entreprise'}
+        <p className="text-sm text-[#6B7280] mt-1">
+          {org?.type === 'club' ? 'Club sportif' : 'Entreprise'}
         </p>
       </div>
 
-      {/* Non connecté → formulaire auth inline */}
-      {hasSession === false && <JoinAuthForm code={code} />}
-
-      {/* Connecté → bouton rejoindre */}
-      {hasSession === true && (
-        <div className="space-y-3">
-          {joinErr && (
-            <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2">{joinErr}</p>
-          )}
-          <button
-            onClick={join}
-            disabled={joining}
-            className="w-full h-12 bg-[#2A9D4E] text-white font-[800] rounded-xl font-[family-name:var(--font-barlow)] uppercase tracking-wide text-sm hover:bg-[#238742] transition-colors disabled:opacity-60"
-          >
-            {joining ? 'Adhésion en cours…' : `Rejoindre ${org?.name ?? 'cette organisation'}`}
-          </button>
-        </div>
-      )}
+      <JoinAuthForm code={code} orgId={orgId} />
     </div>
   )
 }

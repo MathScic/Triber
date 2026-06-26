@@ -1,3 +1,5 @@
+import { Play, Square } from '@phosphor-icons/react'
+
 type MatchStatus = 'upcoming' | 'ongoing' | 'half_time' | 'finished' | null
 
 interface Props {
@@ -9,46 +11,25 @@ interface Props {
 export function MatchControls({ status, loading, onControl }: Props) {
   if (status === 'finished') return null
 
+  if (!status || status === 'upcoming') {
+    return (
+      <button
+        onClick={() => onControl('start')}
+        disabled={loading}
+        className="w-full h-12 rounded-xl bg-[#2A9D4E] text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-[#238742] transition-colors disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
+      >
+        <Play size={16} weight="fill" /> Démarrer le match
+      </button>
+    )
+  }
+
   return (
-    <div className="flex gap-2">
-      {(!status || status === 'upcoming') && (
-        <button
-          onClick={() => onControl('start')}
-          disabled={loading}
-          className="flex-1 h-12 rounded-xl bg-[#2A9D4E] text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-[#238742] transition-colors disabled:opacity-50 shadow-sm"
-        >
-          ▶ Démarrer le match
-        </button>
-      )}
-
-      {status === 'ongoing' && (
-        <>
-          <button
-            onClick={() => onControl('half_time')}
-            disabled={loading}
-            className="flex-1 h-12 rounded-xl bg-[#E8622A] text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-[#d4541e] transition-colors disabled:opacity-50 shadow-sm"
-          >
-            ⏸ Mi-temps (45')
-          </button>
-          <button
-            onClick={() => onControl('end')}
-            disabled={loading}
-            className="h-12 px-4 rounded-xl bg-[#1A1F16] text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-black transition-colors disabled:opacity-50 shadow-sm"
-          >
-            ■ Fin
-          </button>
-        </>
-      )}
-
-      {status === 'half_time' && (
-        <button
-          onClick={() => onControl('resume')}
-          disabled={loading}
-          className="flex-1 h-12 rounded-xl bg-[#2A9D4E] text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-[#238742] transition-colors disabled:opacity-50 shadow-sm"
-        >
-          ▶ Reprendre (2e mi-temps)
-        </button>
-      )}
-    </div>
+    <button
+      onClick={() => onControl('end')}
+      disabled={loading}
+      className="w-full h-12 rounded-xl bg-red-600 text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-red-700 transition-colors disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
+    >
+      <Square size={16} weight="fill" /> Terminer le match
+    </button>
   )
 }

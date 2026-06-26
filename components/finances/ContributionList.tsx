@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import type { Contribution } from '@/lib/hooks/useFinances'
 
@@ -14,10 +14,10 @@ function Row({ c }: { c: Contribution }) {
   const name = c.profiles?.full_name ?? '—'
   const date = new Date(c.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-[#DDD8CE] last:border-0">
+    <div className="flex items-center gap-3 py-3 border-b border-[#D1D1D6] last:border-0">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-[#1A1F16] truncate">{c.label}</p>
-        <p className="text-xs text-[#7A8070]">{name} · {date}</p>
+        <p className="text-xs text-[#6B7280]">{name} · {date}</p>
       </div>
       <p className="text-sm font-bold text-[#1A1F16] tabular-nums flex-shrink-0">{euros} €</p>
       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${s.cls}`}>{s.label}</span>
@@ -34,17 +34,17 @@ export function ContributionList({ contributions, loading }: Props) {
   if (loading) {
     return (
       <div className="space-y-2">
-        {[...Array(3)].map((_, i) => <div key={i} className="h-14 bg-[#F0EBE1] rounded-xl animate-pulse" />)}
+        {[...Array(3)].map((_, i) => <div key={i} className="h-14 bg-[#E8E8EA] rounded-xl animate-pulse" />)}
       </div>
     )
   }
 
   if (!contributions.length) {
-    return <p className="text-sm text-[#7A8070] text-center py-6">Aucune cotisation pour l'instant.</p>
+    return <p className="text-sm text-[#6B7280] text-center py-6">Aucune cotisation pour l'instant.</p>
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DDD8CE] shadow-sm px-4">
+    <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm px-4">
       {contributions.map(c => <Row key={c.id} c={c} />)}
     </div>
   )

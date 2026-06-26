@@ -6,23 +6,21 @@ function getAdmin() {
   return createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
-type EvRow = { organization_id: string; is_home: boolean | null; started_at: string | null; elapsed_minutes: number }
+type EvRow = {
+  organization_id: string; is_home: boolean | null
+  started_at: string | null; paused_at: string | null; total_paused_seconds: number | null
+}
 
 async function verifyCoach(userId: string, eventId: string): Promise<EvRow | null> {
   const admin = getAdmin()
   const { data: ev } = await admin.from('events')
-    .select('organization_id, is_home, started_at, elapsed_minutes')
+    .select('organization_id, is_home, started_at, paused_at, total_paused_seconds')
     .eq('id', eventId).maybeSingle()
   if (!ev) return null
   const { data: mem } = await admin.from('organization_members')
     .select('role').eq('user_id', userId).eq('organization_id', ev.organization_id as string).maybeSingle()
   if (!mem || !['admin', 'member_active'].includes(mem.role as string)) return null
   return ev as EvRow
-}
-
-function calcElapsed(startedAt: string | null, base: number): number {
-  if (!startedAt) return base
-  return Math.min(90, base + Math.floor((Date.now() - new Date(startedAt).getTime()) / 60000))
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -36,17 +34,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { action } = await req.json() as { action: 'start' | 'half_time' | 'resume' | 'end' }
   const admin = getAdmin()
+  const now = new Date().toISOString()
 
   if (action === 'start') {
-    await admin.from('events').update({ status: 'ongoing', started_at: new Date().toISOString(), elapsed_minutes: 0 }).eq('id', id)
+    await admin.from('events').update({
+      status: 'ongoing', started_at: now, paused_at: null, total_paused_seconds: 0,
+    }).eq('id', id)
   } else if (action === 'half_time') {
-    const total = calcElapsed(ev.started_at, ev.elapsed_minutes)
-    await admin.from('events').update({ status: 'half_time', elapsed_minutes: total }).eq('id', id)
+    // Enregistre le moment de la pause — le chrono se fige côté client
+    await admin.from('events').update({
+      status: 'half_time', paused_at: now,
+    }).eq('id', id)
   } else if (action === 'resume') {
-    await admin.from('events').update({ status: 'ongoing', started_at: new Date().toISOString() }).eq('id', id)
+    // Cumule les secondes de pause écoulées depuis paused_at
+    const pausedAt = ev.paused_at ? new Date(ev.paused_at).getTime() : null
+    const additional = pausedAt ? Math.floor((Date.now() - pausedAt) / 1000) : 0
+    const newTotal = (ev.total_paused_seconds ?? 0) + additional
+    await admin.from('events').update({
+      status: 'ongoing', paused_at: null, total_paused_seconds: newTotal,
+    }).eq('id', id)
   } else if (action === 'end') {
-    const total = calcElapsed(ev.started_at, ev.elapsed_minutes)
-    await admin.from('events').update({ status: 'finished', elapsed_minutes: total }).eq('id', id)
+    // Si le match était en pause, cumule le dernier segment
+    const pausedAt = ev.paused_at ? new Date(ev.paused_at).getTime() : null
+    const additional = pausedAt ? Math.floor((Date.now() - pausedAt) / 1000) : 0
+    const newTotal = (ev.total_paused_seconds ?? 0) + additional
+    await admin.from('events').update({
+      status: 'finished', paused_at: null, total_paused_seconds: newTotal,
+    }).eq('id', id)
   } else {
     return NextResponse.json({ error: 'Action invalide' }, { status: 400 })
   }
