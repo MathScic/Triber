@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useMemo } from 'react'
 import { Search, MoreVertical, UserPlus } from 'lucide-react'
@@ -45,11 +45,11 @@ export function MemberTable({ members, isAdmin, onRoleChange, onRemove, onInvite
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Rechercher un membre…"
-            className="w-full h-10 pl-9 pr-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]" />
+            className="w-full h-10 pl-9 pr-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
         </div>
         {isAdmin && (
           <button onClick={onInvite}
-            className="flex items-center gap-2 h-10 px-4 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-[family-name:var(--font-nunito)] whitespace-nowrap">
+            className="flex items-center gap-2 h-10 px-4 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-[family-name:var(--font-nunito)] whitespace-nowrap">
             <UserPlus className="w-4 h-4" /> Ajouter un membre
           </button>
         )}
@@ -59,9 +59,9 @@ export function MemberTable({ members, isAdmin, onRoleChange, onRemove, onInvite
       <div className="flex items-center gap-4 px-5 py-3 border-b border-[#F4F4F6]">
         {TABS.map(t => (
           <button key={t.key} onClick={() => setFilter(t.key)}
-            className={`flex items-center gap-1.5 text-sm font-semibold transition-colors font-[family-name:var(--font-nunito)] ${filter === t.key ? 'text-[#1A1F16]' : 'text-[#9CA3AF]'}`}>
+            className={`flex items-center gap-1.5 text-sm font-semibold transition-colors font-[family-name:var(--font-nunito)] ${filter === t.key ? 'text-brand-dark' : 'text-[#9CA3AF]'}`}>
             {t.label}
-            <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${filter === t.key ? 'bg-[#1A1F16] text-white' : 'bg-[#F4F4F6] text-[#9CA3AF]'}`}>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${filter === t.key ? 'bg-brand-dark text-white' : 'bg-brand-bg text-[#9CA3AF]'}`}>
               {t.count}
             </span>
           </button>
@@ -90,14 +90,14 @@ export function MemberTable({ members, isAdmin, onRoleChange, onRemove, onInvite
                         style={{ backgroundColor: color.bg, color: color.text }}>
                         {initials(name)}
                       </div>
-                      <span className="font-semibold text-[#1A1F16]">{name}</span>
+                      <span className="font-semibold text-brand-dark">{name}</span>
                     </div>
                   </td>
                   <td className="px-5 py-3.5 text-[#6B7280]">{m.category ?? '—'}</td>
                   <td className="px-5 py-3.5">
                     {isAdmin
                       ? <select value={m.role} onChange={e => onRoleChange(m.user_id, e.target.value as MemberRole)}
-                          className="text-xs border border-[#D1D1D6] rounded-lg px-2 py-1 bg-white text-[#1A1F16] focus:outline-none focus:ring-1 focus:ring-[#2A9D4E]">
+                          className="text-xs border border-[#D1D1D6] rounded-lg px-2 py-1 bg-white text-brand-dark focus:outline-none focus:ring-1 focus:ring-success">
                           <option value="member">Membre</option>
                           <option value="member_active">Actif</option>
                           <option value="admin">Admin</option>
@@ -114,13 +114,13 @@ export function MemberTable({ members, isAdmin, onRoleChange, onRemove, onInvite
                     {isAdmin && (
                       <>
                         <button onClick={() => setOpenMenu(openMenu === m.id ? null : m.id)}
-                          className="w-8 h-8 rounded-lg hover:bg-[#F4F4F6] flex items-center justify-center transition-colors">
+                          className="w-8 h-8 rounded-lg hover:bg-brand-bg flex items-center justify-center transition-colors">
                           <MoreVertical className="w-4 h-4 text-[#9CA3AF]" />
                         </button>
                         {openMenu === m.id && (
                           <div className="absolute right-4 top-10 z-10 bg-white border border-[#D1D1D6] rounded-xl shadow-lg py-1 min-w-[140px]">
                             <button onClick={() => { onRemove(m.user_id); setOpenMenu(null) }}
-                              className="w-full text-left px-4 py-2.5 text-sm text-[#E8622A] hover:bg-[#FDF0EB] transition-colors font-[family-name:var(--font-nunito)]">
+                              className="w-full text-left px-4 py-2.5 text-sm text-secondary hover:bg-secondary-light transition-colors font-[family-name:var(--font-nunito)]">
                               Retirer du club
                             </button>
                           </div>

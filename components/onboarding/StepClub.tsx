@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 
 const SPORTS = ['Football', 'Basketball', 'Tennis', 'Rugby', 'Handball', 'Volleyball', 'Pêche', 'Autre']
 const SIZES = ['Moins de 20', '20 à 50', '50 à 150', 'Plus de 150']
-const sel = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] bg-white px-3 text-sm text-[#1A1F16] focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
+const sel = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] bg-white px-3 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-success'
 
 interface ClubFields {
   name: string
@@ -34,7 +34,7 @@ export function StepClub({ onSubmit, onBack, loading }: Props) {
         <Label htmlFor="name">Nom du club *</Label>
         <Input id="name" placeholder="FC Normandie"
           {...register('name', { required: 'Le nom est requis' })} />
-        {errors.name && <p className="text-xs text-[#E8622A]">{errors.name.message}</p>}
+        {errors.name && <p className="text-xs text-secondary">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-1.5">
@@ -64,7 +64,7 @@ export function StepClub({ onSubmit, onBack, loading }: Props) {
         </Label>
         <Input id="slogan" placeholder="Le slogan de votre club"
           {...register('slogan', { maxLength: { value: 60, message: '60 caractères max' } })} />
-        {errors.slogan && <p className="text-xs text-[#E8622A]">{errors.slogan.message}</p>}
+        {errors.slogan && <p className="text-xs text-secondary">{errors.slogan.message}</p>}
       </div>
 
       <div className="flex gap-3 pt-2">

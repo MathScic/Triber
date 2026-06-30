@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { Plus, Trash2, Save } from 'lucide-react'
@@ -23,7 +23,7 @@ function numField(value: number, onChange: (n: number) => void) {
     <input
       type="number" min={0} value={value}
       onChange={e => onChange(Number(e.target.value))}
-      className="w-10 text-center text-xs border border-[#D1D1D6] rounded-lg px-1 py-1.5 bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] tabular-nums font-[family-name:var(--font-nunito)]"
+      className="w-10 text-center text-xs border border-[#D1D1D6] rounded-lg px-1 py-1.5 bg-brand-bg focus:outline-none focus:border-success tabular-nums font-[family-name:var(--font-nunito)]"
     />
   )
 }
@@ -77,7 +77,7 @@ export function StandingsForm({ rows, season, onUpsert, onRemove }: Props) {
                   <input
                     type="text" value={row.team_name} placeholder="Nom équipe"
                     onChange={e => update(idx, { team_name: e.target.value })}
-                    className="w-28 text-xs border border-[#D1D1D6] rounded-lg px-2 py-1.5 bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]"
+                    className="w-28 text-xs border border-[#D1D1D6] rounded-lg px-2 py-1.5 bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]"
                   />
                 </td>
                 <td className="py-1.5 px-1">{numField(row.played, v => update(idx, { played: v }))}</td>
@@ -91,19 +91,19 @@ export function StandingsForm({ rows, season, onUpsert, onRemove }: Props) {
                   <input
                     type="checkbox" checked={row.is_own_team}
                     onChange={e => update(idx, { is_own_team: e.target.checked })}
-                    className="w-4 h-4 accent-[#2A9D4E] cursor-pointer"
+                    className="w-4 h-4 accent-success cursor-pointer"
                   />
                 </td>
                 <td className="py-1.5 px-1">
                   <div className="flex items-center gap-1">
                     {row.dirty && (
                       <button onClick={() => void save(idx)} disabled={saving !== null}
-                        className="p-1.5 rounded-lg bg-[#E8622A] text-white hover:bg-[#d4571f] transition-colors">
+                        className="p-1.5 rounded-lg bg-secondary text-white hover:bg-[#d4571f] transition-colors">
                         <Save className="w-3 h-3" />
                       </button>
                     )}
                     <button onClick={() => void remove(idx)}
-                      className="p-1.5 rounded-lg text-[#6B7280] hover:bg-[#FDF0EB] hover:text-[#E8622A] transition-colors">
+                      className="p-1.5 rounded-lg text-[#6B7280] hover:bg-secondary-light hover:text-secondary transition-colors">
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
@@ -115,7 +115,7 @@ export function StandingsForm({ rows, season, onUpsert, onRemove }: Props) {
       </div>
 
       <button onClick={addRow}
-        className="flex items-center gap-2 text-sm text-[#2A9D4E] font-semibold font-[family-name:var(--font-nunito)] hover:opacity-80 transition-opacity">
+        className="flex items-center gap-2 text-sm text-success font-semibold font-[family-name:var(--font-nunito)] hover:opacity-80 transition-opacity">
         <Plus className="w-4 h-4" />
         Ajouter une équipe
       </button>

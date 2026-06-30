@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { X, ArrowUpRight, ArrowLeftRight, Plus } from 'lucide-react'
@@ -69,11 +69,11 @@ export function AddEventForm({ members, defaultMinute, onAdd, onClose }: Props) 
   return (
     <div className="space-y-4 p-4 pb-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+        <h3 className="text-base font-[800] text-brand-dark font-[family-name:var(--font-barlow)] uppercase tracking-wide">
           Action
         </h3>
         {onClose && (
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-[#F4F4F6] transition-colors text-[#6B7280]">
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-brand-bg transition-colors text-[#6B7280]">
             <X className="w-4 h-4" />
           </button>
         )}
@@ -86,7 +86,7 @@ export function AddEventForm({ members, defaultMinute, onAdd, onClose }: Props) 
           return (
             <button key={type} onClick={() => { setTileType(type); setUserId(''); setAssistUserId(''); setAddAssist(false) }}
               className={`flex-shrink-0 w-[68px] flex flex-col items-center justify-center gap-2 py-3 rounded-2xl transition-colors border ${
-                active ? 'bg-[#2A9D4E] border-[#2A9D4E]' : 'bg-white border-[#E8E8EA] hover:border-[#D1D1D6]'
+                active ? 'bg-success border-success' : 'bg-white border-[#E8E8EA] hover:border-[#D1D1D6]'
               }`}>
               <TileIcon type={type} active={active} />
               <span className={`text-[10px] font-bold leading-tight text-center font-[family-name:var(--font-nunito)] ${active ? 'text-white' : 'text-[#6B7280]'}`}>
@@ -104,7 +104,7 @@ export function AddEventForm({ members, defaultMinute, onAdd, onClose }: Props) 
             <button key={String(own)} onClick={() => { setIsOwnTeam(own); setUserId(''); setAssistUserId(''); setAddAssist(false) }}
               className={`h-10 rounded-xl text-sm font-semibold transition-colors font-[family-name:var(--font-nunito)] border ${
                 isOwnTeam === own
-                  ? own ? 'bg-[#2A9D4E] text-white border-[#2A9D4E]' : 'bg-[#1A1F16] text-white border-[#1A1F16]'
+                  ? own ? 'bg-success text-white border-success' : 'bg-brand-dark text-white border-brand-dark'
                   : 'bg-white text-[#6B7280] border-[#D1D1D6] hover:border-[#9CA3AF]'
               }`}>
               {own ? 'Notre équipe' : 'Adversaire'}
@@ -118,13 +118,13 @@ export function AddEventForm({ members, defaultMinute, onAdd, onClose }: Props) 
         <div className="w-20 flex-shrink-0">
           <p className="text-[11px] text-[#6B7280] mb-1 uppercase font-[family-name:var(--font-nunito)] tracking-wide font-bold">Minute</p>
           <input type="number" min={0} max={200} value={minute} onChange={e => setMinute(Number(e.target.value))}
-            className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm text-center font-[800] bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-barlow)]" />
+            className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm text-center font-[800] bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-barlow)]" />
         </div>
         {needsPlayer && available.length > 0 && (
           <div className="flex-1">
             <p className="text-[11px] text-[#6B7280] mb-1 uppercase font-[family-name:var(--font-nunito)] tracking-wide font-bold">Joueur</p>
             <select value={userId} onChange={e => setUserId(e.target.value)}
-              className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]">
+              className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]">
               <option value="">— Choisir —</option>
               {opts}
             </select>
@@ -136,7 +136,7 @@ export function AddEventForm({ members, defaultMinute, onAdd, onClose }: Props) 
       {isGoal && isOwnTeam && available.length > 0 && (
         !addAssist ? (
           <button onClick={() => setAddAssist(true)}
-            className="flex items-center gap-1.5 text-xs text-[#2A9D4E] font-semibold font-[family-name:var(--font-nunito)] hover:text-[#238742] transition-colors">
+            className="flex items-center gap-1.5 text-xs text-success font-semibold font-[family-name:var(--font-nunito)] hover:text-[#238742] transition-colors">
             <Plus className="w-3.5 h-3.5" /> Ajouter une passe décisive
           </button>
         ) : (
@@ -149,7 +149,7 @@ export function AddEventForm({ members, defaultMinute, onAdd, onClose }: Props) 
               </button>
             </div>
             <select value={assistUserId} onChange={e => setAssistUserId(e.target.value)}
-              className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]">
+              className="w-full h-10 px-2 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]">
               <option value="">— Choisir le passeur —</option>
               {opts}
             </select>

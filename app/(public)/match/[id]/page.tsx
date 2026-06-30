@@ -32,12 +32,12 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
   return (
     <main>
       {/* Barre marque Triber */}
-      <div className="bg-[#F4F4F6] px-5 py-3 flex items-center justify-between border-b border-[#D1D1D6]">
+      <div className="bg-brand-bg px-5 py-3 flex items-center justify-between border-b border-[#D1D1D6]">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ backgroundColor: org?.primary_color ?? '#2A9D4E' }}>
+          <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ backgroundColor: org?.primary_color ?? '#1E5C38' }}>
             <span className="text-white text-[10px] font-[800] font-[family-name:var(--font-barlow)]">T</span>
           </div>
-          <span className="text-sm font-[800] text-[#1A1F16] uppercase font-[family-name:var(--font-barlow)] tracking-tight">Triber</span>
+          <span className="text-sm font-[800] text-brand-dark uppercase font-[family-name:var(--font-barlow)] tracking-tight">Triber</span>
         </div>
         <span className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Direct live</span>
       </div>

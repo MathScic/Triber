@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -71,8 +71,8 @@ export default function JoinOrgCard({ code, orgId, confirmed }: Props) {
   if (loadErr) {
     return (
       <div className="bg-white rounded-xl border border-[#D1D1D6] p-8 text-center space-y-2">
-        <AlertCircle className="w-8 h-8 text-[#E8622A] mx-auto mb-2" />
-        <p className="font-semibold text-[#E8622A]">{loadErr}</p>
+        <AlertCircle className="w-8 h-8 text-secondary mx-auto mb-2" />
+        <p className="font-semibold text-secondary">{loadErr}</p>
         <p className="text-sm text-[#6B7280]">Ce lien d'invitation est invalide ou a expiré.</p>
       </div>
     )
@@ -82,7 +82,7 @@ export default function JoinOrgCard({ code, orgId, confirmed }: Props) {
     <div className="bg-white rounded-xl border border-[#D1D1D6] p-6 space-y-6">
       <div className="text-center pb-4 border-b border-[#D1D1D6]">
         <p className="text-xs text-[#6B7280] uppercase tracking-widest mb-2">Invitation à rejoindre</p>
-        <h2 className="text-2xl font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-tight">
+        <h2 className="text-2xl font-[800] text-brand-dark font-[family-name:var(--font-barlow)] uppercase tracking-tight">
           {org?.name}
         </h2>
         <p className="text-sm text-[#6B7280] mt-1">

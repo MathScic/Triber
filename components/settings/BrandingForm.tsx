@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 export function BrandingForm() {
   const { setPrimaryColor } = useBrandingContext()
   const [orgName, setOrgName] = useState('')
-  const [primary, setPrimary] = useState('#2A9D4E')
+  const [primary, setPrimary] = useState('#1E5C38')
   const [secondary, setSecondary] = useState('#E8622A')
   const [slogan, setSlogan] = useState('')
   const [logoSrc, setLogoSrc] = useState<string | null>(null)
@@ -59,7 +59,7 @@ export function BrandingForm() {
 
   return (
     <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-5 space-y-5">
-      <h2 className="font-[700] text-[#1A1F16] text-base uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+      <h2 className="font-[700] text-brand-dark text-base uppercase tracking-tight font-[family-name:var(--font-barlow)]">
         Personnalisation
       </h2>
 
@@ -70,7 +70,7 @@ export function BrandingForm() {
           type="text" maxLength={80} value={orgName}
           onChange={e => setOrgName(e.target.value)}
           placeholder="ex : FC Normandie"
-          className="w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm text-[#1A1F16] bg-[#F4F4F6] focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]"
+          className="w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm text-brand-dark bg-brand-bg focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]"
         />
       </div>
 
@@ -87,11 +87,11 @@ export function BrandingForm() {
       <div>
         <input type="text" maxLength={60} value={slogan} onChange={e => setSlogan(e.target.value)}
           placeholder="ex : Ensemble, on est plus forts"
-          className="w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm text-[#1A1F16] bg-[#F4F4F6] focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]" />
+          className="w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm text-brand-dark bg-brand-bg focus:outline-none focus:border-primary font-[family-name:var(--font-nunito)]" />
         <p className="text-right text-xs text-[#6B7280] mt-1">{slogan.length}/60</p>
       </div>
 
-      {error && <p className="text-xs text-[#E8622A] bg-[#FDF0EB] rounded-lg px-3 py-2">{error}</p>}
+      {error && <p className="text-xs text-secondary bg-secondary-light rounded-lg px-3 py-2">{error}</p>}
       {success && <p className="text-xs text-primary bg-primary-light rounded-lg px-3 py-2">Paramètres sauvegardés ✓</p>}
 
       <Button className="w-full" type="button" disabled={saving} onClick={() => { void handleSave() }}>

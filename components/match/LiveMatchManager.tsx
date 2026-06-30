@@ -24,20 +24,20 @@ interface Props {
 }
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'live', label: 'Live' },
-  { key: 'compo', label: 'Compo' },
+  { key: 'live',     label: 'Actions du match' },
+  { key: 'compo',    label: 'Composition' },
   { key: 'presence', label: 'Présence' },
 ]
 
 export function LiveMatchManager({ eventId, opponent, isHome, initialStatus, initialStartedAt, initialPausedAt, initialTotalPausedSeconds, orgName, orgLogoUrl, organizationId, eventTitle, allMembers, initialLineup }: Props) {
-  const [status, setStatus] = useState<MatchStatus>(initialStatus)
-  const [startedAt, setStartedAt] = useState<string | null>(initialStartedAt)
-  const [pausedAt, setPausedAt] = useState<string | null>(initialPausedAt)
+  const [status, setStatus]     = useState<MatchStatus>(initialStatus)
+  const [startedAt, setStartedAt]   = useState<string | null>(initialStartedAt)
+  const [pausedAt, setPausedAt]     = useState<string | null>(initialPausedAt)
   const [totalPausedSeconds, setTotalPausedSeconds] = useState(initialTotalPausedSeconds)
   const [showForm, setShowForm] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [tab, setTab] = useState<Tab>('live')
-  const { actions, refetch } = useMatchLive(eventId)
+  const [loading, setLoading]   = useState(false)
+  const [tab, setTab]           = useState<Tab>('live')
+  const { actions, refetch }    = useMatchLive(eventId)
 
   const post = (path: string, body: object) =>
     fetch(`/api/match/${eventId}/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -49,7 +49,7 @@ export function LiveMatchManager({ eventId, opponent, isHome, initialStatus, ini
     const res = await post('control', { action })
     if (res.ok) {
       const now = new Date().toISOString()
-      if (action === 'start') { setStartedAt(now); setStatus('ongoing'); setPausedAt(null); setTotalPausedSeconds(0) }
+      if (action === 'start')      { setStartedAt(now); setStatus('ongoing'); setPausedAt(null); setTotalPausedSeconds(0) }
       else if (action === 'half_time') { setStatus('half_time'); setPausedAt(now) }
       else if (action === 'resume') {
         const add = pausedAt ? Math.floor((Date.now() - new Date(pausedAt).getTime()) / 1000) : 0
@@ -65,7 +65,7 @@ export function LiveMatchManager({ eventId, opponent, isHome, initialStatus, ini
   }
   const removeEvent = (id: string) => { void del('event', { matchActionId: id }).then(() => refetch()) }
 
-  const us = actions.filter(a => a.type === 'goal' && a.is_own_team).length
+  const us   = actions.filter(a => a.type === 'goal' && a.is_own_team).length
   const them = actions.filter(a => a.type === 'goal' && !a.is_own_team).length
   const timelineMembers: OrgMember[] = allMembers.map(m => ({ user_id: m.user_id, name: m.name, jersey: m.jersey }))
   const lineupMembers: OrgMember[] = allMembers.filter(m => initialLineup.some(l => l.org_member_id === m.org_member_id)).length > 0
@@ -86,14 +86,15 @@ export function LiveMatchManager({ eventId, opponent, isHome, initialStatus, ini
         onHalfTime={() => void control('half_time')} onResume={() => void control('resume')}
       />
 
-      {/* Onglets compacts */}
-      <div className="flex bg-white rounded-xl border border-[#D1D1D6] shadow-sm overflow-hidden">
+      {/* Bouton démarrer / terminer — visible depuis tous les onglets */}
+      <MatchControls status={status} loading={loading} onControl={action => void control(action)} />
+
+      {/* Onglets */}
+      <div className="flex bg-white rounded-xl border border-brand-border shadow-sm overflow-hidden">
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`flex-1 py-2.5 text-xs font-[800] uppercase tracking-widest transition-colors font-[family-name:var(--font-barlow)] ${
-              tab === t.key
-                ? 'bg-[#1A1F16] text-white'
-                : 'text-[#6B7280] hover:bg-[#F4F4F6]'
+            className={`flex-1 py-2.5 text-[10px] font-[800] uppercase tracking-wide transition-colors font-[family-name:var(--font-barlow)] ${
+              tab === t.key ? 'bg-brand-dark text-white' : 'text-brand-muted hover:bg-brand-bg'
             }`}>
             {t.label}
           </button>
@@ -101,30 +102,20 @@ export function LiveMatchManager({ eventId, opponent, isHome, initialStatus, ini
       </div>
 
       {tab === 'live' && (
-        <div className="space-y-3">
-          <MatchControls status={status} loading={loading} onControl={action => void control(action)} />
-          <div className="px-1">
-            <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-2 font-[family-name:var(--font-nunito)]">
-              Actions du match
-            </p>
-            <EventTimeline actions={actions} members={timelineMembers} onRemove={status !== 'finished' ? removeEvent : undefined} opponentName={opponent ?? 'Adversaire'} isHome={isHome} orgName={orgName} />
-          </div>
-        </div>
+        <EventTimeline actions={actions} members={timelineMembers} onRemove={status !== 'finished' ? removeEvent : undefined} opponentName={opponent ?? 'Adversaire'} isHome={isHome} orgName={orgName} />
       )}
-
       {tab === 'compo' && (
         <MatchCompositionSection allMembers={allMembers} initialLineup={initialLineup} eventId={eventId} organizationId={organizationId} eventTitle={eventTitle} />
       )}
-
       {tab === 'presence' && (
-        <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4">
+        <div className="bg-white rounded-xl border border-brand-border shadow-sm p-4">
           <AttendeesList eventId={eventId} organizationId={organizationId} isExpanded={true} />
         </div>
       )}
 
       {status === 'ongoing' && tab === 'live' && (
         <button onClick={() => setShowForm(true)}
-          className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 w-14 h-14 rounded-full bg-[#2A9D4E] text-white shadow-lg flex items-center justify-center hover:bg-[#238742] transition-colors z-40">
+          className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 w-14 h-14 rounded-full bg-success text-white shadow-lg flex items-center justify-center hover:bg-success/90 transition-colors z-40">
           <Plus className="w-7 h-7" strokeWidth={2.5} />
         </button>
       )}

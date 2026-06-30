@@ -16,8 +16,8 @@ const EVENT_TYPES = [
 const CATEGORIES = ['Senior', 'U18', 'U16', 'U15', 'U14', 'U13', 'U12', 'Vétérans', 'Féminine', 'Futsal']
 const TEAMS = ['A', 'B', 'C']
 
-const SEL = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
-const DATE = 'accent-[#2A9D4E] [color-scheme:light]'
+const SEL = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-success'
+const DATE = 'accent-success [color-scheme:light]'
 
 interface FormFields {
   title: string; type: EventType; date: string; time: string
@@ -49,14 +49,14 @@ export function EventForm({ onSubmit, onCancel, loading }: Props) {
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="bg-white rounded-xl border border-[#D1D1D6] p-5 space-y-4">
-      <h3 className="font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+      <h3 className="font-[800] text-brand-dark font-[family-name:var(--font-barlow)] uppercase tracking-wide">
         Nouvel événement
       </h3>
 
       <div className="space-y-1">
         <Label htmlFor="ev-title">Titre</Label>
         <Input id="ev-title" placeholder="FC Normandie vs Caen" {...register('title', { required: 'Titre requis' })} />
-        {errors.title && <p className="text-xs text-[#E8622A]">{errors.title.message}</p>}
+        {errors.title && <p className="text-xs text-secondary">{errors.title.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -73,7 +73,7 @@ export function EventForm({ onSubmit, onCancel, loading }: Props) {
         <div className="space-y-1">
           <Label htmlFor="ev-date">Date</Label>
           <Input id="ev-date" type="date" className={DATE} {...register('date', { required: 'Date requise' })} />
-          {errors.date && <p className="text-xs text-[#E8622A]">{errors.date.message}</p>}
+          {errors.date && <p className="text-xs text-secondary">{errors.date.message}</p>}
         </div>
         <div className="space-y-1">
           <Label htmlFor="ev-time">Heure</Label>
@@ -103,7 +103,7 @@ export function EventForm({ onSubmit, onCancel, loading }: Props) {
               <Input id="ev-opponent" placeholder="FC Caen" {...register('opponent')} />
             </div>
             <div className="flex items-end pb-2 gap-2">
-              <input type="checkbox" id="ev-is-home" {...register('is_home')} className="h-4 w-4 rounded accent-[#2A9D4E]" />
+              <input type="checkbox" id="ev-is-home" {...register('is_home')} className="h-4 w-4 rounded accent-success" />
               <Label htmlFor="ev-is-home">Domicile</Label>
             </div>
           </div>

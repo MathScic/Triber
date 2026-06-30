@@ -14,14 +14,14 @@ function ScoreCounter({ value, onChange }: { value: number; onChange: (v: number
   return (
     <div className="flex items-center gap-3">
       <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-10 h-10 rounded-full bg-[#E8E8EA] text-[#1A1F16] text-lg font-bold hover:bg-[#D1D1D6] transition-colors">
+        className="w-10 h-10 rounded-full bg-[#E8E8EA] text-brand-dark text-lg font-bold hover:bg-[#D1D1D6] transition-colors">
         −
       </button>
-      <span className="text-5xl font-extrabold text-[#1A1F16] w-12 text-center tabular-nums">
+      <span className="text-5xl font-extrabold text-brand-dark w-12 text-center tabular-nums">
         {value}
       </span>
       <button type="button" onClick={() => onChange(value + 1)}
-        className="w-10 h-10 rounded-full bg-[#2A9D4E] text-white text-lg font-bold hover:bg-[#238742] transition-colors">
+        className="w-10 h-10 rounded-full bg-success text-white text-lg font-bold hover:bg-[#238742] transition-colors">
         +
       </button>
     </div>
@@ -50,8 +50,8 @@ export function MatchResultForm({ eventId, initialHome = 0, initialAway = 0, onS
 
   return (
     <div className="bg-white rounded-xl border border-[#D1D1D6] p-5 space-y-5">
-      <h3 className="text-sm font-bold text-[#1A1F16] text-center">Score du match</h3>
-      {error && <p className="text-xs text-[#E8622A] text-center">{error}</p>}
+      <h3 className="text-sm font-bold text-brand-dark text-center">Score du match</h3>
+      {error && <p className="text-xs text-secondary text-center">{error}</p>}
 
       <div className="flex items-center justify-center gap-6">
         <div className="text-center space-y-2">

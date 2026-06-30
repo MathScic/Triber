@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -57,7 +57,7 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#F4F4F6] flex items-center justify-center">
+      <main className="min-h-screen bg-brand-bg flex items-center justify-center">
         <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">Chargement…</p>
       </main>
     )
@@ -66,7 +66,7 @@ export default function HomePage() {
   if (!org) return null
 
   return (
-    <main className="min-h-screen bg-[#F4F4F6] px-4 py-8">
+    <main className="min-h-screen bg-brand-bg px-4 py-8">
       <div className="max-w-lg lg:max-w-4xl mx-auto space-y-4">
         <OrgBanner
           name={org.name}
@@ -74,7 +74,7 @@ export default function HomePage() {
           logoUrl={org.logo_url}
           coverUrl={org.cover_url}
           initial={fullName.charAt(0).toUpperCase() || '?'}
-          primaryColor={org.primary_color ?? '#2A9D4E'}
+          primaryColor={org.primary_color ?? '#1E5C38'}
           organizationId={org.id}
         />
         <LiveMatchBanner organizationId={org.id} />
@@ -83,7 +83,7 @@ export default function HomePage() {
         <TopScorerCard organizationId={org.id} />
         <StandingsCard
           organizationId={org.id}
-          primaryColor={org.primary_color ?? '#2A9D4E'}
+          primaryColor={org.primary_color ?? '#1E5C38'}
         />
         {userId && (
           <AnnouncementSection

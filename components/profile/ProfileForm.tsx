@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
@@ -42,7 +42,7 @@ export function ProfileForm({ userId }: { userId: string }) {
 
   return (
     <div className="bg-white rounded-2xl border border-[#D1D1D6] p-6 space-y-4">
-      <h2 className="text-base font-[700] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+      <h2 className="text-base font-[700] text-brand-dark font-[family-name:var(--font-barlow)] uppercase tracking-wide">
         Informations personnelles
       </h2>
 

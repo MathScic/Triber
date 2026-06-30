@@ -35,7 +35,7 @@ export function MatchCompositionSection({ allMembers, initialLineup, eventId, or
       <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm overflow-hidden">
         <button onClick={() => setShowCompo(v => !v)}
           className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E8E8EA] transition-colors">
-          <span className="flex items-center gap-2 text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">
+          <span className="flex items-center gap-2 text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">
             <Users className="w-4 h-4 text-[#6B7280]" />
             Composition ({starters.length} tit. · {subs.length} rem.)
           </span>
@@ -48,7 +48,7 @@ export function MatchCompositionSection({ allMembers, initialLineup, eventId, or
               <div className="py-3 text-center space-y-2">
                 <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">Aucune composition définie</p>
                 <button onClick={() => setShowModal(true)}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#2A9D4E] hover:underline font-[family-name:var(--font-nunito)]">
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-success hover:underline font-[family-name:var(--font-nunito)]">
                   <Settings2 className="w-3.5 h-3.5" /> Définir la composition
                 </button>
               </div>
@@ -58,7 +58,7 @@ export function MatchCompositionSection({ allMembers, initialLineup, eventId, or
                   <div className="pt-2">
                     <p className="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wide mb-1 font-[family-name:var(--font-nunito)]">Titulaires</p>
                     {starters.map(m => (
-                      <p key={m.user_id} className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">
+                      <p key={m.user_id} className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">
                         {m.jersey != null ? `${m.jersey} - ` : ''}{m.name}
                       </p>
                     ))}
@@ -75,7 +75,7 @@ export function MatchCompositionSection({ allMembers, initialLineup, eventId, or
                   </div>
                 )}
                 <button onClick={() => setShowModal(true)}
-                  className="inline-flex items-center gap-1 text-xs text-[#6B7280] hover:text-[#2A9D4E] transition-colors pt-1 font-[family-name:var(--font-nunito)]">
+                  className="inline-flex items-center gap-1 text-xs text-[#6B7280] hover:text-success transition-colors pt-1 font-[family-name:var(--font-nunito)]">
                   <Settings2 className="w-3 h-3" /> Modifier
                 </button>
               </>

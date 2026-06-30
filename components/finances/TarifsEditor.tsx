@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { Plus, Trash2 } from 'lucide-react'
 import type { ContributionTarif } from '@/lib/hooks/useContributions'
@@ -26,7 +26,7 @@ export function TarifsEditor({ tarifs, onChange }: Props) {
           Tarifs par catégorie
         </label>
         <button type="button" onClick={add}
-          className="flex items-center gap-1 text-xs text-[#2A9D4E] font-semibold hover:opacity-80 transition-opacity font-[family-name:var(--font-nunito)]">
+          className="flex items-center gap-1 text-xs text-success font-semibold hover:opacity-80 transition-opacity font-[family-name:var(--font-nunito)]">
           <Plus className="w-3.5 h-3.5" /> Ajouter
         </button>
       </div>
@@ -43,9 +43,9 @@ export function TarifsEditor({ tarifs, onChange }: Props) {
             value={t.category}
             onChange={e => update(i, 'category', e.target.value)}
             placeholder="ex : Seniors"
-            className="flex-1 h-9 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]"
+            className="flex-1 h-9 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]"
           />
-          <div className="flex items-center border border-[#D1D1D6] rounded-xl overflow-hidden bg-[#F4F4F6] h-9">
+          <div className="flex items-center border border-[#D1D1D6] rounded-xl overflow-hidden bg-brand-bg h-9">
             <input
               type="number" min="0" step="0.01"
               value={t.amount_cents > 0 ? (t.amount_cents / 100).toFixed(2) : ''}
@@ -56,7 +56,7 @@ export function TarifsEditor({ tarifs, onChange }: Props) {
             <span className="pr-2 text-sm text-[#6B7280]">€</span>
           </div>
           <button type="button" onClick={() => remove(i)}
-            className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-red-50 text-[#E8622A] transition-colors flex-shrink-0">
+            className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-red-50 text-secondary transition-colors flex-shrink-0">
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>

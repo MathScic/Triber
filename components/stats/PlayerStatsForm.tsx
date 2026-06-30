@@ -10,11 +10,11 @@ type StatsMap = Record<string, PlayerStatsInput>
 const EMPTY: PlayerStatsInput = { goals: 0, assists: 0, minutes_played: 0, yellow_cards: 0, red_cards: 0 }
 
 const FIELDS: { key: keyof PlayerStatsInput; short: string; label: string; cls: string }[] = [
-  { key: 'goals', short: 'B', label: 'Buts', cls: 'text-[#2A9D4E] font-bold' },
-  { key: 'assists', short: 'PD', label: 'Passes décisives', cls: 'text-[#2A9D4E] font-bold' },
+  { key: 'goals', short: 'B', label: 'Buts', cls: 'text-success font-bold' },
+  { key: 'assists', short: 'PD', label: 'Passes décisives', cls: 'text-success font-bold' },
   { key: 'minutes_played', short: 'min', label: 'Minutes jouées', cls: 'text-[#6B7280]' },
   { key: 'yellow_cards', short: 'J', label: 'Cartons jaunes', cls: 'text-yellow-500 font-bold' },
-  { key: 'red_cards', short: 'R', label: 'Cartons rouges', cls: 'text-[#E8622A] font-bold' },
+  { key: 'red_cards', short: 'R', label: 'Cartons rouges', cls: 'text-secondary font-bold' },
 ]
 
 interface Props { eventId: string; members: MemberForStats[]; onSaved?: () => void }
@@ -39,8 +39,8 @@ export function PlayerStatsForm({ eventId, members, onSaved }: Props) {
 
   return (
     <div className="bg-white rounded-xl border border-[#D1D1D6] p-4 space-y-3">
-      <h3 className="text-sm font-bold text-[#1A1F16]">Stats des joueurs</h3>
-      {error && <p className="text-xs text-[#E8622A]">{error}</p>}
+      <h3 className="text-sm font-bold text-brand-dark">Stats des joueurs</h3>
+      {error && <p className="text-xs text-secondary">{error}</p>}
 
       {/* En-tête colonnes */}
       <div className="grid gap-1 items-center" style={{ gridTemplateColumns: '1fr repeat(5, 40px)' }}>
@@ -57,17 +57,17 @@ export function PlayerStatsForm({ eventId, members, onSaved }: Props) {
         return (
           <div key={m.user_id} className="grid gap-1 items-center" style={{ gridTemplateColumns: '1fr repeat(5, 40px)' }}>
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-[#2A9D4E] flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-success flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
                 {initials}
               </div>
-              <span className="text-xs text-[#1A1F16] truncate">{m.name ?? '—'}</span>
+              <span className="text-xs text-brand-dark truncate">{m.name ?? '—'}</span>
             </div>
             {FIELDS.map(f => (
               <input key={f.key} type="number" min="0" max="999"
                 value={s[f.key] === 0 ? '' : s[f.key]}
                 placeholder="0"
                 onChange={e => update(m.user_id, f.key, e.target.value)}
-                className="h-8 w-full text-center text-sm border border-[#D1D1D6] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2A9D4E]"
+                className="h-8 w-full text-center text-sm border border-[#D1D1D6] rounded-lg focus:outline-none focus:ring-1 focus:ring-success"
               />
             ))}
           </div>

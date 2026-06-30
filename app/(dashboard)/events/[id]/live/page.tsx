@@ -63,7 +63,7 @@ export default async function LiveMatchPage({ params, searchParams }: { params: 
   const org = (Array.isArray(rawOrg) ? rawOrg[0] : rawOrg) as OrgData | null
 
   return (
-    <main className="min-h-screen bg-[#F4F4F6] px-4 py-8">
+    <main className="min-h-screen bg-brand-bg px-4 py-8">
       <div className="max-w-lg lg:max-w-4xl mx-auto space-y-4">
         <PageHeader
           title={ev.title as string}
@@ -85,9 +85,9 @@ export default async function LiveMatchPage({ params, searchParams }: { params: 
           allMembers={allMembers}
           initialLineup={initialLineup}
         />
-        <div className="bg-white rounded-xl border border-[#D1D1D6] p-3 text-center">
-          <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)] mb-1">Lien public à partager</p>
-          <p className="text-sm font-semibold text-[#2A9D4E] font-[family-name:var(--font-nunito)] break-all">
+        <div className="bg-white rounded-xl border border-brand-border p-3 text-center">
+          <p className="text-xs text-brand-muted font-[family-name:var(--font-nunito)] mb-1">Lien public à partager</p>
+          <p className="text-sm font-semibold text-success font-[family-name:var(--font-nunito)] break-all">
             /match/{id}
           </p>
         </div>

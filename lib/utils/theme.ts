@@ -47,24 +47,13 @@ export function injectTheme(primary: string, secondary: string) {
 
   el.textContent = `
     :root {
-      --triber-primary: ${p};
-      --triber-secondary: ${secondary};
-      --triber-primary-light: ${pLight};
-      --primary: ${hexToHsl(p)};
-      --primary-foreground: ${isLight ? '0 0% 0%' : '0 0% 100%'};
+      /* Variables lues par @theme inline (bg-primary, bg-secondary…) */
+      --triber-primary:      ${p};
+      --triber-secondary:    ${secondary};
+      --triber-primary-text: ${isLight ? '#000000' : '#ffffff'};
+      /* Compat legacy — certains endroits lisent encore --color-primary */
+      --color-primary:       ${p};
+      --color-secondary:     ${secondary};
     }
-
-    .bg-\\[\\#2A9D4E\\] { background-color: ${p} !important; }
-    .bg-\\[\\#E8F5EE\\], .bg-\\[\\#E8F5EEF\\] { background-color: ${pLight} !important; }
-    .from-\\[\\#2A9D4E\\] { --tw-gradient-from: ${p} !important; }
-    .hover\\:bg-\\[\\#238742\\]:hover { background-color: ${pDark} !important; }
-    .hover\\:bg-\\[\\#2A9D4E\\]:hover { background-color: ${p} !important; }
-    .text-\\[\\#2A9D4E\\] { color: ${p} !important; }
-    .border-\\[\\#2A9D4E\\] { border-color: ${p} !important; }
-    .focus\\:border-\\[\\#2A9D4E\\]:focus { border-color: ${p} !important; }
-    .focus\\:ring-\\[\\#2A9D4E\\]:focus { --tw-ring-color: ${p} !important; }
-    .accent-\\[\\#2A9D4E\\] { accent-color: ${p} !important; }
-    .ring-\\[\\#2A9D4E\\] { --tw-ring-color: ${p} !important; }
-
   `
 }

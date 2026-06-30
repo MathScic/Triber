@@ -7,11 +7,9 @@ interface Props {
   pausedAt: string | null
   totalPausedSeconds: number
   status: string | null
+  compact?: boolean
 }
 
-// Aligné avec la formule mobile :
-// elapsed = (ref - started_at) / 1000 - total_paused_seconds
-// ref = paused_at si en pause, sinon now()
 function calcSec(startedAt: string | null, pausedAt: string | null, totalPausedSec: number, status: string | null): number {
   if (!startedAt) return 0
   const startMs = new Date(startedAt).getTime()
@@ -21,7 +19,7 @@ function calcSec(startedAt: string | null, pausedAt: string | null, totalPausedS
   return Math.min(90 * 60, Math.max(0, Math.floor((refMs - startMs) / 1000) - totalPausedSec))
 }
 
-export function LiveTimer({ startedAt, pausedAt, totalPausedSeconds, status }: Props) {
+export function LiveTimer({ startedAt, pausedAt, totalPausedSeconds, status, compact }: Props) {
   const [totalSec, setTotalSec] = useState(() => calcSec(startedAt, pausedAt, totalPausedSeconds, status))
 
   useEffect(() => {
@@ -34,6 +32,16 @@ export function LiveTimer({ startedAt, pausedAt, totalPausedSeconds, status }: P
 
   const min = Math.floor(totalSec / 60)
   const sec = totalSec % 60
+  const timeStr = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
+
+  if (compact) {
+    return (
+      <span className="font-[800] font-[family-name:var(--font-barlow)] tabular-nums text-base leading-none text-white">
+        {timeStr}
+      </span>
+    )
+  }
+
   const label =
     status === 'half_time' ? 'Mi-temps' :
     status === 'finished' ? 'Terminé' :
@@ -42,11 +50,9 @@ export function LiveTimer({ startedAt, pausedAt, totalPausedSeconds, status }: P
   return (
     <div className="text-center">
       <div className="flex items-center justify-center gap-2">
-        {status === 'ongoing' && (
-          <span className="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0" />
-        )}
+        {status === 'ongoing' && <span className="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0" />}
         <span className="font-[800] font-[family-name:var(--font-barlow)] tabular-nums text-3xl leading-none text-white">
-          {min.toString().padStart(2, '0')}:{sec.toString().padStart(2, '0')}
+          {timeStr}
         </span>
       </div>
       {label && (

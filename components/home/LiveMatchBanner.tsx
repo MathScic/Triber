@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -51,7 +51,7 @@ export function LiveMatchBanner({ organizationId }: { organizationId: string }) 
 
   return (
     <Link href={`/events/${match.id}/live?from=home`}
-      className="block bg-[#1A1F16] rounded-2xl p-4 shadow-sm hover:bg-[#252b1e] transition-colors">
+      className="block bg-brand-dark rounded-2xl p-4 shadow-sm hover:bg-[#252b1e] transition-colors">
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />

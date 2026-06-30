@@ -202,6 +202,37 @@ L'application doit être **utilisable par un président de club de 65 ans**. Cha
 - Upload de la photo de couverture
 - Aperçu en temps réel avant validation
 - Application instantanée sur toute l'interface
+- Intégration Score'n'co : URL du widget de classement officiel
+
+### Module Communications (admin uniquement)
+
+- Création d'annonces envoyées à tous les membres de l'organisation
+- Catégorie optionnelle (info, urgence…)
+- Lecture par tous les membres dans leur fil d'accueil
+- Table `announcements` — RLS : lecture membres, écriture admin uniquement
+
+### Module Équipes / Catégories
+
+- Association des membres à une catégorie (Senior, U18, U16…)
+- Création d'événements ciblés par catégorie et par équipe (A, B, C)
+- Filtres par catégorie dans la liste des membres et des finances
+
+### Module Profil
+
+- Modification du nom, téléphone, photo
+- Visualisation de ses propres cotisations
+- Code d'invitation unique (partageable pour rejoindre une org)
+
+### Page d'invitation (sans connexion)
+
+- URL partageable : `triber.app/join/[code]`
+- Rejoindre une organisation via un code unique issu du profil admin
+- Flux : code → création de compte ou connexion → intégration automatique à l'org
+
+### Pages légales (sans connexion)
+
+- `triber.app/cgu` — Conditions générales d'utilisation
+- `triber.app/mentions-legales` — Mentions légales
 
 ### Mode Entreprise (plan Pro)
 
@@ -224,7 +255,9 @@ Ce projet est initialisé depuis **MathScic/NextJs-Starter-kit** qui inclut déj
 - Tailwind CSS + tailwindcss-animate
 - shadcn/ui (components.json configuré)
 - ESLint + Prettier + Husky (lint avant commit)
-- CI GitHub Actions (lint + typecheck + build)
+- CI GitHub Actions — deux jobs :
+  - **`verify`** (push + PR) : `lint` → `typecheck` → `vitest run` (57 tests) → `build` (standalone)
+  - **`e2e`** (PR vers main uniquement, dépend de `verify`) : Playwright Chromium headless ; rapport HTML uploadé en artifact si échec
 
 Ne jamais reconfigurer ce qui existe déjà dans le starter.
 
@@ -243,11 +276,12 @@ Ne jamais reconfigurer ce qui existe déjà dans le starter.
 | Paiements          | Stripe + Stripe Connect   | Cotisations → compte club    |
 | Emails             | Resend                    | Invitations, convocations    |
 | Push               | Expo Push Notifications   | Alertes mobiles              |
-| Tests unitaires    | Vitest                    | Logique métier               |
-| Tests E2E          | Playwright                | Parcours web                 |
-| CI                 | GitHub Actions            | Déjà configuré               |
-| Déploiement web    | Vercel                    | Auto-deploy GitHub           |
-| Déploiement mobile | Expo EAS Build            | App Store + Play Store       |
+| Tests unitaires    | Vitest                    | Logique métier (57 tests, lancés en CI) |
+| Tests E2E          | Playwright / Chromium     | Parcours web (lancés en CI sur PR)      |
+| CI                 | GitHub Actions            | verify (push+PR) + e2e (PR only)        |
+| Conteneurisation   | Docker multi-stage        | Image standalone ~150 MB (node:20-alpine) |
+| Déploiement web    | Vercel                    | Auto-deploy GitHub                      |
+| Déploiement mobile | Expo EAS Build            | App Store + Play Store                  |
 
 ---
 
@@ -256,36 +290,108 @@ Ne jamais reconfigurer ce qui existe déjà dans le starter.
 ### Palette Triber
 
 ```ts
-// À ajouter dans tailwind.config.ts → theme.extend.colors
+// tailwind.config.ts → theme.extend.colors
 brand: {
-  green:        '#2A9D4E',   // Primaire — vert sport
-  'green-light':'#E8F5EEF',  // Fond vert doux
-  orange:       '#E8622A',   // Accent — orange chaleureux
+  green:         '#2A9D4E',  // Primaire — vert sport (boutons, accents, actif sidebar)
+  'green-light': '#E8F5EE',  // Fond vert doux (badges "Payé", highlights)
+  orange:        '#E8622A',  // Accent — orange chaleureux (boutons secondaires)
   'orange-light':'#FDF0EB',  // Fond orange doux
-  dark:         '#1A1F16',   // Texte principal / fond sombre
-  cream:        '#FAF7F2',   // Fond général
-  sand:         '#F0EBE1',   // Fond sections alternées
-  muted:        '#7A8070',   // Texte secondaire
-  border:       '#DDD8CE',   // Bordures
+  dark:          '#1A1F16',  // Sidebar, header match live, fond sombre
+  cream:         '#FAF7F2',  // Fond général des pages
+  sand:          '#F0EBE1',  // Fond sections alternées, cartes légères
+  muted:         '#7A8070',  // Texte secondaire, labels
+  border:        '#DDD8CE',  // Bordures légères sur cartes et tableaux
 }
 ```
 
-Chaque organisation surcharge `primary` et `secondary` via son profil branding. Ces couleurs sont injectées via CSS custom properties à la racine du layout.
+Chaque organisation surcharge `primary` et `secondary` via son profil branding — injectés en CSS custom properties à la racine du layout via `lib/utils/theme.ts`.
 
 ### Typographie
 
 ```
-Barlow Condensed (700, 800) → Titres, scores, labels sportifs, chiffres clés
-Nunito (400, 600, 700)      → Texte courant, descriptions, boutons
+Barlow Condensed (700, 800) → Titres de page ("FINANCES", "MATCH"), scores,
+                               stats sportives (7V · 3N · 2D), numéros clés
+Nunito (400, 600, 700)      → Corps de texte, labels, boutons, descriptions
 ```
+
+### Layout global
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Sidebar sombre (#1A1F16)  │  Zone principale (cream) │
+│  w-64 desktop / drawer mob │  flex-1, overflow-y-auto  │
+│                             │                          │
+│  Logo + nom org             │  PageHeader (titre page)  │
+│  ─────────────────         │  Contenu (grilles, cards) │
+│  Nav items :                │                          │
+│  • icône + label            │                          │
+│  • actif = fond vert pill   │                          │
+│  • inactif = transparent    │                          │
+└─────────────────────────────────────────────────────┘
+```
+
+Mobile : sidebar masquée, drawer hamburger. Desktop : sidebar fixe w-64, contenu scrollable à droite.
+
+### Page de connexion — layout split
+
+```
+┌──────────────────────┬──────────────────────────┐
+│  Panneau gauche      │  Panneau droit           │
+│  fond sombre         │  fond blanc              │
+│  Logo du club        │  Titre + sous-titre      │
+│  Nom de l'org        │  Champs email/password   │
+│  Saison courante     │  Bouton "Se connecter"   │
+│  Stats (7V 3N 2D)    │  Lien "Créer un compte"  │
+└──────────────────────┴──────────────────────────┘
+```
+
+### Composants récurrents
+
+**Carte standard**
+- `bg-white rounded-2xl border border-brand-border shadow-sm p-4`
+- Titre en Barlow Condensed uppercase, corps en Nunito
+
+**Bannière organisation (home)**
+- Dégradé vert foncé → vert Triber, logo club à gauche
+- Nom en Barlow Condensed 800, stats en ligne (`7V · 3N · 2D · 12MJ · 24BM`)
+
+**Header match en direct (public)**
+- Fond sombre (#1A1F16) pleine largeur
+- Badge "EN DIRECT" vert clignotant · Score central Barlow 800 blanc · Chrono + statut
+
+**Icônes d'actions match** — composants partagés dans `components/match/MatchIcons.tsx`
+- But : `BallIcon` — cercle vert avec cible SVG
+- Carton jaune : `CardRect` couleur `#F59E0B`
+- Carton rouge : `CardRect` couleur `#EF4444`
+
+**Cartes KPI finances**
+- Grille 3 colonnes desktop / 1 colonne mobile
+- Valeur en Barlow Condensed 700 (ex : `345 €`), label muted en Nunito
+
+**Badges de statut**
+
+| Statut     | Classes Tailwind                                |
+| ---------- | ----------------------------------------------- |
+| Payé       | `bg-green-100 text-green-700 rounded-full px-2` |
+| En attente | `bg-amber-100 text-amber-700 rounded-full px-2` |
+| Échec      | `bg-red-100 text-red-700 rounded-full px-2`     |
+
+**Avatars membres** — `lib/utils/avatar.ts`
+- Cercle coloré via `avatarColor(name)` + initiales via `initials(name)`
+
+**Boutons**
+- Primaire : `bg-brand-green text-white hover:bg-brand-green/90 rounded-xl`
+- Secondaire : `bg-brand-orange text-white hover:bg-brand-orange/90 rounded-xl`
+- Fantôme : `border border-brand-border bg-white hover:bg-brand-sand rounded-xl`
 
 ### Principes UI
 
-- Interface **claire et aérée** — pas de surcharge visuelle
+- Interface **claire et aérée** — fond cream, cartes blanches, pas de surcharge
 - Chaque action importante : **3 taps maximum** sur mobile
 - Formulaires courts : jamais plus de 5 champs visibles à la fois
-- Feedback immédiat sur chaque action (toast, loading state, confirmation)
+- Feedback immédiat : toast, loading spinner, état de confirmation
 - Accessible : contrastes WCAG AA minimum
+- **Aucun ajout ou changement visuel sans validation explicite** — soumettre la proposition avant d'implémenter
 
 ---
 
@@ -294,43 +400,90 @@ Nunito (400, 600, 700)      → Texte courant, descriptions, boutons
 ```
 triber/
 ├── app/
+│   ├── page.tsx                            # Redirect → /home
+│   ├── layout.tsx
 │   ├── (auth)/
 │   │   ├── login/page.tsx
-│   │   └── register/page.tsx
+│   │   └── register/
+│   │       ├── page.tsx
+│   │       └── confirme/page.tsx           # Email de confirmation envoyé
 │   ├── (dashboard)/
 │   │   ├── layout.tsx
+│   │   ├── dashboard/page.tsx              # Redirect → /home
+│   │   ├── onboarding/page.tsx             # Création d'organisation (1ère connexion)
 │   │   ├── home/page.tsx
 │   │   ├── members/page.tsx
-│   │   ├── events/page.tsx
+│   │   ├── events/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/
+│   │   │       ├── page.tsx                # Détail événement + présences
+│   │   │       └── live/page.tsx           # Interface coach match en direct
 │   │   ├── stats/page.tsx
-│   │   ├── finances/page.tsx
+│   │   ├── teams/page.tsx                  # Gestion des équipes / catégories
+│   │   ├── finances/
+│   │   │   ├── page.tsx                    # Liste des cotisations
+│   │   │   └── [id]/page.tsx              # Détail cotisation + paiements membres
 │   │   ├── media/page.tsx
+│   │   ├── communications/page.tsx         # Annonces admin → membres
+│   │   ├── profile/page.tsx               # Profil utilisateur
 │   │   └── settings/page.tsx
-│   ├── (public)/              # Pages sans connexion requise
-│   │   ├── [club-slug]/page.tsx   # Page publique du club
-│   │   └── match/[id]/page.tsx    # Match en direct public
-│   ├── api/
-│   │   ├── webhooks/stripe/route.ts
-│   │   └── notifications/route.ts
-│   └── layout.tsx
+│   ├── (public)/                           # Pages sans connexion requise
+│   │   ├── [club-slug]/page.tsx            # Page publique du club
+│   │   ├── match/[id]/page.tsx             # Match en direct public (Realtime)
+│   │   ├── join/[code]/page.tsx            # Rejoindre via code d'invitation
+│   │   ├── cgu/page.tsx                    # Conditions générales
+│   │   └── mentions-legales/page.tsx       # Mentions légales
+│   └── api/
+│       ├── organizations/create/route.ts
+│       ├── members/
+│       │   ├── invite/route.ts             # Créer invitation (envoie email)
+│       │   └── send-invite/route.ts        # Renvoyer une invitation existante
+│       ├── stats/
+│       │   ├── match-result/route.ts
+│       │   └── player-stats/route.ts
+│       ├── contributions/
+│       │   ├── create/route.ts
+│       │   ├── pay/route.ts                # Initie paiement Stripe
+│       │   └── remind/route.ts             # Relance email cotisation impayée
+│       ├── stripe/subscribe/route.ts       # Abonnement plan Club
+│       ├── match/[id]/
+│       │   ├── lineup/route.ts             # Gestion composition
+│       │   ├── control/route.ts            # Contrôle chrono (start/pause/fin)
+│       │   └── event/route.ts              # Ajout/suppression actions (buts, cartons)
+│       ├── join/[code]/route.ts            # Valider code d'invitation
+│       └── webhooks/stripe/route.ts        # Webhook paiements Stripe
 │
 ├── components/
 │   ├── ui/              # shadcn/ui — ne pas modifier
 │   ├── auth/            # LoginForm, RegisterForm
-│   ├── dashboard/       # HomeWidgets, StatsSummary
-│   ├── members/         # MemberList, MemberCard, InviteForm
-│   ├── events/          # EventCard, EventForm, AttendanceButton
-│   ├── stats/           # PlayerRanking, MatchResultForm, StatsChart
-│   ├── finances/        # ContributionList, PaymentForm
-│   ├── media/           # MediaGallery, UploadButton
-│   ├── settings/        # BrandingForm, ColorPicker
-│   └── shared/          # Header, Nav, Logo, ThemeProvider
+│   ├── onboarding/      # CreateOrgForm, StepType, StepClub, StepEnterprise
+│   ├── home/            # OrgBanner, ModuleGrid, LastMatchCard, NextEventCard,
+│   │                    # TopScorerCard, AnnouncementSection, LiveMatchBanner, StandingsCard
+│   ├── members/         # MemberList, MemberCard, MemberTable, InviteForm
+│   ├── events/          # EventCard, EventCardHeader, EventCardActions, EventForm,
+│   │                    # EventDetailView, AttendanceButton, AttendeesList, DeleteConfirmModal
+│   ├── stats/           # PlayerRanking, PlayerStatsForm, PlayerStatsTable,
+│   │                    # MatchResultForm, MatchResultsTable, StandingsForm, StandingsTable,
+│   │                    # SeasonBilan, ScoreEncoWidget
+│   ├── finances/        # ContributionList, ContributionCard, CreateContributionModal,
+│   │                    # EditContributionModal, PaymentForm, PaymentMemberList,
+│   │                    # MarkPaidModal, AddManualMemberModal, TarifsEditor,
+│   │                    # BuvetteEntryForm, BuvetteList
+│   ├── match/           # LiveMatchManager, AddEventForm, EventTimeline, MatchLiveCard,
+│   │                    # ScoreCard, ScoreHeader, LiveScoreBoard, LiveTimer, LiveBand,
+│   │                    # MatchControls, MatchCompositionSection, LineupSection,
+│   │                    # LineupDisplay, LineupEditor, LineupModal, ActionRow, Timeline, MatchIcons
+│   ├── media/           # MediaGallery, MediaUploadButton
+│   ├── profile/         # ProfileForm, MyContributions
+│   ├── join/            # JoinAuthForm, JoinOrgCard
+│   ├── settings/        # BrandingForm, ColorPicker, UploadZone, ScoreEncoSettings,
+│   │                    # UpgradeSection, LogoutButton
+│   └── shared/          # AppNav, SidebarDesktop, SidebarMobile, PageHeader, ThemeProvider
 │
 ├── lib/
 │   ├── supabase/
 │   │   ├── client.ts    # Client browser
-│   │   ├── server.ts    # Client server (cookies)
-│   │   └── types.ts     # Types générés CLI
+│   │   └── server.ts    # Client server (cookies)
 │   ├── stripe/
 │   │   ├── client.ts
 │   │   └── webhooks.ts
@@ -340,21 +493,30 @@ triber/
 │   │   ├── useMembers.ts
 │   │   ├── useEvents.ts
 │   │   ├── useStats.ts
-│   │   └── useFinances.ts
+│   │   ├── useStandings.ts
+│   │   ├── useMedia.ts
+│   │   ├── useContributions.ts
+│   │   ├── useContributionPayments.ts
+│   │   ├── useFinances.ts
+│   │   ├── useTreasury.ts
+│   │   ├── useBranding.ts
+│   │   ├── useAnnouncements.ts
+│   │   ├── useMatchLive.ts
+│   │   └── useLiveMatchPublic.ts
 │   └── utils/
 │       ├── plan-limits.ts
-│       ├── apply-theme.ts
-│       └── formatting.ts
+│       ├── theme.ts      # Application CSS variables branding (ex apply-theme)
+│       ├── finances.ts   # Helpers calcul/formatage finances
+│       ├── match.ts      # Helpers match (pairActionsWithAssists…)
+│       └── avatar.ts     # avatarColor, initials
 │
-├── mobile/              # App Expo séparée
-│   ├── app/             # Expo Router
-│   ├── components/
-│   ├── hooks/
-│   └── lib/
+├── emails/              # Templates React Email (Resend)
+│   ├── welcome.tsx
+│   ├── invite-member.tsx
+│   └── …
 │
 ├── supabase/
-│   ├── migrations/      # Une migration par feature
-│   └── seed.sql
+│   └── migrations/      # Une migration par feature
 │
 ├── tests/
 │   ├── unit/            # Vitest
@@ -382,9 +544,26 @@ Toutes les tables ont RLS activé dès leur création.
 005_event_attendees.sql
 006_match_results.sql
 007_player_stats.sql
-008_contributions.sql
+008_contributions.sql          ← table contributions legacy (remplacée par 022)
 009_media.sql
 010_messages.sql
+011_fix_organization_members_rls.sql
+011_event_status.sql           ← ajoute events.status + index
+012_user_code.sql              ← profiles.invite_code + trigger
+012_match_actions.sql          ← table match_actions + Realtime
+013_divisions.sql              ← organizations.division/category/season + org_members.category
+014_categories_statuts.sql     ← table member_categories + events.category
+015_profiles_trigger.sql       ← trigger auto-création profile à l'inscription
+016_announcements.sql          ← table announcements
+017_match_events.sql           ← table match_events (legacy, remplacée par match_actions)
+018_public_read_policies.sql   ← policies de lecture publique (pages sans connexion)
+019_events_category_team.sql   ← events.category + events.team_label
+020_standings.sql              ← table standings (classement manuel)
+021_scoreenco.sql              ← organizations.scoreenco_url
+022_finance_v2.sql             ← tables contribution_templates, contribution_tarifs,
+                                  contribution_payments, treasury_entries
+023_member_own_payment_rls.sql ← membres peuvent lire/écrire leurs propres paiements
+024_performance_indexes.sql    ← indexes B-tree sur colonnes haute fréquence RLS
 ```
 
 ### Schéma
@@ -403,6 +582,11 @@ create table organizations (
   slogan text,
   stripe_customer_id text,
   stripe_subscription_id text,
+  -- Champs ajoutés par migrations ultérieures :
+  division text,                 -- ex: "Régional 1" (migration 013)
+  category text,                 -- ex: "Senior" (migration 013)
+  season   text default '2025-2026', -- saison courante (migration 013)
+  scoreenco_url text,            -- URL widget classement officiel (migration 021)
   created_at timestamptz default now()
 );
 
@@ -412,8 +596,10 @@ create table profiles (
   avatar_url text,
   phone text,
   push_token text,
+  invite_code text unique,       -- généré automatiquement par trigger (migration 012)
   updated_at timestamptz default now()
 );
+-- Trigger handle_new_user : crée profile automatiquement à l'inscription (migration 015)
 
 create table organization_members (
   id uuid primary key default gen_random_uuid(),
@@ -421,6 +607,9 @@ create table organization_members (
   user_id uuid references auth.users on delete cascade,
   role text not null check (role in ('admin', 'member_active', 'member')),
   joined_at timestamptz default now(),
+  -- Champs ajoutés par migrations ultérieures :
+  jersey_number int,             -- numéro de maillot (triber-mobile)
+  category text,                 -- catégorie/équipe du membre (migration 013)
   unique(organization_id, user_id)
 );
 
@@ -434,7 +623,16 @@ create table events (
   opponent text,
   is_home boolean,
   created_by uuid references auth.users,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  -- Champs ajoutés par migrations ultérieures :
+  status text not null default 'upcoming'
+    check (status in ('upcoming','ongoing','half_time','finished')), -- migration 011
+  category   text,               -- catégorie (Senior, U18…) (migrations 014, 019)
+  team_label text,               -- équipe (A, B…) (migration 019)
+  -- Champs timer match en direct (ajoutés en prod par triber-mobile, pas de migration locale) :
+  started_at          timestamptz,
+  paused_at           timestamptz,
+  total_paused_seconds int
 );
 
 create table event_attendees (
@@ -465,17 +663,113 @@ create table player_stats (
   unique(event_id, user_id)
 );
 
-create table contributions (
-  id uuid primary key default gen_random_uuid(),
-  organization_id uuid references organizations on delete cascade,
-  user_id uuid references auth.users on delete cascade,
-  amount int not null,
-  label text not null,
-  status text not null check (status in ('pending', 'paid', 'failed')),
-  stripe_payment_id text,
-  paid_at timestamptz,
-  created_at timestamptz default now()
+-- Module finances v2 (migration 022) — remplace la table contributions legacy
+create table contribution_templates (
+  id              uuid        primary key default gen_random_uuid(),
+  organization_id uuid        not null references organizations on delete cascade,
+  title           text        not null,
+  description     text,
+  deadline        date,
+  warning_message text,
+  is_buvette      boolean     not null default false,
+  is_active       boolean     not null default true,
+  created_by      uuid        references auth.users,
+  created_at      timestamptz default now()
 );
+
+create table contribution_tarifs (
+  id          uuid primary key default gen_random_uuid(),
+  template_id uuid not null references contribution_templates on delete cascade,
+  category    text not null,
+  amount_cents int  not null check (amount_cents > 0),
+  unique(template_id, category)
+);
+
+create table contribution_payments (
+  id                uuid        primary key default gen_random_uuid(),
+  template_id       uuid        not null references contribution_templates on delete cascade,
+  organization_id   uuid        not null references organizations on delete cascade,
+  user_id           uuid        references auth.users on delete set null,
+  manual_name       text,        -- personne hors app (ex: parent non inscrit)
+  category          text,
+  amount_cents      int         not null,
+  status            text        not null default 'pending'
+                                check (status in ('pending','paid','failed')),
+  payment_method    text        check (payment_method in ('cash','tpe','stripe','transfer','autre')),
+  stripe_payment_id text,
+  paid_at           timestamptz,
+  paid_by           uuid        references auth.users,
+  notes             text,
+  created_at        timestamptz default now(),
+  constraint check_person check (user_id is not null or manual_name is not null)
+);
+
+create table treasury_entries (
+  id                    uuid        primary key default gen_random_uuid(),
+  organization_id       uuid        not null references organizations on delete cascade,
+  template_id           uuid        references contribution_templates on delete set null,
+  amount_declared_cents int         not null,
+  amount_ticket_cents   int,
+  photo_url             text,
+  entry_date            date        not null default current_date,
+  notes                 text,
+  entered_by            uuid        references auth.users,
+  reviewed_by           uuid        references auth.users,
+  reviewed_at           timestamptz,
+  created_at            timestamptz default now()
+);
+
+-- Annonces admin → membres (migration 016)
+create table announcements (
+  id              uuid primary key default gen_random_uuid(),
+  organization_id uuid references organizations on delete cascade,
+  author_id       uuid references profiles(id),
+  title           text not null,
+  message         text not null,
+  category        text,
+  created_at      timestamptz default now()
+);
+
+-- Classement de championnat saisi manuellement (migration 020)
+create table standings (
+  id              uuid primary key default gen_random_uuid(),
+  organization_id uuid references organizations on delete cascade not null,
+  season          text not null default '2025-2026',
+  rank            int  not null,
+  team_name       text not null,
+  played          int  not null default 0,
+  won             int  not null default 0,
+  drawn           int  not null default 0,
+  lost            int  not null default 0,
+  goals_for       int  not null default 0,
+  goals_against   int  not null default 0,
+  points          int  not null default 0,
+  is_own_team     boolean not null default false,
+  updated_at      timestamptz default now()
+);
+
+-- Catégories d'un membre (statut : joueur, bureau, parent) (migration 014)
+create table member_categories (
+  id                     uuid primary key default gen_random_uuid(),
+  organization_member_id uuid references organization_members on delete cascade,
+  status                 text not null check (status in ('joueur', 'bureau', 'parent')),
+  category               text not null,
+  created_at             timestamptz default now()
+);
+
+-- Actions en temps réel lors d'un match en direct (migration 012)
+create table match_actions (
+  id           uuid primary key default gen_random_uuid(),
+  event_id     uuid references events on delete cascade not null,
+  user_id      uuid references auth.users,
+  player_name  text,               -- nom libre si joueur hors app
+  player_in_id uuid references auth.users,  -- entrant (substitution)
+  type         text not null check (type in ('goal','assist','yellow_card','red_card','substitution')),
+  minute       int  not null,
+  is_own_team  boolean not null default true,
+  created_at   timestamptz default now()
+);
+-- Realtime activé : alter publication supabase_realtime add table match_actions;
 
 create table media (
   id uuid primary key default gen_random_uuid(),
@@ -506,12 +800,9 @@ create table match_lineups (
 );
 ```
 
-> **Note — Champs additionnels triber-mobile :** le projet `triber-mobile` a étendu certaines tables en production. Champs à connaître :
-> - `events` : `status text` ('upcoming' | 'ongoing' | 'finished'), `started_at timestamptz`
-> - `organization_members` : `jersey_number int`, `category text`
-> - `profiles` : `invite_code text`
+> **Note — Champs sans migration locale :** les champs `events.started_at`, `events.paused_at` et `events.total_paused_seconds` ont été ajoutés directement en production (par triber-mobile). Ils n'ont pas de migration dans ce repo. Ils sont documentés dans le schéma ci-dessus et utilisés par `app/api/match/[id]/control/route.ts`. Ne pas les recréer en migration — ils existent déjà en base.
 >
-> Ces champs existent déjà en base. Ne pas les recréer en migration — les référencer directement.
+> `organization_members.jersey_number` existe également en base (ajouté par triber-mobile) sans migration locale dans ce repo.
 
 ### RLS — pattern obligatoire sur toutes les tables
 

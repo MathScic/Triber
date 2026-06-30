@@ -28,10 +28,10 @@ describe('injectTheme', () => {
     expect(els[0].textContent).toContain('#FF0000')
   })
 
-  it('le style contient les variables CSS racine (--triber-primary)', () => {
+  it('le style contient les variables CSS racine (--triber-primary, --color-primary)', () => {
     injectTheme('#2A9D4E', '#E8622A')
     const el = document.getElementById('triber-theme')
     expect(el?.textContent).toContain('--triber-primary')
-    expect(el?.textContent).toContain('--primary')
+    expect(el?.textContent).toContain('--color-primary')
   })
 })

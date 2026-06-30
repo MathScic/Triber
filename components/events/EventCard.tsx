@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import type { ElementType } from 'react'
@@ -29,8 +29,8 @@ interface Props {
 }
 
 const TYPE_COLOR: Record<string, string> = {
-  match: 'bg-[#2A9D4E] text-white',
-  training: 'bg-[#E8622A] text-white',
+  match: 'bg-success text-white',
+  training: 'bg-secondary text-white',
   meeting: 'bg-[#3B82F6] text-white',
   other: 'bg-[#6B7280] text-white',
 }
@@ -41,15 +41,15 @@ function ResultChip({ home, away, isHome }: Score & { isHome: boolean | null | u
   const their = isHome === false ? home : away
   const won = our > their; const draw = our === their
   return (
-    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-[family-name:var(--font-nunito)] ${draw ? 'bg-[#E8E8EA] text-[#6B7280]' : won ? 'bg-[#E8F5EE] text-[#2A9D4E]' : 'bg-[#FDF0EB] text-[#E8622A]'}`}>
+    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-[family-name:var(--font-nunito)] ${draw ? 'bg-[#E8E8EA] text-[#6B7280]' : won ? 'bg-primary-light text-success' : 'bg-secondary-light text-secondary'}`}>
       {draw ? 'Nul' : won ? 'Victoire' : 'Défaite'}
     </span>
   )
 }
 
 const BTNS: { s: AttendanceStatus; label: string; Icon: ElementType; active: string }[] = [
-  { s: 'confirmed', label: 'Présent', Icon: Check, active: 'bg-[#2A9D4E] text-white border-transparent' },
-  { s: 'declined', label: 'Absent', Icon: X, active: 'bg-[#E8622A] text-white border-transparent' },
+  { s: 'confirmed', label: 'Présent', Icon: Check, active: 'bg-success text-white border-transparent' },
+  { s: 'declined', label: 'Absent', Icon: X, active: 'bg-secondary text-white border-transparent' },
   { s: 'pending', label: 'Attente', Icon: Clock, active: 'bg-[#6B7280] text-white border-transparent' },
 ]
 
@@ -87,12 +87,12 @@ export function EventCard({ event, currentStatus, onAttendance, canDelete, onDel
               {TYPE_LABEL[event.type] ?? 'Autre'}
             </span>
             {isMatch && event.is_home !== null && (
-              <span className="text-[10px] font-bold bg-[#1A1F16] text-white px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
+              <span className="text-[10px] font-bold bg-brand-dark text-white px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
                 {event.is_home ? 'Domicile' : 'Extérieur'}
               </span>
             )}
             {event.category && (
-              <span className="text-[10px] font-bold bg-[#F4F4F6] text-[#6B7280] px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
+              <span className="text-[10px] font-bold bg-brand-bg text-[#6B7280] px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
                 {event.category}
               </span>
             )}
@@ -105,7 +105,7 @@ export function EventCard({ event, currentStatus, onAttendance, canDelete, onDel
             {canDelete && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button aria-label="Options" className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#F4F4F6] transition-colors text-[#9CA3AF]">
+                  <button aria-label="Options" className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-brand-bg transition-colors text-[#9CA3AF]">
                     <MoreVertical className="w-4 h-4" />
                   </button>
                 </DropdownMenuTrigger>
@@ -141,8 +141,8 @@ export function EventCard({ event, currentStatus, onAttendance, canDelete, onDel
 
         {/* Ligne 2 : titre */}
         <div>
-          <Link href={`/events/${event.id}`} className="block hover:text-[#2A9D4E] transition-colors">
-            <h3 className="font-[800] text-[#1A1F16] text-base uppercase tracking-tight leading-tight font-[family-name:var(--font-barlow)]">
+          <Link href={`/events/${event.id}`} className="block hover:text-success transition-colors">
+            <h3 className="font-[800] text-brand-dark text-base uppercase tracking-tight leading-tight font-[family-name:var(--font-barlow)]">
               {event.title}
             </h3>
           </Link>
@@ -154,7 +154,7 @@ export function EventCard({ event, currentStatus, onAttendance, canDelete, onDel
         {/* Score si disponible */}
         {isMatch && score && (
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-[800] text-[#1A1F16] tabular-nums leading-none font-[family-name:var(--font-barlow)]">
+            <span className="text-3xl font-[800] text-brand-dark tabular-nums leading-none font-[family-name:var(--font-barlow)]">
               {score.home} — {score.away}
             </span>
             <ResultChip home={score.home} away={score.away} isHome={event.is_home} />
@@ -191,8 +191,8 @@ export function EventCard({ event, currentStatus, onAttendance, canDelete, onDel
         {counts ? (
           <button onClick={() => setShowAttendees(v => !v)}
             className="flex items-center gap-3 text-xs text-[#9CA3AF] hover:text-[#6B7280] transition-colors font-[family-name:var(--font-nunito)]">
-            <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-[#2A9D4E]" />{counts.confirmed}</span>
-            <span className="flex items-center gap-1"><XCircle className="w-3.5 h-3.5 text-[#E8622A]" />{counts.declined}</span>
+            <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-success" />{counts.confirmed}</span>
+            <span className="flex items-center gap-1"><XCircle className="w-3.5 h-3.5 text-secondary" />{counts.declined}</span>
             <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-[#9CA3AF]" />{counts.pending}</span>
             <span className="ml-auto underline underline-offset-2">{showAttendees ? 'Masquer' : 'Voir la liste'}</span>
           </button>

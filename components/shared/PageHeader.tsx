@@ -19,7 +19,7 @@ export function PageHeader({ title, subtitle, backHref = '/home', action }: Prop
           <ArrowLeft className="w-4 h-4 text-[#6B7280]" />
         </Link>
         <div className="min-w-0">
-          <h1 className="text-3xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)] leading-none">
+          <h1 className="text-3xl font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)] leading-none">
             {title}
           </h1>
           {subtitle && (

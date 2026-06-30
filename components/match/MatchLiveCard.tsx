@@ -92,7 +92,7 @@ export function MatchLiveCard({ eventId, initialEvent, initialScore }: { eventId
         title={initialEvent.title}
         dateStr={new Date(initialEvent.start_at).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
         location={initialEvent.location}
-        primaryColor={org?.primary_color ?? '#2A9D4E'}
+        primaryColor={org?.primary_color ?? '#1E5C38'}
       />
       {matchActions.filter(a => a.type === 'goal' || a.type === 'yellow_card' || a.type === 'red_card').length > 0 && (
         <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4 space-y-2">

@@ -30,7 +30,7 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {error && (
-        <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2.5">
+        <p className="text-sm text-secondary bg-secondary-light rounded-xl px-3 py-2.5">
           {error}
         </p>
       )}
@@ -44,7 +44,7 @@ export function RegisterForm() {
           {...register('lastName', { required: 'Nom requis' })}
         />
         {errors.lastName && (
-          <p className="text-xs text-[#E8622A]">{errors.lastName.message}</p>
+          <p className="text-xs text-secondary">{errors.lastName.message}</p>
         )}
       </div>
 
@@ -57,7 +57,7 @@ export function RegisterForm() {
           {...register('firstName', { required: 'Prénom requis' })}
         />
         {errors.firstName && (
-          <p className="text-xs text-[#E8622A]">{errors.firstName.message}</p>
+          <p className="text-xs text-secondary">{errors.firstName.message}</p>
         )}
       </div>
 
@@ -74,7 +74,7 @@ export function RegisterForm() {
           })}
         />
         {errors.email && (
-          <p className="text-xs text-[#E8622A]">{errors.email.message}</p>
+          <p className="text-xs text-secondary">{errors.email.message}</p>
         )}
       </div>
 
@@ -91,7 +91,7 @@ export function RegisterForm() {
           })}
         />
         {errors.password && (
-          <p className="text-xs text-[#E8622A]">{errors.password.message}</p>
+          <p className="text-xs text-secondary">{errors.password.message}</p>
         )}
       </div>
 
@@ -110,7 +110,7 @@ export function RegisterForm() {
           })}
         />
         {errors.confirmPassword && (
-          <p className="text-xs text-[#E8622A]">
+          <p className="text-xs text-secondary">
             {errors.confirmPassword.message}
           </p>
         )}
@@ -129,7 +129,7 @@ export function RegisterForm() {
 
       <p className="text-center text-sm text-[#6B7280]">
         Déjà un compte ?{' '}
-        <Link href="/login" className="text-[#E8622A] font-semibold hover:underline">
+        <Link href="/login" className="text-secondary font-semibold hover:underline">
           Se connecter
         </Link>
       </p>

@@ -1,4 +1,4 @@
-import type { MatchResult } from '@/lib/hooks/useStats'
+﻿import type { MatchResult } from '@/lib/hooks/useStats'
 
 interface Props { results: MatchResult[] }
 
@@ -8,7 +8,7 @@ export function MatchResultsTable({ results }: Props) {
   return (
     <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-[#F4F4F6]">
-        <h2 className="text-base font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+        <h2 className="text-base font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
           Résultats
         </h2>
       </div>
@@ -31,7 +31,7 @@ export function MatchResultsTable({ results }: Props) {
               const draw = our === their
               const label = draw ? 'Nul' : won ? 'Victoire' : 'Défaite'
               const labelStyle = draw
-                ? 'bg-[#F4F4F6] text-[#6B7280]'
+                ? 'bg-brand-bg text-[#6B7280]'
                 : won
                   ? 'bg-[#D1FAE5] text-[#065F46]'
                   : 'bg-[#FEE2E2] text-[#B91C1C]'
@@ -42,10 +42,10 @@ export function MatchResultsTable({ results }: Props) {
               return (
                 <tr key={r.id} className="border-b border-[#F4F4F6] last:border-0 hover:bg-[#FAFAFA] transition-colors">
                   <td className="px-5 py-3.5 text-[#6B7280] whitespace-nowrap">{date}</td>
-                  <td className="px-5 py-3.5 font-semibold text-[#1A1F16] truncate max-w-[140px]">{ev?.title ?? 'Match'}</td>
+                  <td className="px-5 py-3.5 font-semibold text-brand-dark truncate max-w-[140px]">{ev?.title ?? 'Match'}</td>
                   <td className="px-5 py-3.5 text-[#6B7280]">{ev?.opponent ?? '—'}</td>
                   <td className="px-5 py-3.5">
-                    <span className="text-lg font-[800] tabular-nums text-[#1A1F16] font-[family-name:var(--font-barlow)]">
+                    <span className="text-lg font-[800] tabular-nums text-brand-dark font-[family-name:var(--font-barlow)]">
                       {our} – {their}
                     </span>
                   </td>

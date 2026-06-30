@@ -1,4 +1,4 @@
-import type { PlayerStatRow } from '@/lib/hooks/useStats'
+﻿import type { PlayerStatRow } from '@/lib/hooks/useStats'
 
 interface Props { rows: PlayerStatRow[] }
 
@@ -12,9 +12,9 @@ function GoalBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0
   return (
     <div className="flex items-center gap-2 min-w-[80px]">
-      <span className={`text-sm font-[800] tabular-nums w-5 text-right font-[family-name:var(--font-barlow)] flex-shrink-0 ${value > 0 ? 'text-[#2A9D4E]' : 'text-[#D1D1D6]'}`}>{value}</span>
-      <div className="flex-1 h-1.5 bg-[#F4F4F6] rounded-full overflow-hidden">
-        <div className="h-full bg-[#2A9D4E] rounded-full" style={{ width: `${pct}%` }} />
+      <span className={`text-sm font-[800] tabular-nums w-5 text-right font-[family-name:var(--font-barlow)] flex-shrink-0 ${value > 0 ? 'text-success' : 'text-[#D1D1D6]'}`}>{value}</span>
+      <div className="flex-1 h-1.5 bg-brand-bg rounded-full overflow-hidden">
+        <div className="h-full bg-success rounded-full" style={{ width: `${pct}%` }} />
       </div>
     </div>
   )
@@ -25,7 +25,7 @@ export function PlayerStatsTable({ rows }: Props) {
     return (
       <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm px-5 py-10 text-center space-y-2">
         <p className="text-3xl">📊</p>
-        <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">Pas encore de statistiques</p>
+        <p className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">Pas encore de statistiques</p>
         <p className="text-xs text-[#9CA3AF] font-[family-name:var(--font-nunito)]">
           Les stats se mettent à jour automatiquement pendant les matchs en direct.
         </p>
@@ -39,13 +39,13 @@ export function PlayerStatsTable({ rows }: Props) {
   return (
     <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-[#F4F4F6] flex items-center justify-between">
-        <h2 className="text-base font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+        <h2 className="text-base font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
           Statistiques joueurs
         </h2>
         {topAssister.assists > 0 && (
           <div className="text-right">
             <p className="text-[10px] text-[#9CA3AF] font-[family-name:var(--font-nunito)]">Top passeur</p>
-            <p className="text-xs font-bold text-[#1A1F16] font-[family-name:var(--font-nunito)]">
+            <p className="text-xs font-bold text-brand-dark font-[family-name:var(--font-nunito)]">
               {topAssister.profiles?.full_name?.split(' ')[0] ?? '—'} · {topAssister.assists} passe{topAssister.assists > 1 ? 's' : ''}
             </p>
           </div>
@@ -76,12 +76,12 @@ export function PlayerStatsTable({ rows }: Props) {
                     {i + 1}
                   </span>
                 </td>
-                <td className="px-2 py-3.5 font-semibold text-[#1A1F16] max-w-[120px] truncate">
+                <td className="px-2 py-3.5 font-semibold text-brand-dark max-w-[120px] truncate">
                   {r.profiles?.full_name ?? '—'}
                 </td>
                 <td className="px-2 py-3.5"><GoalBar value={r.goals} max={maxGoals} /></td>
                 <td className="px-2 py-3.5 text-center">
-                  <span className={`text-sm font-bold tabular-nums font-[family-name:var(--font-barlow)] ${r.assists > 0 ? 'text-[#1A1F16]' : 'text-[#D1D1D6]'}`}>
+                  <span className={`text-sm font-bold tabular-nums font-[family-name:var(--font-barlow)] ${r.assists > 0 ? 'text-brand-dark' : 'text-[#D1D1D6]'}`}>
                     {r.assists > 0 ? r.assists : '—'}
                   </span>
                 </td>

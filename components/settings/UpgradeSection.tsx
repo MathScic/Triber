@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -29,9 +29,9 @@ export function UpgradeSection() {
   }
 
   return (
-    <section className="bg-white rounded-xl border border-[#2A9D4E] shadow-sm p-4 space-y-4 font-[family-name:var(--font-nunito)]">
+    <section className="bg-white rounded-xl border border-success shadow-sm p-4 space-y-4 font-[family-name:var(--font-nunito)]">
       <div>
-        <h2 className="font-[800] text-[#1A1F16] text-base uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+        <h2 className="font-[800] text-brand-dark text-base uppercase tracking-tight font-[family-name:var(--font-barlow)]">
           Passer au Plan Club
         </h2>
         <p className="text-xs text-[#6B7280] mt-1">
@@ -40,24 +40,24 @@ export function UpgradeSection() {
       </div>
 
       {/* Avantages */}
-      <ul className="space-y-1.5 text-sm text-[#1A1F16]">
+      <ul className="space-y-1.5 text-sm text-brand-dark">
         {['Membres illimités (gratuit : 20 max)', 'Gestion financière complète', 'Cotisations en ligne via Stripe', 'Statistiques avancées & classements'].map(a => (
           <li key={a} className="flex items-start gap-2">
-            <span className="text-[#2A9D4E] font-bold mt-0.5">✓</span>
+            <span className="text-success font-bold mt-0.5">✓</span>
             <span>{a}</span>
           </li>
         ))}
       </ul>
 
       {/* Consentement 1.5% — obligatoire par CLAUDE.md */}
-      <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-[#DDD8CE] bg-[#F4F4F6] p-3">
+      <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-brand-border bg-brand-bg p-3">
         <input
           type="checkbox"
           checked={consent}
           onChange={e => setConsent(e.target.checked)}
-          className="mt-0.5 h-4 w-4 accent-[#2A9D4E] flex-shrink-0"
+          className="mt-0.5 h-4 w-4 accent-success flex-shrink-0"
         />
-        <span className="text-[13px] text-[#1A1F16] leading-snug">
+        <span className="text-[13px] text-brand-dark leading-snug">
           Je comprends que Triber perçoit une <strong>commission de 1,5%</strong> sur les cotisations encaissées
           via la plateforme, en plus de l&apos;abonnement mensuel de 11,99€.
           Ce montant est prélevé automatiquement à chaque transaction.
@@ -65,13 +65,13 @@ export function UpgradeSection() {
       </label>
 
       {error && (
-        <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-lg px-3 py-2">{error}</p>
+        <p className="text-sm text-secondary bg-secondary-light rounded-lg px-3 py-2">{error}</p>
       )}
 
       <button
         onClick={handleUpgrade}
         disabled={!consent || loading}
-        className="w-full bg-[#2A9D4E] text-white font-[700] text-sm py-3.5 rounded-xl uppercase tracking-wide disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#238f44] transition-colors"
+        className="w-full bg-success text-white font-[700] text-sm py-3.5 rounded-xl uppercase tracking-wide disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#238f44] transition-colors"
       >
         {loading ? 'Redirection…' : 'Passer au Plan Club — 11,99€/mois →'}
       </button>

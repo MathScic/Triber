@@ -1,12 +1,12 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import type { TriberEvent } from '@/lib/hooks/useEvents'
 
 const TYPE_LABELS: Record<string, string> = { match: 'Match', training: 'Entraînement', meeting: 'Réunion', other: 'Autre' }
 const TYPE_BADGE: Record<string, string> = {
-  match: 'bg-[#2A9D4E] text-white',
-  training: 'bg-[#E8622A] text-white',
+  match: 'bg-success text-white',
+  training: 'bg-secondary text-white',
   meeting: 'bg-[#3B82F6] text-white',
   other: 'bg-[#6B7280] text-white',
 }
@@ -19,7 +19,7 @@ function ResultBadge({ home, away, isHome }: Score & { isHome: boolean | null | 
   const draw = our === their
   const won = our > their
   const label = draw ? 'Nul' : won ? 'Victoire' : 'Défaite'
-  const cls = draw ? 'bg-[#E8E8EA] text-[#6B7280]' : won ? 'bg-[#E8F5EE] text-[#2A9D4E]' : 'bg-[#FDF0EB] text-[#E8622A]'
+  const cls = draw ? 'bg-[#E8E8EA] text-[#6B7280]' : won ? 'bg-primary-light text-success' : 'bg-secondary-light text-secondary'
   return <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${cls}`}>{label}</span>
 }
 
@@ -39,25 +39,25 @@ export function EventCardHeader({ event, score }: Props) {
           {TYPE_LABELS[event.type] ?? 'Autre'}
         </span>
         {event.type === 'match' && event.is_home !== null && (
-          <span className="text-[11px] font-bold text-white bg-[#1A1F16] px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
+          <span className="text-[11px] font-bold text-white bg-brand-dark px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
             {event.is_home ? 'Dom.' : 'Ext.'}
           </span>
         )}
         {event.category && (
-          <span className="text-[11px] font-bold text-white bg-[#1A1F16] px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
+          <span className="text-[11px] font-bold text-white bg-brand-dark px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
             {event.category}
           </span>
         )}
         {event.team_label && (
-          <span className="text-[11px] font-bold text-white bg-[#1A1F16] px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
+          <span className="text-[11px] font-bold text-white bg-brand-dark px-2.5 py-0.5 rounded-full font-[family-name:var(--font-nunito)]">
             Éq. {event.team_label}
           </span>
         )}
       </div>
 
       {/* Titre */}
-      <Link href={`/events/${event.id}`} className="block hover:text-[#2A9D4E] transition-colors">
-        <h3 className="font-[800] text-[#1A1F16] text-base uppercase tracking-tight leading-tight font-[family-name:var(--font-barlow)]">
+      <Link href={`/events/${event.id}`} className="block hover:text-success transition-colors">
+        <h3 className="font-[800] text-brand-dark text-base uppercase tracking-tight leading-tight font-[family-name:var(--font-barlow)]">
           {event.title}
         </h3>
       </Link>
@@ -70,7 +70,7 @@ export function EventCardHeader({ event, score }: Props) {
       {/* Score */}
       {event.type === 'match' && score && (
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-[800] text-[#1A1F16] tabular-nums leading-none font-[family-name:var(--font-barlow)]">
+          <span className="text-2xl font-[800] text-brand-dark tabular-nums leading-none font-[family-name:var(--font-barlow)]">
             {score.home} — {score.away}
           </span>
           <ResultBadge home={score.home} away={score.away} isHome={event.is_home} />

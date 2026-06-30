@@ -13,24 +13,24 @@ export function DeleteConfirmModal({ isOpen, onConfirm, onCancel, eventTitle }: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
       <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm space-y-4">
-        <h3 className="font-bold text-[#1A1F16] text-base">
+        <h3 className="font-bold text-brand-dark text-base">
           Supprimer cet événement ?
         </h3>
         <p className="text-sm text-[#6B7280]">
-          <span className="font-semibold text-[#1A1F16]">&ldquo;{eventTitle}&rdquo;</span>
+          <span className="font-semibold text-brand-dark">&ldquo;{eventTitle}&rdquo;</span>
           {' '}sera définitivement supprimé.
           <br />Cette action est irréversible.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 h-10 rounded-xl border border-[#D1D1D6] text-sm font-semibold text-[#1A1F16] hover:bg-[#E8E8EA] transition-colors"
+            className="flex-1 h-10 rounded-xl border border-[#D1D1D6] text-sm font-semibold text-brand-dark hover:bg-[#E8E8EA] transition-colors"
           >
             Annuler
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 h-10 rounded-xl bg-[#E8622A] text-white text-sm font-semibold hover:bg-red-600 transition-colors"
+            className="flex-1 h-10 rounded-xl bg-secondary text-white text-sm font-semibold hover:bg-red-600 transition-colors"
           >
             Supprimer
           </button>

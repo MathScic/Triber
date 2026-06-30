@@ -13,7 +13,7 @@ export function AppNav() {
   const [org, setOrg] = useState<OrgInfo | null>(null)
   const [userName, setUserName] = useState<string | null>(null)
   const [role, setRole] = useState<Role>('member')
-  const { primaryColor, sidebarBg } = useBrandingContext()
+  const { primaryColor } = useBrandingContext()
 
   useEffect(() => {
     const s = createClient()
@@ -45,9 +45,8 @@ export function AppNav() {
         userName={userName}
         role={role}
         primaryColor={primaryColor}
-        sidebarBg={sidebarBg}
       />
-      <SidebarMobile primaryColor={primaryColor} sidebarBg={sidebarBg} userName={userName} role={role} />
+      <SidebarMobile primaryColor={primaryColor} userName={userName} role={role} />
     </>
   )
 }

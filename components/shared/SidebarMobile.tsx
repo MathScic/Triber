@@ -25,12 +25,11 @@ function canSee(userRole: Role, minRole: Role | undefined) {
 
 interface Props {
   primaryColor: string
-  sidebarBg: string
   userName?: string | null
   role: Role
 }
 
-export function SidebarMobile({ primaryColor, sidebarBg, userName, role }: Props) {
+export function SidebarMobile({ primaryColor, userName, role }: Props) {
   const path = usePathname()
   const router = useRouter()
   const nav = NAV_ALL.filter(item => canSee(role, item.minRole))
@@ -41,7 +40,7 @@ export function SidebarMobile({ primaryColor, sidebarBg, userName, role }: Props
   }
 
   return (
-    <nav style={{ backgroundColor: sidebarBg }} className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-white/10 flex flex-col">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-brand-dark border-t border-white/10 flex flex-col">
       {userName && (
         <div className="flex items-center justify-between px-4 py-1 border-b border-white/5">
           <p className="text-[9px] text-white/30 truncate font-[family-name:var(--font-nunito)]">{userName}</p>

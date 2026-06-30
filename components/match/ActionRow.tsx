@@ -35,11 +35,11 @@ export function ActionRow({ action, assistAction, players, opponent }: Props) {
   return (
     <div className={`flex ${isOwn ? 'flex-row' : 'flex-row-reverse'} mb-3`}>
       <div className={`flex flex-col items-center ${isOwn ? 'mr-3' : 'ml-3'} flex-shrink-0`}>
-        <div className={`w-2.5 h-2.5 rounded-full ${isOwn ? 'bg-[#2A9D4E]' : 'bg-[#DC2626]'}`} />
+        <div className={`w-2.5 h-2.5 rounded-full ${isOwn ? 'bg-success' : 'bg-brand-danger'}`} />
         <div className="w-0.5 flex-1 bg-[#D1D1D6] mt-1" />
       </div>
       <div className={isOwn ? '' : 'text-right'}>
-        <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">
+        <p className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">
           {icon} {name} — {action.minute}&apos;
         </p>
         {assistName && (

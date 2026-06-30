@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { Nunito, Barlow_Condensed } from 'next/font/google'
@@ -76,12 +76,12 @@ export default function EventsPage() {
   })
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-4 py-8`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-4 py-8`}>
       <div className="max-w-lg lg:max-w-4xl mx-auto space-y-5">
         <PageHeader title="Événements" subtitle={`${events.length} événement${events.length !== 1 ? 's' : ''}`}
           action={canCreate && !showForm ? <Button onClick={() => setShowForm(true)} size="sm">+ Créer</Button> : undefined} />
 
-        {error && <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2">{error}</p>}
+        {error && <p className="text-sm text-secondary bg-secondary-light rounded-xl px-3 py-2">{error}</p>}
         {showForm && <EventForm onSubmit={async d => { const ok = await createEvent(d); if (ok) setShowForm(false); return ok }} onCancel={() => setShowForm(false)} loading={loading} />}
 
         {loading && !showForm && (
@@ -109,7 +109,7 @@ export default function EventsPage() {
                   </p>
                   {!showPast && (
                     <button onClick={() => setShowPast(true)}
-                      className="text-xs text-[#2A9D4E] font-semibold font-[family-name:var(--font-nunito)]">
+                      className="text-xs text-success font-semibold font-[family-name:var(--font-nunito)]">
                       Voir tout
                     </button>
                   )}
@@ -122,7 +122,7 @@ export default function EventsPage() {
               <div className="text-center py-12">
                 <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">Aucun événement pour l&apos;instant.</p>
                 {canCreate && (
-                  <button onClick={() => setShowForm(true)} className="mt-3 text-sm text-[#2A9D4E] font-semibold font-[family-name:var(--font-nunito)]">
+                  <button onClick={() => setShowForm(true)} className="mt-3 text-sm text-success font-semibold font-[family-name:var(--font-nunito)]">
                     + Créer le premier événement
                   </button>
                 )}

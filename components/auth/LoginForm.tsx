@@ -25,7 +25,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       {error && (
-        <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2.5">
+        <p className="text-sm text-secondary bg-secondary-light rounded-xl px-3 py-2.5">
           {error}
         </p>
       )}
@@ -43,7 +43,7 @@ export function LoginForm() {
           })}
         />
         {errors.email && (
-          <p className="text-xs text-[#E8622A]">{errors.email.message}</p>
+          <p className="text-xs text-secondary">{errors.email.message}</p>
         )}
       </div>
 
@@ -57,7 +57,7 @@ export function LoginForm() {
           {...register('password', { required: 'Mot de passe requis' })}
         />
         {errors.password && (
-          <p className="text-xs text-[#E8622A]">{errors.password.message}</p>
+          <p className="text-xs text-secondary">{errors.password.message}</p>
         )}
       </div>
 
@@ -69,7 +69,7 @@ export function LoginForm() {
         Pas encore de compte ?{' '}
         <Link
           href="/register"
-          className="text-[#E8622A] font-semibold hover:underline"
+          className="text-secondary font-semibold hover:underline"
         >
           Créer mon compte
         </Link>

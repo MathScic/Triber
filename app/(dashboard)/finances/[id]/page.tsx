@@ -47,20 +47,20 @@ function RelanceModal({ members, manualMembers, templateTitle, onClose, getExpec
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#F4F4F6]">
           <div>
-            <p className="text-sm font-bold text-[#1A1F16] font-[family-name:var(--font-nunito)]">Relancer les impayés</p>
+            <p className="text-sm font-bold text-brand-dark font-[family-name:var(--font-nunito)]">Relancer les impayés</p>
             <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">{pending.length} membre{pending.length !== 1 ? 's' : ''} en attente</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl hover:bg-[#F4F4F6] flex items-center justify-center"><X className="w-4 h-4 text-[#6B7280]" /></button>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl hover:bg-brand-bg flex items-center justify-center"><X className="w-4 h-4 text-[#6B7280]" /></button>
         </div>
         <div className="p-5 space-y-4">
           {pending.length === 0
-            ? <p className="text-sm text-center text-[#2A9D4E] font-semibold py-4 font-[family-name:var(--font-nunito)]">✓ Tout le monde a payé !</p>
+            ? <p className="text-sm text-center text-success font-semibold py-4 font-[family-name:var(--font-nunito)]">✓ Tout le monde a payé !</p>
             : <>
-                <div className="bg-[#F4F4F6] rounded-xl p-3 max-h-48 overflow-y-auto">
-                  <p className="text-xs text-[#1A1F16] whitespace-pre-wrap font-[family-name:var(--font-nunito)]">{msg}</p>
+                <div className="bg-brand-bg rounded-xl p-3 max-h-48 overflow-y-auto">
+                  <p className="text-xs text-brand-dark whitespace-pre-wrap font-[family-name:var(--font-nunito)]">{msg}</p>
                 </div>
                 <button onClick={copy}
-                  className={`w-full flex items-center justify-center gap-2 h-11 text-sm font-semibold rounded-xl transition-colors font-[family-name:var(--font-nunito)] ${copied ? 'bg-[#2A9D4E] text-white' : 'bg-[#1A1F16] text-white hover:bg-[#2a2f25]'}`}>
+                  className={`w-full flex items-center justify-center gap-2 h-11 text-sm font-semibold rounded-xl transition-colors font-[family-name:var(--font-nunito)] ${copied ? 'bg-success text-white' : 'bg-brand-dark text-white hover:bg-[#2a2f25]'}`}>
                   {copied ? <><Check className="w-4 h-4" /> Copié !</> : <><Copy className="w-4 h-4" /> Copier le message</>}
                 </button>
                 <p className="text-center text-xs text-[#9CA3AF] font-[family-name:var(--font-nunito)]">Collez ce message dans WhatsApp ou par email</p>
@@ -152,8 +152,8 @@ export default function FinanceDetailPage() {
   }, [id])
 
   if (!template || !orgId) return (
-    <div className="min-h-screen bg-[#F4F4F6] flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-[#2A9D4E] border-t-transparent animate-spin" />
+    <div className="min-h-screen bg-brand-bg flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-success border-t-transparent animate-spin" />
     </div>
   )
 
@@ -177,36 +177,36 @@ export default function FinanceDetailPage() {
   const selectedPaid = selectedStatus === 'paid' && (selectedExpected === 0 || selectedPaidCents >= selectedExpected)
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6]`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg`}>
       <div className="bg-white border-b border-[#D1D1D6] px-4 py-4 relative flex items-center justify-center">
-        <Link href="/finances" className="absolute left-4 w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-[#F4F4F6] transition-colors">
+        <Link href="/finances" className="absolute left-4 w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-brand-bg transition-colors">
           <ArrowLeft className="w-4 h-4 text-[#6B7280]" />
         </Link>
         <div className="text-center">
-          <h1 className="text-base font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-tight leading-tight">{template.title}</h1>
+          <h1 className="text-base font-[800] text-brand-dark font-[family-name:var(--font-barlow)] uppercase tracking-tight leading-tight">{template.title}</h1>
           <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)] mt-0.5">{template.is_buvette ? 'Buvette cumulatif' : 'Liste des membres'}</p>
         </div>
         {!template.is_buvette && (
           <div className="absolute right-4 flex items-center gap-1.5">
             <button onClick={() => exportXLS(payments.members, payments.manualMembers, template.title, getAmount)}
               title="Exporter CSV"
-              className="w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-[#F4F4F6] transition-colors">
+              className="w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-brand-bg transition-colors">
               <Download className="w-4 h-4 text-[#6B7280]" />
             </button>
             <button onClick={() => setShowRelance(true)}
               title="Relancer les impayés"
-              className="w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-[#FDF0EB] transition-colors">
-              <BellRing className="w-4 h-4 text-[#E8622A]" />
+              className="w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-secondary-light transition-colors">
+              <BellRing className="w-4 h-4 text-secondary" />
             </button>
             <button onClick={() => setShowAddManual(true)}
-              className="w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-[#F4F4F6] transition-colors">
+              className="w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-brand-bg transition-colors">
               <Plus className="w-4 h-4 text-[#6B7280]" />
             </button>
           </div>
         )}
         {template.is_buvette && (
           <button onClick={() => setShowBuvetteForm(true)}
-            className="absolute right-4 w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-[#F4F4F6] transition-colors">
+            className="absolute right-4 w-9 h-9 rounded-xl border border-[#D1D1D6] flex items-center justify-center hover:bg-brand-bg transition-colors">
             <Plus className="w-4 h-4 text-[#6B7280]" />
           </button>
         )}
@@ -215,8 +215,8 @@ export default function FinanceDetailPage() {
       <div className="px-4 py-5 max-w-lg lg:max-w-4xl mx-auto space-y-4">
         {template.warning_message && (
           <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-2xl px-4 py-3.5">
-            <AlertTriangle className="w-5 h-5 text-[#E8622A] flex-shrink-0 mt-0.5" />
-            <p className="text-sm font-semibold text-[#E8622A] font-[family-name:var(--font-nunito)]">{template.warning_message}</p>
+            <AlertTriangle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+            <p className="text-sm font-semibold text-secondary font-[family-name:var(--font-nunito)]">{template.warning_message}</p>
           </div>
         )}
 
@@ -225,11 +225,11 @@ export default function FinanceDetailPage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm p-4">
                 <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Total encaissé</p>
-                <p className="text-2xl font-[800] text-[#2A9D4E] tabular-nums font-[family-name:var(--font-barlow)]">{(treasury.total / 100).toFixed(2)} €</p>
+                <p className="text-2xl font-[800] text-success tabular-nums font-[family-name:var(--font-barlow)]">{(treasury.total / 100).toFixed(2)} €</p>
               </div>
               <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm p-4">
                 <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Écarts signalés</p>
-                <p className={`text-2xl font-[800] tabular-nums font-[family-name:var(--font-barlow)] ${treasury.flaggedCount > 0 ? 'text-[#E8622A]' : 'text-[#2A9D4E]'}`}>{treasury.flaggedCount}</p>
+                <p className={`text-2xl font-[800] tabular-nums font-[family-name:var(--font-barlow)] ${treasury.flaggedCount > 0 ? 'text-secondary' : 'text-success'}`}>{treasury.flaggedCount}</p>
               </div>
             </div>
             <BuvetteList entries={treasury.entries} isFlagged={treasury.isFlagged} />
@@ -241,10 +241,10 @@ export default function FinanceDetailPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un membre…"
-                className="w-full h-10 pl-9 pr-9 rounded-xl border border-[#D1D1D6] bg-white text-sm focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]" />
+                className="w-full h-10 pl-9 pr-9 rounded-xl border border-[#D1D1D6] bg-white text-sm focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
               {search && (
                 <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <X className="w-4 h-4 text-[#9CA3AF] hover:text-[#1A1F16]" />
+                  <X className="w-4 h-4 text-[#9CA3AF] hover:text-brand-dark" />
                 </button>
               )}
             </div>
@@ -263,7 +263,7 @@ export default function FinanceDetailPage() {
 
       <div className="fixed bottom-6 left-0 right-0 lg:left-56 flex justify-center z-10 pointer-events-none">
         <button onClick={() => template.is_buvette ? setShowBuvetteForm(true) : setShowAddManual(true)}
-          className="pointer-events-auto flex items-center gap-2.5 px-7 py-4 bg-[#E8622A] text-white text-sm font-semibold rounded-full shadow-xl hover:bg-[#d4571f] active:scale-95 transition-all font-[family-name:var(--font-nunito)]">
+          className="pointer-events-auto flex items-center gap-2.5 px-7 py-4 bg-secondary text-white text-sm font-semibold rounded-full shadow-xl hover:bg-[#d4571f] active:scale-95 transition-all font-[family-name:var(--font-nunito)]">
           <Plus className="w-5 h-5" />
           {template.is_buvette ? 'Nouvelle entrée' : 'Ajouter un paiement'}
         </button>

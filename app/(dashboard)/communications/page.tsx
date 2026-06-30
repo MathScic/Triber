@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
@@ -76,19 +76,19 @@ export default function CommunicationsPage() {
     new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-6 py-8`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-6 py-8`}>
       <div className="max-w-3xl mx-auto space-y-6">
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+            <h1 className="text-2xl font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
               Communications
             </h1>
             <p className="text-sm text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">Annonces du club</p>
           </div>
           {isAdmin && (
             <button onClick={() => setShowForm(v => !v)}
-              className="flex items-center gap-2 h-10 px-4 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-[family-name:var(--font-nunito)]">
+              className="flex items-center gap-2 h-10 px-4 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-[family-name:var(--font-nunito)]">
               <Megaphone className="w-4 h-4" /> Nouvelle annonce
             </button>
           )}
@@ -98,18 +98,18 @@ export default function CommunicationsPage() {
         {showForm && (
           <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-bold text-[#1A1F16] font-[family-name:var(--font-nunito)]">Nouvelle annonce</p>
+              <p className="text-sm font-bold text-brand-dark font-[family-name:var(--font-nunito)]">Nouvelle annonce</p>
               <button onClick={() => { setShowForm(false); setContent('') }}>
                 <X className="w-4 h-4 text-[#9CA3AF]" />
               </button>
             </div>
             <textarea value={content} onChange={e => setContent(e.target.value)} rows={4}
               placeholder="Votre message pour tous les membres du club…"
-              className="w-full px-3 py-2.5 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] resize-none font-[family-name:var(--font-nunito)]" />
+              className="w-full px-3 py-2.5 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success resize-none font-[family-name:var(--font-nunito)]" />
             <div className="flex items-center justify-between">
               <span className="text-xs text-[#9CA3AF] font-[family-name:var(--font-nunito)]">{content.length} / 500</span>
               <button onClick={() => void sendMessage()} disabled={!content.trim() || sending}
-                className="flex items-center gap-2 h-10 px-5 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
+                className="flex items-center gap-2 h-10 px-5 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
                 <Send className="w-4 h-4" /> {sending ? 'Envoi…' : 'Envoyer à tous'}
               </button>
             </div>
@@ -120,10 +120,10 @@ export default function CommunicationsPage() {
 
         {!loading && messages.length === 0 && (
           <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm p-12 flex flex-col items-center gap-3 text-center">
-            <div className="w-12 h-12 rounded-xl bg-[#F4F4F6] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-brand-bg flex items-center justify-center">
               <Megaphone className="w-5 h-5 text-[#9CA3AF]" />
             </div>
-            <p className="text-sm font-bold text-[#1A1F16] font-[family-name:var(--font-nunito)]">Aucune annonce</p>
+            <p className="text-sm font-bold text-brand-dark font-[family-name:var(--font-nunito)]">Aucune annonce</p>
             <p className="text-xs text-[#9CA3AF] font-[family-name:var(--font-nunito)]">
               {isAdmin ? 'Publiez votre première annonce.' : 'Aucune annonce pour le moment.'}
             </p>
@@ -135,13 +135,13 @@ export default function CommunicationsPage() {
             <div key={m.id} className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-[#2A9D4E] flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-success flex items-center justify-center flex-shrink-0">
                     <span className="text-xs font-bold text-white">
                       {(m.profiles?.full_name ?? 'A').charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <div className="min-w-0">
-                    <span className="text-xs font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">
+                    <span className="text-xs font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">
                       {m.profiles?.full_name ?? 'Admin'}
                     </span>
                     <span className="text-xs text-[#9CA3AF] font-[family-name:var(--font-nunito)] ml-2">
@@ -159,7 +159,7 @@ export default function CommunicationsPage() {
                 )}
               </div>
 
-              <p className="text-sm text-[#1A1F16] leading-relaxed font-[family-name:var(--font-nunito)] mt-3">
+              <p className="text-sm text-brand-dark leading-relaxed font-[family-name:var(--font-nunito)] mt-3">
                 {m.content}
               </p>
 
@@ -171,7 +171,7 @@ export default function CommunicationsPage() {
                   </p>
                   <div className="flex items-center gap-2">
                     <button onClick={() => setConfirmId(null)}
-                      className="text-xs font-semibold text-[#6B7280] hover:text-[#1A1F16] transition-colors font-[family-name:var(--font-nunito)] px-3 py-1">
+                      className="text-xs font-semibold text-[#6B7280] hover:text-brand-dark transition-colors font-[family-name:var(--font-nunito)] px-3 py-1">
                       Annuler
                     </button>
                     <button onClick={() => void deleteMessage(m.id)} disabled={deletingId === m.id}

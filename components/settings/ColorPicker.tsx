@@ -9,7 +9,7 @@ interface Props {
 export function ColorPicker({ label, value, onChange }: Props) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-[#1A1F16] font-semibold font-[family-name:var(--font-nunito)] w-32 flex-shrink-0">
+      <span className="text-sm text-brand-dark font-semibold font-[family-name:var(--font-nunito)] w-32 flex-shrink-0">
         {label}
       </span>
       <div className="flex items-center gap-2.5">

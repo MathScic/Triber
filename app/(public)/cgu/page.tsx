@@ -1,14 +1,14 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 
 export const metadata = { title: "Conditions Générales d'Utilisation — Triber" }
 
 export default function CguPage() {
   return (
-    <main className="min-h-screen bg-[#F4F4F6] py-12 px-6">
+    <main className="min-h-screen bg-brand-bg py-12 px-6">
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <Link href="/" className="text-xs text-[#6B7280] hover:text-[#1A1F16] transition-colors font-['Nunito',sans-serif]">← Retour</Link>
-          <h1 className="text-3xl font-[800] text-[#1A1F16] mt-3 font-['Barlow_Condensed',sans-serif] uppercase tracking-tight">Conditions Générales d&apos;Utilisation</h1>
+          <Link href="/" className="text-xs text-[#6B7280] hover:text-brand-dark transition-colors font-['Nunito',sans-serif]">← Retour</Link>
+          <h1 className="text-3xl font-[800] text-brand-dark mt-3 font-['Barlow_Condensed',sans-serif] uppercase tracking-tight">Conditions Générales d&apos;Utilisation</h1>
           <p className="text-sm text-[#6B7280] mt-1 font-['Nunito',sans-serif]">Version 1.0 — Juin 2026</p>
         </div>
 
@@ -28,7 +28,7 @@ export default function CguPage() {
             <li><strong>Plan Gratuit :</strong> 0€/mois — limité à 20 membres, sans commission</li>
             <li><strong>Plan Club :</strong> 11,99€/mois — membres illimités + commission de 1,5% sur les cotisations encaissées</li>
           </ul>
-          <p className="mt-2 font-semibold text-[#E8622A]">Commission 1,5% : en souscrivant au Plan Club, l&apos;administrateur accepte explicitement que Triber perçoive une commission de 1,5% sur chaque cotisation encaissée via la plateforme, en sus de l&apos;abonnement mensuel de 11,99€. Ce montant est prélevé automatiquement par Stripe au moment du paiement.</p>
+          <p className="mt-2 font-semibold text-secondary">Commission 1,5% : en souscrivant au Plan Club, l&apos;administrateur accepte explicitement que Triber perçoive une commission de 1,5% sur chaque cotisation encaissée via la plateforme, en sus de l&apos;abonnement mensuel de 11,99€. Ce montant est prélevé automatiquement par Stripe au moment du paiement.</p>
           <p className="mt-2">Cette acceptation est confirmée par une case à cocher obligatoire lors de la souscription. Sans validation de cette case, la souscription est impossible.</p>
         </Section>
 
@@ -74,7 +74,7 @@ export default function CguPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="bg-white rounded-2xl border border-[#D1D1D6] p-6 space-y-2">
-      <h2 className="text-base font-[800] text-[#1A1F16] font-['Barlow_Condensed',sans-serif] uppercase tracking-tight">{title}</h2>
+      <h2 className="text-base font-[800] text-brand-dark font-['Barlow_Condensed',sans-serif] uppercase tracking-tight">{title}</h2>
       <div className="text-sm text-[#6B7280] leading-relaxed font-['Nunito',sans-serif] space-y-1">{children}</div>
     </section>
   )

@@ -33,7 +33,7 @@ export function CreateOrgForm() {
             <div
               key={s}
               className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
-                s <= step ? 'bg-[#2A9D4E]' : 'bg-[#D1D1D6]'
+                s <= step ? 'bg-success' : 'bg-[#D1D1D6]'
               }`}
             />
           ))}
@@ -43,7 +43,7 @@ export function CreateOrgForm() {
 
       {/* Erreur globale */}
       {error && (
-        <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2.5 font-medium">
+        <p className="text-sm text-secondary bg-secondary-light rounded-xl px-3 py-2.5 font-medium">
           {error}
         </p>
       )}

@@ -1,0 +1,34 @@
+# Dépendances — réinstallées dans le Dockerfile
+node_modules
+
+# Build Next.js — régénéré dans le Dockerfile
+.next
+
+# Fichiers de développement local
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Git
+.git
+.gitignore
+
+# CI / outillage
+.github
+.claude
+.husky
+
+# Tests — non nécessaires dans l'image de prod
+tests
+playwright-report
+test-results
+
+# Docker lui-même (évite les boucles de copie)
+Dockerfile
+.dockerignore
+
+# Docs et fichiers de configuration locale
+*.md
+README*

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
@@ -118,7 +118,7 @@ export function MyContributions({ userId, orgId, justPaid }: Props) {
 
   return (
     <div className="bg-white rounded-2xl border border-[#D1D1D6] p-6 space-y-4">
-      <h2 className="text-base font-[700] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+      <h2 className="text-base font-[700] text-brand-dark font-[family-name:var(--font-barlow)] uppercase tracking-wide">
         Mes cotisations
       </h2>
 
@@ -132,41 +132,48 @@ export function MyContributions({ userId, orgId, justPaid }: Props) {
           const remaining = expected - (pmt?.amount_cents ?? 0)
 
           return (
-            <div key={t.id} className="flex items-center justify-between gap-4 p-4 rounded-xl border border-[#E5E7EB]">
+            <div key={t.id} className="flex items-center justify-between gap-4 p-4 rounded-xl border border-brand-border">
               <div className="min-w-0">
-                <p className="font-semibold text-sm text-[#1A1F16] font-[family-name:var(--font-nunito)]">{t.title}</p>
+                <p className="font-semibold text-sm text-brand-dark font-[family-name:var(--font-nunito)]">{t.title}</p>
                 {expected > 0 && (
-                  <p className="text-xs text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
+                  <p className="text-xs text-brand-muted mt-0.5 font-[family-name:var(--font-nunito)]">
                     {fullyPaid
-                      ? `Payé le ${pmt?.paid_at ? new Date(pmt.paid_at).toLocaleDateString('fr-FR') : '—'}`
+                      ? `Payé le ${pmt?.paid_at ? new Date(pmt.paid_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}`
                       : awaitingValidation
-                      ? `Paiement reçu (${((pmt?.amount_cents ?? 0) / 100).toFixed(2)} €) — en attente de validation`
+                      ? `En attente de validation`
                       : partial
-                      ? `Versé : ${((pmt?.amount_cents ?? 0) / 100).toFixed(2)} € · Reste : ${(remaining / 100).toFixed(2)} €`
-                      : `Montant : ${(expected / 100).toFixed(2)} €`
+                      ? `Versé ${((pmt?.amount_cents ?? 0) / 100).toFixed(0)} € · Reste ${(remaining / 100).toFixed(0)} €`
+                      : `À régler`
                     }
                   </p>
                 )}
               </div>
 
-              {fullyPaid ? (
-                <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#D1FAE5] text-[#065F46] whitespace-nowrap font-[family-name:var(--font-nunito)]">
-                  ✓ Payé
-                </span>
-              ) : awaitingValidation ? (
-                <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 whitespace-nowrap font-[family-name:var(--font-nunito)]">
-                  En attente de validation
-                </span>
-              ) : (
-                <button
-                  onClick={() => void pay(t)}
-                  disabled={paying === t.id}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#2A9D4E] text-white hover:bg-[#238742] transition-colors disabled:opacity-60 whitespace-nowrap font-[family-name:var(--font-nunito)]"
-                >
-                  <CreditCard className="w-3.5 h-3.5" />
-                  {paying === t.id ? '…' : partial ? 'Payer le reste' : 'Payer en ligne'}
-                </button>
-              )}
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {expected > 0 && (
+                  <span className="font-[800] text-base text-brand-dark font-[family-name:var(--font-barlow)]">
+                    {(expected / 100).toFixed(0)} €
+                  </span>
+                )}
+                {fullyPaid ? (
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-success/10 text-success whitespace-nowrap font-[family-name:var(--font-nunito)]">
+                    ✓ Payé
+                  </span>
+                ) : awaitingValidation ? (
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 whitespace-nowrap font-[family-name:var(--font-nunito)]">
+                    En cours
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => void pay(t)}
+                    disabled={paying === t.id}
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-success text-white hover:bg-success/90 transition-colors disabled:opacity-60 whitespace-nowrap font-[family-name:var(--font-nunito)]"
+                  >
+                    <CreditCard className="w-3.5 h-3.5" />
+                    {paying === t.id ? '…' : partial ? 'Payer le reste' : 'Payer en ligne'}
+                  </button>
+                )}
+              </div>
             </div>
           )
         })}

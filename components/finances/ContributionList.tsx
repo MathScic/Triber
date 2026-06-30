@@ -3,8 +3,8 @@
 import type { Contribution } from '@/lib/hooks/useFinances'
 
 const STATUS: Record<string, { label: string; cls: string }> = {
-  paid:    { label: 'Payé',       cls: 'bg-[#E8F5EE] text-[#2A9D4E]' },
-  pending: { label: 'En attente', cls: 'bg-[#FDF0EB] text-[#E8622A]' },
+  paid:    { label: 'Payé',       cls: 'bg-primary-light text-success' },
+  pending: { label: 'En attente', cls: 'bg-secondary-light text-secondary' },
   failed:  { label: 'Échoué',     cls: 'bg-red-50 text-red-600' },
 }
 
@@ -16,10 +16,10 @@ function Row({ c }: { c: Contribution }) {
   return (
     <div className="flex items-center gap-3 py-3 border-b border-[#D1D1D6] last:border-0">
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-[#1A1F16] truncate">{c.label}</p>
+        <p className="text-sm font-semibold text-brand-dark truncate">{c.label}</p>
         <p className="text-xs text-[#6B7280]">{name} · {date}</p>
       </div>
-      <p className="text-sm font-bold text-[#1A1F16] tabular-nums flex-shrink-0">{euros} €</p>
+      <p className="text-sm font-bold text-brand-dark tabular-nums flex-shrink-0">{euros} €</p>
       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${s.cls}`}>{s.label}</span>
     </div>
   )

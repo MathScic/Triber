@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { Check, X, Clock } from 'lucide-react'
 import type { AttendanceStatus } from '@/lib/hooks/useEvents'
@@ -16,15 +16,15 @@ const BUTTONS: ButtonConfig[] = [
     status: 'confirmed',
     label: 'Présent',
     Icon: Check,
-    active: 'bg-[#2A9D4E] text-white',
-    inactive: 'bg-white text-[#6B7280] border border-[#D1D1D6] hover:border-[#2A9D4E] hover:text-[#2A9D4E]',
+    active: 'bg-success text-white',
+    inactive: 'bg-white text-[#6B7280] border border-[#D1D1D6] hover:border-success hover:text-success',
   },
   {
     status: 'declined',
     label: 'Absent',
     Icon: X,
-    active: 'bg-[#E8622A] text-white',
-    inactive: 'bg-white text-[#6B7280] border border-[#D1D1D6] hover:border-[#E8622A] hover:text-[#E8622A]',
+    active: 'bg-secondary text-white',
+    inactive: 'bg-white text-[#6B7280] border border-[#D1D1D6] hover:border-secondary hover:text-secondary',
   },
   {
     status: 'pending',

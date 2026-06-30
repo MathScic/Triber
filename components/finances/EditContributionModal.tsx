@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { X, Save } from 'lucide-react'
@@ -47,10 +47,10 @@ export function EditContributionModal({ template, onClose, onSave }: Props) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#F4F4F6]">
-          <h2 className="text-base font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+          <h2 className="text-base font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
             Modifier
           </h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl hover:bg-[#F4F4F6] flex items-center justify-center transition-colors">
+          <button onClick={onClose} className="w-8 h-8 rounded-xl hover:bg-brand-bg flex items-center justify-center transition-colors">
             <X className="w-4 h-4 text-[#6B7280]" />
           </button>
         </div>
@@ -59,20 +59,20 @@ export function EditContributionModal({ template, onClose, onSave }: Props) {
           <div>
             <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Titre *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} maxLength={80}
-              className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]" />
+              className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
           </div>
 
           <div>
             <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Description</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={2} maxLength={600}
-              className="mt-1.5 w-full px-3 py-2.5 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] resize-none font-[family-name:var(--font-nunito)]" />
+              className="mt-1.5 w-full px-3 py-2.5 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success resize-none font-[family-name:var(--font-nunito)]" />
           </div>
 
           {!template.is_buvette && (
             <>
               <div>
                 <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Montant (€)</label>
-                <div className="mt-1.5 flex items-center border border-[#D1D1D6] rounded-xl overflow-hidden bg-[#F4F4F6] h-10">
+                <div className="mt-1.5 flex items-center border border-[#D1D1D6] rounded-xl overflow-hidden bg-brand-bg h-10">
                   <input type="number" min="0" step="0.01" value={defaultAmount}
                     onChange={e => { setDefaultAmount(e.target.value); if (e.target.value) setShowCategories(false) }}
                     placeholder="ex : 80"
@@ -83,7 +83,7 @@ export function EditContributionModal({ template, onClose, onSave }: Props) {
               <div>
                 <button type="button"
                   onClick={() => { setShowCategories(v => !v); if (!showCategories) setDefaultAmount('') }}
-                  className="text-xs text-[#2A9D4E] font-semibold hover:opacity-80 font-[family-name:var(--font-nunito)]">
+                  className="text-xs text-success font-semibold hover:opacity-80 font-[family-name:var(--font-nunito)]">
                   {showCategories ? '− Masquer les tarifs par catégorie' : '+ Tarifs différents par catégorie'}
                 </button>
                 {showCategories && <div className="mt-2"><TarifsEditor tarifs={tarifs} onChange={setTarifs} /></div>}
@@ -91,18 +91,18 @@ export function EditContributionModal({ template, onClose, onSave }: Props) {
               <div>
                 <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Date limite</label>
                 <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)}
-                  className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]" />
+                  className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
               </div>
               <div>
                 <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Message d'avertissement</label>
                 <input value={warning} onChange={e => setWarning(e.target.value)} maxLength={200}
-                  className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]" />
+                  className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
               </div>
             </>
           )}
 
           <button onClick={() => void submit()} disabled={!title.trim() || saving}
-            className="w-full flex items-center justify-center gap-2 h-11 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
+            className="w-full flex items-center justify-center gap-2 h-11 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
             <Save className="w-4 h-4" />
             {saving ? 'Sauvegarde…' : 'Enregistrer'}
           </button>

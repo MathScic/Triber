@@ -1,4 +1,4 @@
-import type { StandingRow } from '@/lib/hooks/useStandings'
+﻿import type { StandingRow } from '@/lib/hooks/useStandings'
 
 interface Props {
   rows: StandingRow[]
@@ -6,7 +6,7 @@ interface Props {
   compact?: boolean
 }
 
-export function StandingsTable({ rows, primaryColor = '#2A9D4E', compact = false }: Props) {
+export function StandingsTable({ rows, primaryColor = '#1E5C38', compact = false }: Props) {
   if (!rows.length) return null
 
   const display = compact ? rows.slice(0, 5) : rows
@@ -46,21 +46,21 @@ export function StandingsTable({ rows, primaryColor = '#2A9D4E', compact = false
                   {row.is_own_team && (
                     <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }} />
                   )}
-                  <span className={`text-sm font-[family-name:var(--font-nunito)] ${row.is_own_team ? 'text-[#1A1F16]' : 'text-[#1A1F16]'}`}>
+                  <span className={`text-sm font-[family-name:var(--font-nunito)] ${row.is_own_team ? 'text-brand-dark' : 'text-brand-dark'}`}>
                     {row.team_name}
                   </span>
                 </div>
               </td>
               <td className="py-2.5 px-2 text-center text-xs text-[#6B7280] tabular-nums font-[family-name:var(--font-nunito)]">{row.played}</td>
               {!compact && <>
-                <td className="py-2.5 px-2 text-center text-xs text-[#2A9D4E] font-semibold tabular-nums font-[family-name:var(--font-nunito)]">{row.won}</td>
+                <td className="py-2.5 px-2 text-center text-xs text-success font-semibold tabular-nums font-[family-name:var(--font-nunito)]">{row.won}</td>
                 <td className="py-2.5 px-2 text-center text-xs text-[#6B7280] tabular-nums font-[family-name:var(--font-nunito)]">{row.drawn}</td>
-                <td className="py-2.5 px-2 text-center text-xs text-[#E8622A] tabular-nums font-[family-name:var(--font-nunito)]">{row.lost}</td>
+                <td className="py-2.5 px-2 text-center text-xs text-secondary tabular-nums font-[family-name:var(--font-nunito)]">{row.lost}</td>
                 <td className="py-2.5 px-2 text-center text-xs text-[#6B7280] tabular-nums font-[family-name:var(--font-nunito)]">{row.goals_for}-{row.goals_against}</td>
               </>}
               <td className="py-2.5 px-2 text-center">
                 <span className="text-sm font-[800] font-[family-name:var(--font-barlow)] tabular-nums"
-                  style={row.is_own_team ? { color: primaryColor } : { color: '#1A1F16' }}>
+                  style={row.is_own_team ? { color: primaryColor } : { color: 'var(--color-brand-dark)' }}>
                   {row.points}
                 </span>
               </td>

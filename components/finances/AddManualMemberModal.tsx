@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { X, UserPlus } from 'lucide-react'
@@ -43,8 +43,8 @@ export function AddManualMemberModal({ categories, defaultAmount = 0, getDefault
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl">
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#F4F4F6]">
-          <h2 className="text-sm font-bold text-[#1A1F16] font-[family-name:var(--font-nunito)]">Ajouter hors application</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl hover:bg-[#F4F4F6] flex items-center justify-center">
+          <h2 className="text-sm font-bold text-brand-dark font-[family-name:var(--font-nunito)]">Ajouter hors application</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl hover:bg-brand-bg flex items-center justify-center">
             <X className="w-4 h-4 text-[#6B7280]" />
           </button>
         </div>
@@ -54,7 +54,7 @@ export function AddManualMemberModal({ categories, defaultAmount = 0, getDefault
             <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Nom complet *</label>
             <input value={name} onChange={e => { setName(e.target.value); setError(null) }} maxLength={80}
               placeholder="ex : Dupont Pierre"
-              className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]" />
+              className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
           </div>
 
           {categories.length > 0 && (
@@ -68,21 +68,21 @@ export function AddManualMemberModal({ categories, defaultAmount = 0, getDefault
                   if (cents > 0) setAmount((cents / 100).toFixed(2))
                 }
               }}
-                className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]">
+                className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]">
                 {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 <option value="__custom__">Autre…</option>
               </select>
               {category === '__custom__' && (
                 <input value={customCategory} onChange={e => setCustomCategory(e.target.value)} maxLength={40}
                   placeholder="Nom de la catégorie"
-                  className="mt-2 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-[#F4F4F6] focus:outline-none focus:border-[#2A9D4E] font-[family-name:var(--font-nunito)]" />
+                  className="mt-2 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
               )}
             </div>
           )}
 
           <div>
             <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Montant *</label>
-            <div className="mt-1.5 flex items-center border border-[#D1D1D6] rounded-xl bg-[#F4F4F6] h-10 overflow-hidden focus-within:border-[#2A9D4E]">
+            <div className="mt-1.5 flex items-center border border-[#D1D1D6] rounded-xl bg-brand-bg h-10 overflow-hidden focus-within:border-success">
               <input type="number" min="0" step="0.01" value={amount} onChange={e => { setAmount(e.target.value); setError(null) }}
                 placeholder="0.00"
                 className="flex-1 h-full px-3 bg-transparent text-sm focus:outline-none font-[family-name:var(--font-nunito)]" />
@@ -90,10 +90,10 @@ export function AddManualMemberModal({ categories, defaultAmount = 0, getDefault
             </div>
           </div>
 
-          {error && <p className="text-xs text-[#E8622A] font-[family-name:var(--font-nunito)]">{error}</p>}
+          {error && <p className="text-xs text-secondary font-[family-name:var(--font-nunito)]">{error}</p>}
 
           <button onClick={() => void submit()} disabled={saving}
-            className="w-full flex items-center justify-center gap-2 h-11 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
+            className="w-full flex items-center justify-center gap-2 h-11 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
             <UserPlus className="w-4 h-4" />
             {saving ? 'Ajout…' : 'Ajouter'}
           </button>

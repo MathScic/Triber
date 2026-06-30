@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -28,10 +28,10 @@ function ProfileContent() {
   }, [router])
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-6 py-8`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-6 py-8`}>
       <div className="max-w-2xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+          <h1 className="text-2xl font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
             Mon profil
           </h1>
           <p className="text-sm text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">

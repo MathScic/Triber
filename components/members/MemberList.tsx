@@ -35,7 +35,7 @@ export function MemberList({ organizationId, currentUserId }: Props) {
 
   if (error) {
     return (
-      <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2">{error}</p>
+      <p className="text-sm text-secondary bg-secondary-light rounded-xl px-3 py-2">{error}</p>
     )
   }
 

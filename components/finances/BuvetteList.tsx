@@ -1,4 +1,4 @@
-import { AlertTriangle, Image, Check } from 'lucide-react'
+﻿import { AlertTriangle, Image, Check } from 'lucide-react'
 import type { TreasuryEntry } from '@/lib/hooks/useTreasury'
 
 interface Props {
@@ -25,17 +25,17 @@ export function BuvetteList({ entries, isFlagged }: Props) {
 
         return (
           <div key={e.id} className={`flex items-start gap-3 px-4 py-3.5 ${idx !== entries.length - 1 ? 'border-b border-[#F4F4F6]' : ''} ${flagged ? 'bg-red-50' : ''}`}>
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${flagged ? 'bg-red-100' : 'bg-[#E8F5EE]'}`}>
-              {flagged ? <AlertTriangle className="w-4 h-4 text-[#E8622A]" /> : <Check className="w-4 h-4 text-[#2A9D4E]" />}
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${flagged ? 'bg-red-100' : 'bg-primary-light'}`}>
+              {flagged ? <AlertTriangle className="w-4 h-4 text-secondary" /> : <Check className="w-4 h-4 text-success" />}
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <p className="text-base font-[800] tabular-nums font-[family-name:var(--font-barlow)] text-[#1A1F16]">
+                <p className="text-base font-[800] tabular-nums font-[family-name:var(--font-barlow)] text-brand-dark">
                   {(e.amount_declared_cents / 100).toFixed(2)} €
                 </p>
                 {flagged && ecart !== null && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#E8622A] text-white font-[family-name:var(--font-nunito)]">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-secondary text-white font-[family-name:var(--font-nunito)]">
                     {ecart < 0 ? '-' : '+'}{(Math.abs(ecart) / 100).toFixed(2)} €
                   </span>
                 )}
@@ -47,7 +47,7 @@ export function BuvetteList({ entries, isFlagged }: Props) {
                 <p className="text-xs text-[#6B7280] italic mt-0.5 font-[family-name:var(--font-nunito)]">{e.notes}</p>
               )}
               {flagged && e.amount_ticket_cents !== null && (
-                <p className="text-xs text-[#E8622A] mt-0.5 font-[family-name:var(--font-nunito)]">
+                <p className="text-xs text-secondary mt-0.5 font-[family-name:var(--font-nunito)]">
                   Ticket : {(e.amount_ticket_cents / 100).toFixed(2)} € · Écart signalé
                 </p>
               )}
@@ -60,7 +60,7 @@ export function BuvetteList({ entries, isFlagged }: Props) {
               </a>
             )}
             {!e.photo_url && (
-              <div className="w-10 h-10 rounded-xl bg-[#F4F4F6] flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-brand-bg flex items-center justify-center flex-shrink-0">
                 <Image className="w-4 h-4 text-[#D1D1D6]" />
               </div>
             )}

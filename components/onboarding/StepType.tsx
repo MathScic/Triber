@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { Shield, Building2 } from 'lucide-react'
 
@@ -27,7 +27,7 @@ export function StepType({ onSelect }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-[800] text-[#1A1F16] uppercase tracking-tight mb-1">
+        <h2 className="text-2xl font-[800] text-brand-dark uppercase tracking-tight mb-1">
           Bienvenue sur Triber
         </h2>
         <p className="text-sm text-[#6B7280]">
@@ -41,10 +41,10 @@ export function StepType({ onSelect }: Props) {
             key={value}
             type="button"
             onClick={() => onSelect(value)}
-            className="rounded-2xl border-2 border-[#D1D1D6] bg-white p-5 text-left hover:border-[#2A9D4E] hover:bg-[#E8F5EE] active:scale-95 transition-all cursor-pointer"
+            className="rounded-2xl border-2 border-[#D1D1D6] bg-white p-5 text-left hover:border-success hover:bg-primary-light active:scale-95 transition-all cursor-pointer"
           >
-            <Icon className="w-8 h-8 text-[#2A9D4E] mb-3" />
-            <span className="block text-sm font-bold text-[#1A1F16]">{label}</span>
+            <Icon className="w-8 h-8 text-success mb-3" />
+            <span className="block text-sm font-bold text-brand-dark">{label}</span>
             <span className="text-xs text-[#6B7280] mt-0.5 block">{desc}</span>
           </button>
         ))}

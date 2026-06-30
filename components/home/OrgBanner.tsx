@@ -49,7 +49,7 @@ export function OrgBanner({ name, fullName, logoUrl, coverUrl, initial, primaryC
     })()
   }, [organizationId])
 
-  const color = primaryColor || '#2A9D4E'
+  const color = primaryColor || '#1E5C38'
 
   return (
     <div className="rounded-xl overflow-hidden relative" style={{ backgroundColor: color }}>

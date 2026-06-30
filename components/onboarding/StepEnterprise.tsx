@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 
 const SECTORS = ['Commerce', 'Restauration', 'Artisanat', 'Services', 'Santé', 'Autre']
 const SIZES = ['1 à 5', '6 à 20', '21 à 50', 'Plus de 50']
-const sel = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] bg-white px-3 text-sm text-[#1A1F16] focus:outline-none focus:ring-2 focus:ring-[#2A9D4E]'
+const sel = 'flex h-11 w-full rounded-xl border border-[#D1D1D6] bg-white px-3 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-success'
 
 interface EnterpriseFields {
   name: string
@@ -34,7 +34,7 @@ export function StepEnterprise({ onSubmit, onBack, loading }: Props) {
         <Label htmlFor="name">Nom de l'entreprise *</Label>
         <Input id="name" placeholder="Acme SAS"
           {...register('name', { required: 'Le nom est requis' })} />
-        {errors.name && <p className="text-xs text-[#E8622A]">{errors.name.message}</p>}
+        {errors.name && <p className="text-xs text-secondary">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-1.5">

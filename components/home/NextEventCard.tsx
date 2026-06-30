@@ -29,7 +29,7 @@ export function NextEventCard({ organizationId }: { organizationId: string }) {
   const date = new Date(event.start_at)
   const dateStr = date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
   const timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-  const TYPE_COLOR: Record<string, string> = { match: '#2A9D4E', training: '#E8622A', meeting: '#3B82F6', other: '#D1D1D6' }
+  const TYPE_COLOR: Record<string, string> = { match: 'var(--color-success)', training: 'var(--color-secondary)', meeting: '#3B82F6', other: '#D1D1D6' }
   const accent = TYPE_COLOR[event.type] ?? '#D1D1D6'
 
   return (
@@ -37,12 +37,12 @@ export function NextEventCard({ organizationId }: { organizationId: string }) {
       className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4 flex items-center gap-3"
       style={{ borderLeft: `3px solid ${accent}` }}
     >
-      <div className="w-9 h-9 rounded-xl bg-[#E8F5EE] flex items-center justify-center flex-shrink-0">
-        <Calendar className="w-4 h-4 text-[#2A9D4E]" />
+      <div className="w-9 h-9 rounded-xl bg-primary-light flex items-center justify-center flex-shrink-0">
+        <Calendar className="w-4 h-4 text-success" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Prochain événement</p>
-        <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)] truncate">
+        <p className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)] truncate">
           {event.title}
           {event.opponent ? ` · vs ${event.opponent}` : ''}
         </p>

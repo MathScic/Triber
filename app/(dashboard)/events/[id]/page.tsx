@@ -34,9 +34,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   ])
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#FAF7F2] px-4 py-6`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-4 py-6`}>
       <div className="max-w-lg lg:max-w-4xl mx-auto space-y-4">
-        <Link href="/events" className="inline-flex items-center gap-1 text-sm text-[#7A8070] hover:text-[#1A1F16] transition-colors font-[family-name:var(--font-nunito)]">
+        <Link href="/events" className="inline-flex items-center gap-1 text-sm text-brand-muted hover:text-brand-dark transition-colors font-[family-name:var(--font-nunito)]">
           <ChevronLeft className="w-4 h-4" /> Événements
         </Link>
 

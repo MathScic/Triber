@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect } from 'react'
 import Link from 'next/link'
@@ -7,13 +7,13 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   useEffect(() => { console.error(error) }, [error])
 
   return (
-    <div className="min-h-screen bg-[#F4F4F6] flex flex-col items-center justify-center px-6 text-center">
+    <div className="min-h-screen bg-brand-bg flex flex-col items-center justify-center px-6 text-center">
       <div className="space-y-6 max-w-sm">
         <div className="flex flex-col items-center gap-1">
-          <span className="text-6xl font-[800] text-[#E8622A] font-['Barlow_Condensed',sans-serif] tracking-tight">500</span>
-          <span className="text-sm font-bold text-[#1A1F16] tracking-widest uppercase font-['Nunito',sans-serif]">Erreur inattendue</span>
+          <span className="text-6xl font-[800] text-secondary font-['Barlow_Condensed',sans-serif] tracking-tight">500</span>
+          <span className="text-sm font-bold text-brand-dark tracking-widest uppercase font-['Nunito',sans-serif]">Erreur inattendue</span>
         </div>
-        <div className="w-12 h-1 bg-[#E8622A] rounded-full mx-auto" />
+        <div className="w-12 h-1 bg-secondary rounded-full mx-auto" />
         <p className="text-sm text-[#6B7280] leading-relaxed font-['Nunito',sans-serif]">
           Quelque chose s&apos;est mal passé de notre côté.<br />
           Notre équipe a été notifiée. Vous pouvez réessayer ou revenir à l&apos;accueil.
@@ -25,11 +25,11 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         )}
         <div className="flex flex-col gap-2">
           <button onClick={reset}
-            className="px-6 py-3 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-['Nunito',sans-serif]">
+            className="px-6 py-3 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-['Nunito',sans-serif]">
             Réessayer
           </button>
           <Link href="/home"
-            className="px-6 py-3 bg-white border border-[#D1D1D6] text-[#1A1F16] text-sm font-semibold rounded-xl hover:bg-[#F4F4F6] transition-colors font-['Nunito',sans-serif]">
+            className="px-6 py-3 bg-white border border-[#D1D1D6] text-brand-dark text-sm font-semibold rounded-xl hover:bg-brand-bg transition-colors font-['Nunito',sans-serif]">
             Retour à l&apos;accueil
           </Link>
         </div>

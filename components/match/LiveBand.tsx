@@ -33,14 +33,14 @@ export function LiveBand({ startedAt, pausedAt, totalPausedSeconds, status }: Pr
 
   if (isFinished) {
     return (
-      <div className="bg-[#1A1F16] flex items-center justify-center gap-2 pb-4">
+      <div className="bg-brand-dark flex items-center justify-center gap-2 pb-4">
         <span className="text-[#6B7280] font-bold text-[11px] tracking-widest">TERMINÉ</span>
       </div>
     )
   }
 
   return (
-    <div className="bg-[#1A1F16] flex items-center justify-center gap-2 pb-4">
+    <div className="bg-brand-dark flex items-center justify-center gap-2 pb-4">
       {!isHalf && <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />}
       <span className="text-red-500 font-bold text-[11px] tracking-widest font-[family-name:var(--font-nunito)]">
         {isHalf ? 'MI-TEMPS' : 'EN DIRECT'}

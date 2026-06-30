@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -34,7 +34,7 @@ export default function MediaPage() {
   const canDelete = role === 'admin' || role === 'member_active'
 
   return (
-    <main className="min-h-screen bg-[#F4F4F6] px-4 py-8">
+    <main className="min-h-screen bg-brand-bg px-4 py-8">
       <div className="max-w-lg lg:max-w-4xl mx-auto space-y-6">
         <div className="flex items-start justify-between gap-4">
           <PageHeader

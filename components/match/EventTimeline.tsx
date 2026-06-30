@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react'
+﻿import { Trash2 } from 'lucide-react'
 import type { MatchAction, OrgMember } from '@/lib/match/types'
 import { pairActionsWithAssists } from '@/lib/utils/match'
 import { BallSvg, CardRect } from '@/components/match/MatchIcons'
@@ -61,7 +61,7 @@ export function EventTimeline({ actions, members, onRemove, opponentName = 'Adve
           const assistName = assist ? resolveName(assist, members, opponentName) : null
           const assistJersey = assist ? resolveJersey(assist.user_id, members) : null
           const icon = action.type === 'goal'
-            ? <BallSvg color={isHomeAction ? '#1A1F16' : '#ef4444'} />
+            ? <BallSvg color={isHomeAction ? 'var(--color-brand-dark)' : '#ef4444'} />
             : <CardRect color={action.type === 'yellow_card' ? 'yellow' : 'red'} />
           const rev = !isHomeAction ? 'flex-row-reverse' : ''
 
@@ -74,7 +74,7 @@ export function EventTimeline({ actions, members, onRemove, opponentName = 'Adve
                       {onRemove && <button onClick={() => onRemove(action.id)} className="text-[#D1D1D6] hover:text-red-500 transition-colors flex-shrink-0"><Trash2 className="w-3 h-3" /></button>}
                       <span className="text-[11px] font-[800] text-[#6B7280] font-[family-name:var(--font-barlow)] tabular-nums flex-shrink-0">{action.minute}&apos;</span>
                       {icon}
-                      <span className="flex-1 text-xs font-semibold font-[family-name:var(--font-nunito)] truncate text-[#1A1F16]">
+                      <span className="flex-1 text-xs font-semibold font-[family-name:var(--font-nunito)] truncate text-brand-dark">
                         {jersey != null ? `${jersey} – ` : ''}{name}
                       </span>
                     </div>

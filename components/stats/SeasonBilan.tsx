@@ -1,4 +1,4 @@
-import type { MatchResult } from '@/lib/hooks/useStats'
+﻿import type { MatchResult } from '@/lib/hooks/useStats'
 
 interface Props { matchResults: MatchResult[] }
 
@@ -32,14 +32,14 @@ export function SeasonBilan({ matchResults }: Props) {
           <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">{total} match{total > 1 ? 's' : ''} joué{total > 1 ? 's' : ''}</p>
         </div>
         <div className="text-right">
-          <p className="text-4xl font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] leading-none">{points}</p>
+          <p className="text-4xl font-[800] text-brand-dark font-[family-name:var(--font-barlow)] leading-none">{points}</p>
           <p className="text-[10px] text-[#9CA3AF] font-[family-name:var(--font-nunito)] uppercase tracking-widest">points</p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 divide-x divide-[#F4F4F6]">
         <div className="py-5 text-center">
-          <p className="text-4xl font-[800] text-[#2A9D4E] font-[family-name:var(--font-barlow)] leading-none">{wins}</p>
+          <p className="text-4xl font-[800] text-success font-[family-name:var(--font-barlow)] leading-none">{wins}</p>
           <p className="text-[11px] text-[#6B7280] mt-1.5 font-[family-name:var(--font-nunito)] uppercase tracking-widest font-bold">V</p>
         </div>
         <div className="py-5 text-center">
@@ -47,7 +47,7 @@ export function SeasonBilan({ matchResults }: Props) {
           <p className="text-[11px] text-[#6B7280] mt-1.5 font-[family-name:var(--font-nunito)] uppercase tracking-widest font-bold">N</p>
         </div>
         <div className="py-5 text-center">
-          <p className="text-4xl font-[800] text-[#E8622A] font-[family-name:var(--font-barlow)] leading-none">{losses}</p>
+          <p className="text-4xl font-[800] text-secondary font-[family-name:var(--font-barlow)] leading-none">{losses}</p>
           <p className="text-[11px] text-[#6B7280] mt-1.5 font-[family-name:var(--font-nunito)] uppercase tracking-widest font-bold">D</p>
         </div>
       </div>
@@ -55,27 +55,27 @@ export function SeasonBilan({ matchResults }: Props) {
       <div className="px-5 pb-4 space-y-1.5">
         <div className="flex items-center justify-between">
           <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wide font-[family-name:var(--font-nunito)]">Taux de victoire</p>
-          <p className="text-[11px] font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)]">{winRate} %</p>
+          <p className="text-[11px] font-[800] text-brand-dark font-[family-name:var(--font-barlow)]">{winRate} %</p>
         </div>
-        <div className="h-2 bg-[#F4F4F6] rounded-full overflow-hidden">
+        <div className="h-2 bg-brand-bg rounded-full overflow-hidden">
           <div className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${winRate}%`, backgroundColor: winRate >= 60 ? '#2A9D4E' : winRate >= 40 ? '#E8622A' : '#EF4444' }} />
+            style={{ width: `${winRate}%`, backgroundColor: winRate >= 60 ? 'var(--color-success)' : winRate >= 40 ? 'var(--color-secondary)' : '#EF4444' }} />
         </div>
       </div>
 
       <div className="grid grid-cols-3 divide-x divide-[#F4F4F6] border-t border-[#F4F4F6] bg-[#FAFAFA]">
         <div className="py-3 text-center">
-          <p className="text-xl font-[800] text-[#2A9D4E] font-[family-name:var(--font-barlow)]">{goalsFor}</p>
+          <p className="text-xl font-[800] text-success font-[family-name:var(--font-barlow)]">{goalsFor}</p>
           <p className="text-[10px] text-[#9CA3AF] font-[family-name:var(--font-nunito)]">Buts pour</p>
         </div>
         <div className="py-3 text-center">
-          <p className={`text-xl font-[800] font-[family-name:var(--font-barlow)] ${goalDiff >= 0 ? 'text-[#2A9D4E]' : 'text-[#E8622A]'}`}>
+          <p className={`text-xl font-[800] font-[family-name:var(--font-barlow)] ${goalDiff >= 0 ? 'text-success' : 'text-secondary'}`}>
             {goalDiff > 0 ? '+' : ''}{goalDiff}
           </p>
           <p className="text-[10px] text-[#9CA3AF] font-[family-name:var(--font-nunito)]">Diff.</p>
         </div>
         <div className="py-3 text-center">
-          <p className="text-xl font-[800] text-[#E8622A] font-[family-name:var(--font-barlow)]">{goalsAgainst}</p>
+          <p className="text-xl font-[800] text-secondary font-[family-name:var(--font-barlow)]">{goalsAgainst}</p>
           <p className="text-[10px] text-[#9CA3AF] font-[family-name:var(--font-nunito)]">Buts contre</p>
         </div>
       </div>

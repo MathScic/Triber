@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useRef, useState } from 'react'
 import { Upload } from 'lucide-react'
@@ -26,7 +26,7 @@ export function MediaUploadButton({ onUpload }: Props) {
       <button
         onClick={() => ref.current?.click()}
         disabled={loading}
-        className="flex items-center gap-2 px-4 py-2.5 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors disabled:opacity-60 font-[family-name:var(--font-nunito)]"
+        className="flex items-center gap-2 px-4 py-2.5 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors disabled:opacity-60 font-[family-name:var(--font-nunito)]"
       >
         <Upload className="w-4 h-4" />
         {loading ? 'Envoi…' : 'Ajouter'}

@@ -56,7 +56,7 @@ export function EventDetailView({ event, role, currentUserId, currentUserName, i
             </span>
             {canManage && (
               <Link href={`/events/${ev.id}/live`}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2A9D4E] text-white text-[10px] font-bold hover:bg-[#238742] transition-colors uppercase tracking-wide">
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success text-white text-[10px] font-bold hover:bg-[#238742] transition-colors uppercase tracking-wide">
                 <Zap className="w-3 h-3" /> Gérer le direct
               </Link>
             )}
@@ -74,13 +74,13 @@ export function EventDetailView({ event, role, currentUserId, currentUserName, i
           <div className="flex flex-wrap gap-2 pt-2 border-t border-[#D1D1D6]">
             {isMatch && (
               <button onClick={() => setShowLineup(true)}
-                className="px-3 py-1.5 rounded-lg bg-[#E8E8EA] text-[#1A1F16] text-xs font-semibold hover:bg-[#D1D1D6] transition-colors font-[family-name:var(--font-nunito)]">
+                className="px-3 py-1.5 rounded-lg bg-[#E8E8EA] text-brand-dark text-xs font-semibold hover:bg-[#D1D1D6] transition-colors font-[family-name:var(--font-nunito)]">
                 Composition
               </button>
             )}
             {isMatch && (isOngoing || isFinished) && (
               <button onClick={() => setShowScore(v => !v)}
-                className="px-3 py-1.5 rounded-lg bg-[#E8E8EA] text-[#1A1F16] text-xs font-semibold hover:bg-[#D1D1D6] transition-colors font-[family-name:var(--font-nunito)]">
+                className="px-3 py-1.5 rounded-lg bg-[#E8E8EA] text-brand-dark text-xs font-semibold hover:bg-[#D1D1D6] transition-colors font-[family-name:var(--font-nunito)]">
                 Score {showScore ? '▲' : '▼'}
               </button>
             )}

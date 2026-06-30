@@ -24,7 +24,7 @@ export default async function ClubPage({ params }: { params: Promise<{ 'club-slu
 
   if (!org) notFound()
 
-  const primary = (org.primary_color as string | null) ?? '#2A9D4E'
+  const primary = (org.primary_color as string | null) ?? '#1E5C38'
   const matchIds = (allEvents ?? []).filter(e => e.type === 'match').map(e => e.id as string)
 
   const { data: lastResult } = matchIds.length
@@ -53,10 +53,10 @@ export default async function ClubPage({ params }: { params: Promise<{ 'club-slu
   const our = lastResult ? (isHome ? lastResult.score_home : lastResult.score_away) as number : null
   const their = lastResult ? (isHome ? lastResult.score_away : lastResult.score_home) as number : null
   const resultLabel = our === null ? null : our > their! ? 'Victoire' : our === their ? 'Nul' : 'Défaite'
-  const resultColor = resultLabel === 'Victoire' ? '#2A9D4E' : resultLabel === 'Nul' ? '#6B7280' : '#DC2626'
+  const resultColor = resultLabel === 'Victoire' ? '#1E5C38' : resultLabel === 'Nul' ? '#6B7280' : 'var(--color-brand-danger)'
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6]`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg`}>
       <div className="px-5 pt-10 pb-8 text-center" style={{ background: `linear-gradient(160deg, ${primary}18 0%, ${primary}06 100%)`, borderBottom: `3px solid ${primary}26` }}>
         {org.logo_url ? (
           <img src={org.logo_url as string} alt={org.name as string} className="w-20 h-20 rounded-full object-cover mx-auto mb-3 shadow-md ring-4 ring-white" />
@@ -65,7 +65,7 @@ export default async function ClubPage({ params }: { params: Promise<{ 'club-slu
             {(org.name as string).split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2)}
           </div>
         )}
-        <h1 className="text-2xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">{org.name as string}</h1>
+        <h1 className="text-2xl font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">{org.name as string}</h1>
         {org.slogan && <p className="text-sm text-[#6B7280] mt-1 font-[family-name:var(--font-nunito)]">{org.slogan as string}</p>}
       </div>
 
@@ -75,11 +75,11 @@ export default async function ClubPage({ params }: { params: Promise<{ 'club-slu
             <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-widest mb-2 font-[family-name:var(--font-nunito)]">Dernier résultat</p>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">vs {(lastMatchEv.opponent as string | null) ?? 'Adversaire'}</p>
+                <p className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">vs {(lastMatchEv.opponent as string | null) ?? 'Adversaire'}</p>
                 <span className="text-xs font-bold" style={{ color: resultColor }}>{resultLabel}</span>
               </div>
               <Link href={`/match/${lastResult.event_id}`} className="text-right group">
-                <p className="text-3xl font-[800] text-[#1A1F16] tabular-nums font-[family-name:var(--font-barlow)] leading-none">{our} – {their}</p>
+                <p className="text-3xl font-[800] text-brand-dark tabular-nums font-[family-name:var(--font-barlow)] leading-none">{our} – {their}</p>
                 <p className="text-[10px] group-hover:underline font-[family-name:var(--font-nunito)]" style={{ color: primary }}>Voir le direct →</p>
               </Link>
             </div>
@@ -89,7 +89,7 @@ export default async function ClubPage({ params }: { params: Promise<{ 'club-slu
         {nextEv && (
           <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4">
             <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-widest mb-1 font-[family-name:var(--font-nunito)]">Prochain événement</p>
-            <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">
+            <p className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">
               {nextEv.title as string}{nextEv.opponent ? ` · vs ${nextEv.opponent as string}` : ''}
             </p>
             <p className="text-xs text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
@@ -109,7 +109,7 @@ export default async function ClubPage({ params }: { params: Promise<{ 'club-slu
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: primary }}>
                     {(sc.name ?? '?').split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) || '?'}
                   </div>
-                  <p className="text-sm font-semibold text-[#1A1F16] flex-1 truncate font-[family-name:var(--font-nunito)]">{sc.name ?? '—'}</p>
+                  <p className="text-sm font-semibold text-brand-dark flex-1 truncate font-[family-name:var(--font-nunito)]">{sc.name ?? '—'}</p>
                   <p className="text-sm font-[800] tabular-nums font-[family-name:var(--font-barlow)]" style={{ color: primary }}>
                     {sc.goals} <span className="text-[10px] font-normal text-[#6B7280]">but{sc.goals !== 1 ? 's' : ''}</span>
                   </p>
@@ -120,7 +120,7 @@ export default async function ClubPage({ params }: { params: Promise<{ 'club-slu
         )}
 
         <p className="text-center text-xs text-[#6B7280] font-[family-name:var(--font-nunito)] pt-2">
-          Propulsé par <span className="font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)]">Triber</span>
+          Propulsé par <span className="font-[800] text-brand-dark font-[family-name:var(--font-barlow)]">Triber</span>
         </p>
       </div>
     </main>

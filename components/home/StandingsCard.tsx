@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ interface Props {
   primaryColor?: string
 }
 
-export function StandingsCard({ organizationId, primaryColor = '#2A9D4E' }: Props) {
+export function StandingsCard({ organizationId, primaryColor = '#1E5C38' }: Props) {
   const [scoreencoUrl, setScoreEncoUrl] = useState<string | null | undefined>(undefined)
   const { rows, loading } = useStandings(organizationId)
 
@@ -35,8 +35,8 @@ export function StandingsCard({ organizationId, primaryColor = '#2A9D4E' }: Prop
     <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-[#F4F4F6]">
         <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-[#E8622A]" />
-          <p className="text-sm font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+          <Trophy className="w-4 h-4 text-secondary" />
+          <p className="text-sm font-[800] text-brand-dark font-[family-name:var(--font-barlow)] uppercase tracking-wide">
             Classement
           </p>
         </div>
@@ -47,7 +47,7 @@ export function StandingsCard({ organizationId, primaryColor = '#2A9D4E' }: Prop
               href={scoreencoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[11px] text-[#6B7280] hover:text-[#2A9D4E] transition-colors font-[family-name:var(--font-nunito)]"
+              className="flex items-center gap-1 text-[11px] text-[#6B7280] hover:text-success transition-colors font-[family-name:var(--font-nunito)]"
             >
               <ExternalLink className="w-3 h-3" />
               Score'n'co
@@ -55,7 +55,7 @@ export function StandingsCard({ organizationId, primaryColor = '#2A9D4E' }: Prop
           )}
           <Link
             href="/stats"
-            className="text-[11px] text-[#6B7280] hover:text-[#2A9D4E] font-semibold transition-colors font-[family-name:var(--font-nunito)]"
+            className="text-[11px] text-[#6B7280] hover:text-success font-semibold transition-colors font-[family-name:var(--font-nunito)]"
           >
             Voir tout →
           </Link>
@@ -66,7 +66,7 @@ export function StandingsCard({ organizationId, primaryColor = '#2A9D4E' }: Prop
         {loading ? (
           <div className="space-y-2 py-1">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-8 bg-[#F4F4F6] rounded-lg animate-pulse" />
+              <div key={i} className="h-8 bg-brand-bg rounded-lg animate-pulse" />
             ))}
           </div>
         ) : (

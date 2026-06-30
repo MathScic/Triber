@@ -48,7 +48,7 @@ export function LastMatchCard({ organizationId }: { organizationId: string }) {
   const won = our > their
   const draw = our === their
   const label = draw ? 'Nul' : won ? 'Victoire' : 'Défaite'
-  const color = draw ? '#6B7280' : won ? '#2A9D4E' : '#E8622A'
+  const color = draw ? '#6B7280' : won ? 'var(--color-success)' : 'var(--color-secondary)'
 
   return (
     <div
@@ -61,19 +61,19 @@ export function LastMatchCard({ organizationId }: { organizationId: string }) {
         </div>
         <div>
           <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Dernier match</p>
-          <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)] leading-tight">
+          <p className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)] leading-tight">
             {result.opponent ? `vs ${result.opponent}` : result.title}
           </p>
           <span className="text-xs font-semibold" style={{ color }}>{label}</span>
         </div>
       </div>
       <div className="text-right">
-        <p className="text-2xl font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)] tabular-nums leading-none">
+        <p className="text-2xl font-[800] text-brand-dark font-[family-name:var(--font-barlow)] tabular-nums leading-none">
           {our} – {their}
         </p>
         <Link
           href={`/match/${result.eventId}`}
-          className="text-[10px] text-[#2A9D4E] hover:underline font-[family-name:var(--font-nunito)]"
+          className="text-[10px] text-success hover:underline font-[family-name:var(--font-nunito)]"
         >
           Voir le direct →
         </Link>

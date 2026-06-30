@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -50,23 +50,32 @@ function MembersPageContent() {
   }, [searchParams, isAdmin])
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-6 py-8`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-6 py-8`}>
       <div className="max-w-5xl mx-auto space-y-6">
 
         {/* En-tête page */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+            <h1 className="text-2xl font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
               Membres
             </h1>
-            <p className="text-sm text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
+            <p className="text-sm text-brand-muted mt-0.5 font-[family-name:var(--font-nunito)]">
               Gestion des adhérents du club
             </p>
           </div>
+          {isAdmin && (
+            <button
+              onClick={() => setShowInvite(true)}
+              className="flex items-center gap-2 bg-secondary text-white font-semibold text-sm px-4 py-2.5 rounded-xl hover:bg-secondary/90 transition-colors font-[family-name:var(--font-nunito)]"
+            >
+              <span className="text-lg leading-none">+</span>
+              Ajouter un membre
+            </button>
+          )}
         </div>
 
         {loading && !members.length && (
-          <div className="bg-white rounded-2xl border border-[#D1D1D6] h-64 animate-pulse" />
+          <div className="bg-white rounded-2xl border border-brand-border h-64 animate-pulse" />
         )}
 
         {(!loading || members.length > 0) && orgId && (

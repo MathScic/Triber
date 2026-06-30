@@ -20,7 +20,7 @@ function aggregate(stats: PlayerStatRow[], key: 'goals' | 'assists') {
 function RankList({ title, data }: { title: string; data: { name: string | null; total: number }[] }) {
   return (
     <div>
-      <p className="text-sm font-bold text-[#1A1F16] mb-3">{title}</p>
+      <p className="text-sm font-bold text-brand-dark mb-3">{title}</p>
       {!data.length ? (
         <p className="text-xs text-[#6B7280]">Aucun résultat.</p>
       ) : (
@@ -30,11 +30,11 @@ function RankList({ title, data }: { title: string; data: { name: string | null;
             return (
               <div key={i} className="flex items-center gap-2">
                 <span className="text-[10px] font-bold text-[#6B7280] w-6 text-center leading-none">{RANK_LABELS[i]}</span>
-                <div className="w-7 h-7 rounded-full bg-[#2A9D4E] flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-7 h-7 rounded-full bg-success flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
                   {initials}
                 </div>
-                <span className="text-sm text-[#1A1F16] flex-1 truncate">{p.name ?? '—'}</span>
-                <span className="text-sm font-bold text-[#2A9D4E] tabular-nums">{p.total}</span>
+                <span className="text-sm text-brand-dark flex-1 truncate">{p.name ?? '—'}</span>
+                <span className="text-sm font-bold text-success tabular-nums">{p.total}</span>
               </div>
             )
           })}

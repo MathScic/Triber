@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { useStats } from '@/lib/hooks/useStats'
@@ -29,11 +29,11 @@ export default function StatsPage() {
   }, [organizationId])
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-6 py-8`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-6 py-8`}>
       <div className="max-w-5xl mx-auto space-y-6">
 
         <div>
-          <h1 className="text-2xl font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+          <h1 className="text-2xl font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
             Statistiques
           </h1>
           <p className="text-sm text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
@@ -41,7 +41,7 @@ export default function StatsPage() {
           </p>
         </div>
 
-        {error && <p className="text-sm text-[#E8622A] bg-[#FDF0EB] rounded-xl px-3 py-2">{error}</p>}
+        {error && <p className="text-sm text-secondary bg-secondary-light rounded-xl px-3 py-2">{error}</p>}
 
         {loading
           ? <div className="h-28 bg-white rounded-2xl border border-[#D1D1D6] animate-pulse" />
@@ -59,21 +59,21 @@ export default function StatsPage() {
           <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#F4F4F6]">
               <div className="flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-[#E8622A]" />
-                <h2 className="text-base font-[800] text-[#1A1F16] uppercase tracking-tight font-[family-name:var(--font-barlow)]">
+                <Trophy className="w-4 h-4 text-secondary" />
+                <h2 className="text-base font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
                   Classement
                 </h2>
               </div>
               <div className="flex items-center gap-3">
                 {scoreencoUrl && (
                   <a href={scoreencoUrl} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-xs text-[#9CA3AF] hover:text-[#2A9D4E] transition-colors font-[family-name:var(--font-nunito)]">
+                    className="flex items-center gap-1 text-xs text-[#9CA3AF] hover:text-success transition-colors font-[family-name:var(--font-nunito)]">
                     <ExternalLink className="w-3 h-3" /> Score'n'co
                   </a>
                 )}
                 {!scoreencoUrl && canEdit && (
                   <button onClick={() => setEditStandings(v => !v)}
-                    className="flex items-center gap-1 text-xs font-semibold text-[#6B7280] hover:text-[#2A9D4E] transition-colors font-[family-name:var(--font-nunito)]">
+                    className="flex items-center gap-1 text-xs font-semibold text-[#6B7280] hover:text-success transition-colors font-[family-name:var(--font-nunito)]">
                     {editStandings ? <><ChevronUp className="w-3.5 h-3.5" /> Terminer</> : <><ChevronDown className="w-3.5 h-3.5" /> Modifier</>}
                   </button>
                 )}

@@ -10,8 +10,8 @@ const ROLE_LABELS: Record<MemberRole, string> = {
 }
 
 const ROLE_COLORS: Record<MemberRole, string> = {
-  admin: 'bg-[#E8F5EE] text-[#2A9D4E]',
-  member_active: 'bg-[#FDF0EB] text-[#E8622A]',
+  admin: 'bg-primary-light text-success',
+  member_active: 'bg-secondary-light text-secondary',
   member: 'bg-[#E8E8EA] text-[#6B7280]',
 }
 
@@ -34,13 +34,13 @@ export function MemberCard({ member, isAdmin, onRoleChange, onRemove }: Props) {
   return (
     <div className="bg-white rounded-xl border border-[#D1D1D6] p-4 flex items-center gap-3">
       {/* Avatar initiales */}
-      <div className="w-10 h-10 rounded-full bg-[#2A9D4E] flex-shrink-0 flex items-center justify-center">
+      <div className="w-10 h-10 rounded-full bg-success flex-shrink-0 flex items-center justify-center">
         <span className="text-white text-sm font-bold">{initials}</span>
       </div>
 
       {/* Nom + date */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-[#1A1F16] truncate">{name}</p>
+        <p className="text-sm font-semibold text-brand-dark truncate">{name}</p>
         <p className="text-xs text-[#6B7280]">
           {new Date(member.joined_at).toLocaleDateString('fr-FR')}
         </p>
@@ -51,7 +51,7 @@ export function MemberCard({ member, isAdmin, onRoleChange, onRemove }: Props) {
         <select
           value={member.role}
           onChange={e => onRoleChange(member.user_id, e.target.value as MemberRole)}
-          className="text-xs border border-[#D1D1D6] rounded-lg px-2 py-1 bg-white text-[#1A1F16] focus:outline-none focus:ring-1 focus:ring-[#2A9D4E]"
+          className="text-xs border border-[#D1D1D6] rounded-lg px-2 py-1 bg-white text-brand-dark focus:outline-none focus:ring-1 focus:ring-success"
         >
           <option value="member">Membre</option>
           <option value="member_active">Actif</option>
@@ -68,7 +68,7 @@ export function MemberCard({ member, isAdmin, onRoleChange, onRemove }: Props) {
         <button
           onClick={() => onRemove(member.user_id)}
           aria-label="Supprimer"
-          className="text-[#6B7280] hover:text-[#E8622A] transition-colors text-sm ml-1"
+          className="text-[#6B7280] hover:text-secondary transition-colors text-sm ml-1"
         >
           <X className="w-3.5 h-3.5" />
         </button>

@@ -63,10 +63,10 @@ export function LineupModal({ eventId, organizationId, eventTitle, onClose }: Pr
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl">
         <div className="flex items-center justify-between p-4 border-b border-[#D1D1D6]">
-          <h2 className="text-base font-[800] text-[#1A1F16] font-[family-name:var(--font-barlow)]">
+          <h2 className="text-base font-[800] text-brand-dark font-[family-name:var(--font-barlow)]">
             Composition — {eventTitle}
           </h2>
-          <button onClick={onClose} className="text-[#6B7280] hover:text-[#1A1F16] transition-colors">
+          <button onClick={onClose} className="text-[#6B7280] hover:text-brand-dark transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -82,7 +82,7 @@ export function LineupModal({ eventId, organizationId, eventTitle, onClose }: Pr
             ✓ Modifications enregistrées automatiquement
           </p>
           <button onClick={onClose}
-            className="w-full h-11 rounded-xl bg-[#2A9D4E] text-white text-sm font-[800] font-[family-name:var(--font-barlow)] uppercase tracking-wide hover:bg-[#238742] transition-colors">
+            className="w-full h-11 rounded-xl bg-success text-white text-sm font-[800] font-[family-name:var(--font-barlow)] uppercase tracking-wide hover:bg-[#238742] transition-colors">
             Confirmer la composition
           </button>
         </div>

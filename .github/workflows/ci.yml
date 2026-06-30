@@ -1,3 +1,15 @@
+# CI Triber — s'exécute sur push vers main et sur toutes les PR vers main
+#
+# Job "verify"  : lint → typecheck → tests unitaires → build  (push ET PR)
+# Job "e2e"     : Playwright en mode headless             (PR vers main uniquement)
+#
+# Secrets GitHub à configurer (Settings → Secrets → Actions) :
+#   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
+#   SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_APP_URL,
+#   STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
+#   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_PRICE_CLUB,
+#   RESEND_API_KEY, TEST_EMAIL, TEST_PASSWORD
+
 name: CI
 
 on:
@@ -7,17 +19,111 @@ on:
     branches: [main]
 
 jobs:
+  # ------------------------------------------------------------------ #
+  # Job principal : qualité du code + build de production              #
+  # ------------------------------------------------------------------ #
   verify:
+    name: Lint · Typecheck · Unit tests · Build
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      # Récupère le code source
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Configure Node.js 20 avec cache npm pour accélérer les runs suivants
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run build
+      # Installe les dépendances en suivant strictement le lockfile
+      - name: Install dependencies
+        run: npm ci
+
+      # Vérifie le style et les règles ESLint (next/core-web-vitals + prettier)
+      - name: Lint
+        run: npm run lint
+
+      # Vérifie les types TypeScript — zéro any, zéro @ts-ignore
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Lance les 57 tests unitaires Vitest en mode non-interactif (--run)
+      - name: Unit tests
+        run: npx vitest run
+
+      # Compile le projet Next.js (mode standalone) — échoue si le build est cassé
+      - name: Build
+        run: npm run build
+        env:
+          # Variables publiques nécessaires pour le build Next.js
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+
+  # ------------------------------------------------------------------ #
+  # Job E2E : tests Playwright — uniquement sur les PR vers main       #
+  # ------------------------------------------------------------------ #
+  e2e:
+    name: E2E tests (Playwright / Chromium)
+    runs-on: ubuntu-latest
+    # Uniquement sur les PR — évite de lancer les E2E sur chaque push vers main
+    if: github.event_name == 'pull_request'
+    # Attend que lint/typecheck/build passent avant de lancer les E2E
+    needs: verify
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Installe uniquement Chromium + ses dépendances système (plus rapide que --with-deps seul)
+      - name: Install Playwright + Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Build de production avant les E2E — next start est plus stable que next dev en CI
+      - name: Build for E2E
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+
+      # Lance les tests E2E — Playwright démarre automatiquement `next start`
+      # (voir webServer.command dans playwright.config.ts avec process.env.CI)
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_PRICE_CLUB: ${{ secrets.STRIPE_PRICE_CLUB }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+
+      # Publie le rapport HTML Playwright en cas d'échec pour faciliter le debug
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

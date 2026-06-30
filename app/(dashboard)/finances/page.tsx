@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -61,12 +61,12 @@ export default function FinancesPage() {
   })
 
   return (
-    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-[#F4F4F6] px-4 py-8`}>
+    <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-4 py-8`}>
       <div className="max-w-lg lg:max-w-4xl mx-auto space-y-6">
         <PageHeader title="Finances" subtitle="Réservé aux administrateurs"
           action={canManage ? (
             <button onClick={() => setShowCreate(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#E8622A] text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-[family-name:var(--font-nunito)]">
+              className="flex items-center gap-2 px-4 py-2 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-[#d4571f] transition-colors font-[family-name:var(--font-nunito)]">
               <Plus className="w-4 h-4" /> Nouvelle
             </button>
           ) : undefined}
@@ -76,15 +76,15 @@ export default function FinancesPage() {
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4">
             <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Encaissé</p>
-            <p className="text-xl font-[800] text-[#2A9D4E] tabular-nums font-[family-name:var(--font-barlow)]">{(totalPaid / 100).toFixed(0)} €</p>
+            <p className="text-xl font-[800] text-success tabular-nums font-[family-name:var(--font-barlow)]">{(totalPaid / 100).toFixed(0)} €</p>
           </div>
           <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4">
             <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">En attente</p>
-            <p className="text-xl font-[800] text-[#E8622A] tabular-nums font-[family-name:var(--font-barlow)]">{(totalPending / 100).toFixed(0)} €</p>
+            <p className="text-xl font-[800] text-secondary tabular-nums font-[family-name:var(--font-barlow)]">{(totalPending / 100).toFixed(0)} €</p>
           </div>
           <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4">
             <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Recouvrement</p>
-            <p className={`text-xl font-[800] tabular-nums font-[family-name:var(--font-barlow)] ${recoveryRate >= 80 ? 'text-[#2A9D4E]' : recoveryRate >= 50 ? 'text-amber-500' : 'text-[#E8622A]'}`}>
+            <p className={`text-xl font-[800] tabular-nums font-[family-name:var(--font-barlow)] ${recoveryRate >= 80 ? 'text-success' : recoveryRate >= 50 ? 'text-amber-500' : 'text-secondary'}`}>
               {recoveryRate} %
             </p>
           </div>
@@ -99,7 +99,7 @@ export default function FinancesPage() {
         {!loading && templates.length === 0 && (
           <div className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-10 text-center space-y-2">
             <Receipt className="w-8 h-8 text-[#D1D1D6] mx-auto" />
-            <p className="text-sm font-semibold text-[#1A1F16] font-[family-name:var(--font-nunito)]">Aucune cotisation</p>
+            <p className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">Aucune cotisation</p>
             <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">
               {canManage ? 'Cliquez sur "Nouvelle" pour créer votre première cotisation.' : 'Aucune cotisation créée.'}
             </p>

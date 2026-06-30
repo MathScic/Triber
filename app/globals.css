@@ -4,8 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-primary-light: var(--color-primary-light);
-  --color-secondary-light: var(--color-secondary-light);
+  /* ── shadcn/ui — tokens pour composants ui/ ────────────────────────── */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -31,10 +30,6 @@
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -43,6 +38,23 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* ── Triber white-label (surchargeables par injectTheme au runtime) ── */
+  --color-primary:              var(--triber-primary);
+  --color-primary-foreground:   var(--triber-primary-text);
+  --color-secondary:            var(--triber-secondary);
+  --color-secondary-foreground: #ffffff;
+  --color-primary-light:        #E8F5EE;
+  --color-secondary-light:      #FDF0EB;
+
+  /* ── Triber tokens fixes (non white-label) ───────────────────────── */
+  --color-success:     #2A9D4E;
+  --color-brand-dark:  #1A1F16;
+  --color-brand-bg:    #FAF7F2;
+  --color-brand-sand:  #F0EBE1;
+  --color-brand-muted: #7A8070;
+  --color-brand-border:#DDD8CE;
+  --color-brand-danger:#DC2626;
 }
 
 :root {
@@ -80,13 +92,14 @@
   --sidebar-ring: oklch(0.707 0.022 261.325);
 }
 
-/* Couleurs dynamiques Triber — surchargent les valeurs shadcn par défaut */
+/* ── Triber runtime defaults ────────────────────────────────────────────────
+   Surchargés par injectTheme() (lib/utils/theme.ts) quand l'org a son propre
+   branding. Les @theme inline ci-dessus lisent ces variables via var(--triber-*).
+   ────────────────────────────────────────────────────────────────────────── */
 :root {
-  --color-primary: #2A9D4E;
-  --color-secondary: #E8622A;
-  --color-primary-light: #E8F5EE;
-  --color-secondary-light: #FDF0EB;
-  --color-primary-text: #FFFFFF;
+  --triber-primary:      #1E5C38;   /* vert forêt — défaut white-label */
+  --triber-secondary:    #E8622A;   /* orange accent — défaut white-label */
+  --triber-primary-text: #FFFFFF;   /* texte sur fond primary */
 }
 
 .dark {

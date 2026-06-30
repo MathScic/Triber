@@ -48,7 +48,7 @@ export function InviteForm({ organizationId, orgName, onClose }: Props) {
     <div className="bg-white rounded-xl border border-[#D1D1D6] p-5 space-y-4">
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-base font-bold text-[#1A1F16] font-[family-name:var(--font-barlow)] uppercase tracking-wide">
+          <h3 className="text-base font-bold text-brand-dark font-[family-name:var(--font-barlow)] uppercase tracking-wide">
             Inviter un membre
           </h3>
           <p className="text-xs text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
@@ -56,14 +56,14 @@ export function InviteForm({ organizationId, orgName, onClose }: Props) {
           </p>
         </div>
         {onClose && (
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-[#F4F4F6] transition-colors flex-shrink-0">
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-brand-bg transition-colors flex-shrink-0">
             <X className="w-4 h-4 text-[#6B7280]" />
           </button>
         )}
       </div>
 
-      {error && <p className="text-xs text-[#E8622A] bg-[#FDF0EB] rounded-lg px-3 py-2">{error}</p>}
-      {success && <p className="text-xs text-[#2A9D4E] bg-[#E8F5EE] rounded-lg px-3 py-2">{success}</p>}
+      {error && <p className="text-xs text-secondary bg-secondary-light rounded-lg px-3 py-2">{error}</p>}
+      {success && <p className="text-xs text-success bg-primary-light rounded-lg px-3 py-2">{success}</p>}
 
       <form onSubmit={handleSubmit} className="flex gap-2">
         <Input

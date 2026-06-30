@@ -31,7 +31,7 @@ export function BallSvg({ color }: { color: string }) {
 
 export function CardRect({ color, active }: { color: 'yellow' | 'red'; active?: boolean }) {
   if (active !== undefined) {
-    const bg = color === 'yellow' ? (active ? '#FBBF24' : '#FDE68A') : (active ? '#DC2626' : '#FCA5A5')
+    const bg = color === 'yellow' ? (active ? '#FBBF24' : '#FDE68A') : (active ? 'var(--color-brand-danger)' : '#FCA5A5')
     return <span className="inline-block w-4 h-5 rounded-[3px] flex-shrink-0" style={{ backgroundColor: bg }} />
   }
   return <span className={`inline-block w-2.5 h-4 rounded-[2px] flex-shrink-0 ${color === 'yellow' ? 'bg-yellow-400' : 'bg-red-600'}`} />

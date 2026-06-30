@@ -13,14 +13,14 @@ interface Props {
 function TeamBadge({ name, logoUrl, align }: { name: string; logoUrl?: string | null; align: 'left' | 'right' }) {
   const initials = name.split(/\s+/).filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 3) || '?'
   return (
-    <div className={`flex flex-col ${align === 'left' ? 'items-start' : 'items-end'} gap-1.5`}>
-      <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-white/20 bg-white/10 flex-shrink-0 flex items-center justify-center">
+    <div className={`flex flex-col ${align === 'left' ? 'items-start' : 'items-end'} gap-2`}>
+      <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-white/20 bg-white/10 flex-shrink-0 flex items-center justify-center">
         {logoUrl
           ? <img src={logoUrl} alt={name} className="w-full h-full object-cover" />
-          : <span className="text-white/80 font-[800] text-xs font-[family-name:var(--font-barlow)]">{initials}</span>
+          : <span className="text-white/80 font-[800] text-sm font-[family-name:var(--font-barlow)]">{initials}</span>
         }
       </div>
-      <p className={`text-[10px] font-[800] text-white uppercase tracking-tight leading-tight font-[family-name:var(--font-barlow)] max-w-[80px] line-clamp-2 ${align === 'left' ? 'text-left' : 'text-right'}`}>{name}</p>
+      <p className={`text-[11px] font-[800] text-white/80 uppercase tracking-tight leading-tight font-[family-name:var(--font-barlow)] max-w-[80px] line-clamp-2 ${align === 'left' ? 'text-left' : 'text-right'}`}>{name}</p>
     </div>
   )
 }
@@ -36,42 +36,55 @@ export function LiveScoreBoard({ orgName, opponent, us, them, status, startedAt,
   const leftLogo = isHome !== false ? orgLogoUrl : null
   const rightLogo = isHome !== false ? null : orgLogoUrl
 
+  const halfLabel = (() => {
+    if (!startedAt || !isLive) return null
+    const minElapsed = (Date.now() - new Date(startedAt).getTime()) / 60000 - totalPausedSeconds / 60
+    return minElapsed <= 45 ? '1ère MT' : '2ème MT'
+  })()
+
   return (
     <div className="relative overflow-hidden rounded-2xl shadow-lg" style={{ background: 'linear-gradient(160deg, #1C2117 0%, #252b1d 55%, #2A3020 100%)' }}>
-      <div className="px-5 pt-4 pb-2">
+      <div className="px-5 pt-4 pb-1">
         {isLive && (
           <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest font-[family-name:var(--font-nunito)]">
             <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> En direct
           </span>
         )}
-        {isHalf && (
-          <span className="inline-flex items-center gap-1.5 bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest font-[family-name:var(--font-nunito)]">
-            Mi-temps
-          </span>
-        )}
+        {isHalf && <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest font-[family-name:var(--font-nunito)]">Mi-temps</span>}
         {isDone && <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest font-[family-name:var(--font-nunito)]">Terminé</span>}
         {(!status || status === 'upcoming') && <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest font-[family-name:var(--font-nunito)]">À venir</span>}
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 pb-1">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-5 pb-2">
         <TeamBadge name={leftName} logoUrl={leftLogo} align="left" />
-        <div className="text-[64px] font-[800] font-[family-name:var(--font-barlow)] tabular-nums leading-none text-white tracking-tighter px-2 text-center">
+        <div className="text-[72px] font-[800] font-[family-name:var(--font-barlow)] tabular-nums leading-none text-white tracking-tighter px-2 text-center">
           {leftScore} – {rightScore}
         </div>
         <TeamBadge name={rightName} logoUrl={rightLogo} align="right" />
       </div>
 
-      <div className="flex items-center justify-center gap-3 px-5 pb-5 pt-2">
-        <LiveTimer startedAt={startedAt} pausedAt={pausedAt} totalPausedSeconds={totalPausedSeconds} status={status} />
+      <div className="flex items-center justify-center gap-3 pb-5 pt-2">
+        <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-2">
+          {isLive && <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse flex-shrink-0" />}
+          <LiveTimer startedAt={startedAt} pausedAt={pausedAt} totalPausedSeconds={totalPausedSeconds} status={status} compact />
+          {(isLive || isHalf) && (
+            <>
+              <span className="text-white/30 select-none">·</span>
+              <span className="text-white/60 text-xs font-[family-name:var(--font-nunito)]">
+                {isHalf ? 'Mi-temps' : (halfLabel ?? '1ère MT')}
+              </span>
+            </>
+          )}
+        </div>
         {isLive && (
           <button onClick={onHalfTime} disabled={loading}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
-            <Pause className="w-3 h-3 fill-current" /> Mi-temps
+            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
+            <Pause className="w-3 h-3 fill-current" /> Pause
           </button>
         )}
         {isHalf && (
           <button onClick={onResume} disabled={loading}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
+            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
             <Play className="w-3 h-3 fill-current" /> Reprendre
           </button>
         )}

@@ -1,4 +1,4 @@
-import { Play, Square } from '@phosphor-icons/react'
+﻿import { Play, Square } from '@phosphor-icons/react'
 
 type MatchStatus = 'upcoming' | 'ongoing' | 'half_time' | 'finished' | null
 
@@ -16,7 +16,7 @@ export function MatchControls({ status, loading, onControl }: Props) {
       <button
         onClick={() => onControl('start')}
         disabled={loading}
-        className="w-full h-12 rounded-xl bg-[#2A9D4E] text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-[#238742] transition-colors disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
+        className="w-full h-12 rounded-xl bg-success text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-[#238742] transition-colors disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
       >
         <Play size={16} weight="fill" /> Démarrer le match
       </button>
