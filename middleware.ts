@@ -12,6 +12,9 @@ const PROTECTED = [
   '/media',
   '/settings',
   '/dashboard',
+  '/profile',
+  '/communications',
+  '/teams',
 ]
 
 // Routes réservées aux non-authentifiés — redirige vers /home si déjà connecté
@@ -48,7 +51,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const isProtected = PROTECTED.some((p) => pathname.startsWith(p))
+  const isProtected = PROTECTED.some((p) => pathname === p || pathname.startsWith(p + '/'))
   const isAuthOnly = AUTH_ONLY.some((p) => pathname === p || pathname === `${p}/`)
 
   if (!user && isProtected) {

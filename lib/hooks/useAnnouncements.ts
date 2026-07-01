@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 export type Announcement = {
@@ -18,7 +18,7 @@ export function useAnnouncements(organizationId: string) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchAnnouncements = async () => {
+  const fetchAnnouncements = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
     const { data, error: err } = await supabase
@@ -30,7 +30,6 @@ export function useAnnouncements(organizationId: string) {
 
     if (err) { setError('Impossible de charger les annonces.'); setLoading(false); return }
 
-    // Charge les profils des auteurs séparément (pas de FK directe)
     const authorIds = [...new Set((data ?? []).map(a => a.author_id as string))]
     const { data: profiles } = await supabase
       .from('profiles').select('id, full_name').in('id', authorIds)
@@ -42,7 +41,22 @@ export function useAnnouncements(organizationId: string) {
       profiles: profiles?.find(p => p.id === a.author_id) ?? null,
     })))
     setLoading(false)
-  }
+  }, [organizationId])
+
+  // Actualisation temps réel — toute insertion sur announcements déclenche un refetch
+  useEffect(() => {
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`ann-${organizationId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'announcements',
+        filter: `organization_id=eq.${organizationId}`,
+      }, () => { void fetchAnnouncements() })
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  }, [organizationId, fetchAnnouncements])
 
   const createAnnouncement = async (title: string, message: string, category?: string): Promise<boolean> => {
     const supabase = createClient()

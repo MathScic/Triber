@@ -11,14 +11,11 @@ interface Props {
 }
 
 function TeamBadge({ name, logoUrl, align }: { name: string; logoUrl?: string | null; align: 'left' | 'right' }) {
-  const initials = name.split(/\s+/).filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 3) || '?'
+  const ini = name.split(/\s+/).filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 3) || '?'
   return (
     <div className={`flex flex-col ${align === 'left' ? 'items-start' : 'items-end'} gap-2`}>
       <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-white/20 bg-white/10 flex-shrink-0 flex items-center justify-center">
-        {logoUrl
-          ? <img src={logoUrl} alt={name} className="w-full h-full object-cover" />
-          : <span className="text-white/80 font-[800] text-sm font-[family-name:var(--font-barlow)]">{initials}</span>
-        }
+        {logoUrl ? <img src={logoUrl} alt={name} className="w-full h-full object-cover" /> : <span className="text-white/80 font-[800] text-sm font-[family-name:var(--font-barlow)]">{ini}</span>}
       </div>
       <p className={`text-[11px] font-[800] text-white/80 uppercase tracking-tight leading-tight font-[family-name:var(--font-barlow)] max-w-[80px] line-clamp-2 ${align === 'left' ? 'text-left' : 'text-right'}`}>{name}</p>
     </div>
@@ -29,29 +26,21 @@ export function LiveScoreBoard({ orgName, opponent, us, them, status, startedAt,
   const isLive = status === 'ongoing'
   const isHalf = status === 'half_time'
   const isDone = status === 'finished'
-  const leftName = isHome !== false ? orgName : opponent
-  const rightName = isHome !== false ? opponent : orgName
-  const leftScore = isHome !== false ? us : them
+  const leftName  = isHome !== false ? orgName   : opponent
+  const rightName = isHome !== false ? opponent  : orgName
+  const leftScore = isHome !== false ? us   : them
   const rightScore = isHome !== false ? them : us
-  const leftLogo = isHome !== false ? orgLogoUrl : null
+  const leftLogo  = isHome !== false ? orgLogoUrl : null
   const rightLogo = isHome !== false ? null : orgLogoUrl
-
-  const halfLabel = (() => {
-    if (!startedAt || !isLive) return null
-    const minElapsed = (Date.now() - new Date(startedAt).getTime()) / 60000 - totalPausedSeconds / 60
-    return minElapsed <= 45 ? '1ère MT' : '2ème MT'
-  })()
+  const halfLabel = isLive && startedAt
+    ? ((Date.now() - new Date(startedAt).getTime()) / 60000 - totalPausedSeconds / 60) <= 45 ? '1ère MT' : '2ème MT'
+    : null
 
   return (
-    <div className="relative overflow-hidden rounded-2xl shadow-lg" style={{ background: 'linear-gradient(160deg, #1C2117 0%, #252b1d 55%, #2A3020 100%)' }}>
-      <div className="px-5 pt-4 pb-1">
-        {isLive && (
-          <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest font-[family-name:var(--font-nunito)]">
-            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> En direct
-          </span>
-        )}
+    <div className="relative overflow-hidden rounded-2xl shadow-lg" style={{ background: 'linear-gradient(160deg, var(--color-brand-dark) 0%, var(--triber-primary) 100%)' }}>
+      {/* Statut contextuel dans le hero — badge principal dans le PageHeader via LivePageWrapper */}
+      <div className="px-5 pt-4 pb-1 min-h-[28px] flex items-center">
         {isHalf && <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest font-[family-name:var(--font-nunito)]">Mi-temps</span>}
-        {isDone && <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest font-[family-name:var(--font-nunito)]">Terminé</span>}
         {(!status || status === 'upcoming') && <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest font-[family-name:var(--font-nunito)]">À venir</span>}
       </div>
 
@@ -68,28 +57,20 @@ export function LiveScoreBoard({ orgName, opponent, us, them, status, startedAt,
           {isLive && <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse flex-shrink-0" />}
           <LiveTimer startedAt={startedAt} pausedAt={pausedAt} totalPausedSeconds={totalPausedSeconds} status={status} compact />
           {(isLive || isHalf) && (
-            <>
-              <span className="text-white/30 select-none">·</span>
-              <span className="text-white/60 text-xs font-[family-name:var(--font-nunito)]">
-                {isHalf ? 'Mi-temps' : (halfLabel ?? '1ère MT')}
-              </span>
-            </>
+            <><span className="text-white/30 select-none">·</span><span className="text-white/60 text-xs font-[family-name:var(--font-nunito)]">{isHalf ? 'Mi-temps' : (halfLabel ?? '1ère MT')}</span></>
           )}
         </div>
         {isLive && (
-          <button onClick={onHalfTime} disabled={loading}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
+          <button onClick={onHalfTime} disabled={loading} className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
             <Pause className="w-3 h-3 fill-current" /> Pause
           </button>
         )}
         {isHalf && (
-          <button onClick={onResume} disabled={loading}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
+          <button onClick={onResume} disabled={loading} className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors disabled:opacity-50 font-[family-name:var(--font-nunito)]">
             <Play className="w-3 h-3 fill-current" /> Reprendre
           </button>
         )}
       </div>
-
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
     </div>
   )

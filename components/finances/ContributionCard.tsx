@@ -28,7 +28,7 @@ export function ContributionCard({ template, onClick, onEdit, onDelete, onToggle
   const iconBg = template.is_buvette ? 'bg-blue-50' : 'bg-primary-light'
 
   return (
-    <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm">
+    <div className="bg-white rounded-2xl border border-brand-border shadow-sm">
       <div className="p-4 flex items-start gap-3">
         <div className={`w-11 h-11 rounded-xl ${iconBg} flex items-center justify-center flex-shrink-0`}>
           {icon}
@@ -39,14 +39,14 @@ export function ContributionCard({ template, onClick, onEdit, onDelete, onToggle
             <p className="text-sm font-bold text-brand-dark font-[family-name:var(--font-nunito)] truncate">{template.title}</p>
             <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0 ${
               template.is_buvette ? 'bg-blue-50 text-blue-600' :
-              template.is_active ? 'bg-primary-light text-success' : 'bg-brand-bg text-[#6B7280]'
+              template.is_active ? 'bg-primary-light text-success' : 'bg-brand-bg text-brand-muted'
             }`}>
               {template.is_buvette ? 'Cumulatif' : template.is_active ? 'Actif' : 'Terminé'}
             </span>
           </div>
 
           {fmtDate && (
-            <div className={`flex items-center gap-1.5 text-xs font-[family-name:var(--font-nunito)] ${deadlinePast ? 'text-secondary font-semibold' : 'text-[#6B7280]'}`}>
+            <div className={`flex items-center gap-1.5 text-xs font-[family-name:var(--font-nunito)] ${deadlinePast ? 'text-secondary font-semibold' : 'text-brand-muted'}`}>
               <Calendar className="w-3.5 h-3.5" />
               Date limite <span className={deadlinePast ? 'text-secondary' : 'text-brand-dark'}>{fmtDate}</span>
             </div>
@@ -56,7 +56,7 @@ export function ContributionCard({ template, onClick, onEdit, onDelete, onToggle
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-[family-name:var(--font-nunito)]">
                 <span className="text-brand-dark font-semibold">{template.paid_count}/{template.payments_count} payés</span>
-                <span className="text-[#6B7280]">{pct}%</span>
+                <span className="text-brand-muted">{pct}%</span>
               </div>
               <div className="h-2 bg-brand-bg rounded-full overflow-hidden">
                 <div className="h-full bg-success rounded-full transition-all" style={{ width: `${pct}%` }} />
@@ -71,7 +71,7 @@ export function ContributionCard({ template, onClick, onEdit, onDelete, onToggle
           )}
 
           {!template.is_buvette && !template.payments_count && (
-            <p className="text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">Aucun paiement enregistré</p>
+            <p className="text-xs text-brand-muted font-[family-name:var(--font-nunito)]">Aucun paiement enregistré</p>
           )}
 
           {template.warning_message && (
@@ -86,22 +86,22 @@ export function ContributionCard({ template, onClick, onEdit, onDelete, onToggle
         <div className="relative flex-shrink-0">
           <button onClick={e => { e.stopPropagation(); setMenuOpen(v => !v); setConfirmDelete(false) }}
             className="w-8 h-8 rounded-lg hover:bg-brand-bg flex items-center justify-center transition-colors">
-            <MoreVertical className="w-4 h-4 text-[#9CA3AF]" />
+            <MoreVertical className="w-4 h-4 text-brand-muted" />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-9 z-20 bg-white border border-[#D1D1D6] rounded-xl shadow-lg py-1 min-w-[160px]">
+            <div className="absolute right-0 top-9 z-20 bg-white border border-brand-border rounded-xl shadow-lg py-1 min-w-[160px]">
               {!template.is_buvette && (
                 <button onClick={() => { setMenuOpen(false); onEdit() }}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-brand-dark hover:bg-brand-bg transition-colors font-[family-name:var(--font-nunito)]">
-                  <Pencil className="w-3.5 h-3.5 text-[#6B7280]" /> Modifier
+                  <Pencil className="w-3.5 h-3.5 text-brand-muted" /> Modifier
                 </button>
               )}
               <button onClick={() => { setMenuOpen(false); onToggleActive() }}
                 className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-brand-dark hover:bg-brand-bg transition-colors font-[family-name:var(--font-nunito)]">
                 {template.is_active
-                  ? <><ToggleRight className="w-3.5 h-3.5 text-[#6B7280]" /> Archiver</>
-                  : <><ToggleLeft className="w-3.5 h-3.5 text-[#6B7280]" /> Réactiver</>
+                  ? <><ToggleRight className="w-3.5 h-3.5 text-brand-muted" /> Archiver</>
+                  : <><ToggleLeft className="w-3.5 h-3.5 text-brand-muted" /> Réactiver</>
                 }
               </button>
               {!confirmDelete
@@ -109,11 +109,11 @@ export function ContributionCard({ template, onClick, onEdit, onDelete, onToggle
                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-secondary hover:bg-secondary-light transition-colors font-[family-name:var(--font-nunito)]">
                     <Trash2 className="w-3.5 h-3.5" /> Supprimer
                   </button>
-                : <div className="px-4 py-2.5 space-y-2 border-t border-[#F4F4F6]">
+                : <div className="px-4 py-2.5 space-y-2 border-t border-brand-sand">
                     <p className="text-xs font-semibold text-secondary font-[family-name:var(--font-nunito)]">Supprimer définitivement ?</p>
                     <div className="flex gap-2">
                       <button onClick={() => setConfirmDelete(false)}
-                        className="flex-1 text-xs py-1.5 rounded-lg border border-[#D1D1D6] text-[#6B7280] font-[family-name:var(--font-nunito)]">
+                        className="flex-1 text-xs py-1.5 rounded-lg border border-brand-border text-brand-muted font-[family-name:var(--font-nunito)]">
                         Annuler
                       </button>
                       <button onClick={() => { setMenuOpen(false); onDelete() }}
@@ -129,7 +129,7 @@ export function ContributionCard({ template, onClick, onEdit, onDelete, onToggle
       </div>
 
       <button onClick={onClick}
-        className="w-full flex items-center justify-center gap-1.5 py-3 border-t border-[#F4F4F6] text-sm font-semibold text-success hover:bg-primary-light transition-colors font-[family-name:var(--font-nunito)]">
+        className="w-full flex items-center justify-center gap-1.5 py-3 border-t border-brand-sand text-sm font-semibold text-success hover:bg-primary-light transition-colors font-[family-name:var(--font-nunito)]">
         {template.is_buvette ? 'Voir les entrées' : 'Voir la liste'} <ChevronRight className="w-4 h-4" />
       </button>
     </div>

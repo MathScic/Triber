@@ -35,7 +35,7 @@ export default function MediaPage() {
 
   return (
     <main className="min-h-screen bg-brand-bg px-4 py-8">
-      <div className="max-w-lg lg:max-w-4xl mx-auto space-y-6">
+      <div className="max-w-lg lg:max-w-[90%] mx-auto space-y-6">
         <div className="flex items-start justify-between gap-4">
           <PageHeader
             title="Médias"

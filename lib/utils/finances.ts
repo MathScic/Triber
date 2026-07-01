@@ -1,3 +1,11 @@
+import type { ContributionTarif } from '@/lib/hooks/useContributions'
+
+export function getAmountForMember(category: string | null, tarifs: ContributionTarif[], defaultCents: number): number {
+  if (!tarifs.length) return defaultCents
+  const match = tarifs.find(t => t.category === category) ?? tarifs.find(t => t.category === '') ?? tarifs[0]
+  return match?.amount_cents ?? defaultCents
+}
+
 export function isPartialPayment(status: string, paidCents: number, expectedCents: number): boolean {
   return status === 'paid' && expectedCents > 0 && paidCents < expectedCents
 }

@@ -13,23 +13,21 @@ export function MatchControls({ status, loading, onControl }: Props) {
 
   if (!status || status === 'upcoming') {
     return (
-      <button
-        onClick={() => onControl('start')}
-        disabled={loading}
-        className="w-full h-12 rounded-xl bg-success text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-[#238742] transition-colors disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
-      >
-        <Play size={16} weight="fill" /> Démarrer le match
-      </button>
+      <div className="flex justify-center">
+        <button onClick={() => onControl('start')} disabled={loading}
+          className="flex items-center gap-2 h-10 px-8 rounded-xl bg-success text-white text-sm font-[800] uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-success/90 transition-colors disabled:opacity-50">
+          <Play size={14} weight="fill" /> Démarrer le match
+        </button>
+      </div>
     )
   }
 
   return (
-    <button
-      onClick={() => onControl('end')}
-      disabled={loading}
-      className="w-full h-12 rounded-xl bg-red-600 text-white font-[800] text-sm uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-red-700 transition-colors disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
-    >
-      <Square size={16} weight="fill" /> Terminer le match
-    </button>
+    <div className="flex justify-center">
+      <button onClick={() => onControl('end')} disabled={loading}
+        className="flex items-center gap-2 h-10 px-8 rounded-xl border border-red-500 text-red-500 text-sm font-[800] uppercase tracking-wide font-[family-name:var(--font-barlow)] hover:bg-red-500/10 transition-colors disabled:opacity-50">
+        <Square size={14} weight="fill" /> Terminer le match
+      </button>
+    </div>
   )
 }

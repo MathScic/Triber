@@ -29,7 +29,7 @@ function ProfileContent() {
 
   return (
     <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-6 py-8`}>
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl lg:max-w-[90%] mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
             Mon profil

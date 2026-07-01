@@ -77,7 +77,7 @@ export default function EventsPage() {
 
   return (
     <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-4 py-8`}>
-      <div className="max-w-lg lg:max-w-4xl mx-auto space-y-5">
+      <div className="max-w-lg lg:max-w-[90%] mx-auto space-y-5">
         <PageHeader title="Événements" subtitle={`${events.length} événement${events.length !== 1 ? 's' : ''}`}
           action={canCreate && !showForm ? <Button onClick={() => setShowForm(true)} size="sm">+ Créer</Button> : undefined} />
 

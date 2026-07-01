@@ -15,9 +15,9 @@ interface Props {
 
 type TileType = 'goal' | 'assist' | 'yellow_card' | 'red_card' | 'substitution'
 
+// 'assist' n'est pas une tuile indépendante — il s'ajoute via "Ajouter une passe décisive" sur un but
 const TILES: { type: TileType; label: string }[] = [
   { type: 'goal', label: 'But' },
-  { type: 'assist', label: 'Passe' },
   { type: 'yellow_card', label: 'J. jaune' },
   { type: 'red_card', label: 'J. rouge' },
   { type: 'substitution', label: 'Remplac.' },

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  getAmountForMember,
   isPartialPayment,
   isFullyPaid,
   getPaymentStatus,
@@ -7,6 +8,37 @@ import {
   countFullyPaid,
   countPartial,
 } from '@/lib/utils/finances'
+
+describe('getAmountForMember', () => {
+  const tarifs = [
+    { category: 'Senior', amount_cents: 12000 },
+    { category: 'U18', amount_cents: 8000 },
+  ]
+
+  it('retourne le montant de la catégorie correspondante', () => {
+    expect(getAmountForMember('Senior', tarifs, 10000)).toBe(12000)
+    expect(getAmountForMember('U18', tarifs, 10000)).toBe(8000)
+  })
+  it('catégorie inconnue → premier tarif de la liste', () => {
+    expect(getAmountForMember('U14', tarifs, 10000)).toBe(12000)
+  })
+  it('catégorie null → premier tarif de la liste', () => {
+    expect(getAmountForMember(null, tarifs, 10000)).toBe(12000)
+  })
+  it('pas de tarifs → retourne defaultCents', () => {
+    expect(getAmountForMember('Senior', [], 10000)).toBe(10000)
+  })
+  it('tarif générique (category vide) utilisé en fallback', () => {
+    const t = [{ category: '', amount_cents: 9000 }]
+    expect(getAmountForMember(null, t, 5000)).toBe(9000)
+    expect(getAmountForMember('U18', t, 5000)).toBe(9000)
+  })
+  it('tarif vide + catégorie spécifique → tarif spécifique prioritaire', () => {
+    const t = [{ category: '', amount_cents: 9000 }, { category: 'Senior', amount_cents: 12000 }]
+    expect(getAmountForMember('Senior', t, 5000)).toBe(12000)
+    expect(getAmountForMember(null, t, 5000)).toBe(9000)
+  })
+})
 
 describe('isPartialPayment', () => {
   it('60€ sur 80€ → partiel', () => {

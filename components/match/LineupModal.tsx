@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
@@ -61,28 +61,28 @@ export function LineupModal({ eventId, organizationId, eventTitle, onClose }: Pr
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl">
-        <div className="flex items-center justify-between p-4 border-b border-[#D1D1D6]">
-          <h2 className="text-base font-[800] text-brand-dark font-[family-name:var(--font-barlow)]">
+      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl">
+        <div className="flex items-center justify-between p-4 border-b border-brand-border">
+          <h2 className="text-sm font-[800] text-brand-dark uppercase tracking-wide font-[family-name:var(--font-barlow)]">
             Composition — {eventTitle}
           </h2>
-          <button onClick={onClose} className="text-[#6B7280] hover:text-brand-dark transition-colors">
+          <button onClick={onClose} className="text-brand-muted hover:text-brand-dark transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           {fetching ? (
-            <p className="text-sm text-center text-[#6B7280] py-8 font-[family-name:var(--font-nunito)]">Chargement…</p>
+            <p className="text-sm text-center text-brand-muted py-8 font-[family-name:var(--font-nunito)]">Chargement…</p>
           ) : (
             <LineupEditor allMembers={members} lineup={lineup} onAdd={addToLineup} onRemove={removeFromLineup} />
           )}
         </div>
-        <div className="p-4 border-t border-[#D1D1D6] space-y-2">
-          <p className="text-center text-xs text-[#6B7280] font-[family-name:var(--font-nunito)]">
+        <div className="p-4 border-t border-brand-border space-y-2">
+          <p className="text-center text-xs text-brand-muted font-[family-name:var(--font-nunito)]">
             ✓ Modifications enregistrées automatiquement
           </p>
           <button onClick={onClose}
-            className="w-full h-11 rounded-xl bg-success text-white text-sm font-[800] font-[family-name:var(--font-barlow)] uppercase tracking-wide hover:bg-[#238742] transition-colors">
+            className="w-full h-11 rounded-xl bg-success text-white text-sm font-[800] font-[family-name:var(--font-barlow)] uppercase tracking-wide hover:bg-success/90 transition-colors">
             Confirmer la composition
           </button>
         </div>

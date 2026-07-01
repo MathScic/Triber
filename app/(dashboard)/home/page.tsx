@@ -58,7 +58,7 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <main className="min-h-screen bg-brand-bg flex items-center justify-center">
-        <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">Chargement…</p>
+        <p className="text-sm text-brand-muted font-[family-name:var(--font-nunito)]">Chargement…</p>
       </main>
     )
   }
@@ -67,31 +67,30 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-brand-bg px-4 py-8">
-      <div className="max-w-lg lg:max-w-4xl mx-auto space-y-4">
+      <div className="max-w-lg lg:max-w-[90%] mx-auto space-y-4">
         <OrgBanner
           name={org.name}
           fullName={fullName}
           logoUrl={org.logo_url}
           coverUrl={org.cover_url}
-          initial={fullName.charAt(0).toUpperCase() || '?'}
           primaryColor={org.primary_color ?? '#1E5C38'}
           organizationId={org.id}
         />
         <LiveMatchBanner organizationId={org.id} />
-        <LastMatchCard organizationId={org.id} />
-        <NextEventCard organizationId={org.id} />
-        <TopScorerCard organizationId={org.id} />
-        <StandingsCard
-          organizationId={org.id}
-          primaryColor={org.primary_color ?? '#1E5C38'}
-        />
-        {userId && (
-          <AnnouncementSection
-            organizationId={org.id}
-            canCreate={role === 'admin' || role === 'member_active'}
-            currentUserId={userId}
-          />
-        )}
+        {/* Grille 2 colonnes desktop / 1 colonne mobile */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <LastMatchCard organizationId={org.id} orgLogoUrl={org.logo_url ?? null} />
+          <NextEventCard organizationId={org.id} userId={userId ?? ''} />
+          <TopScorerCard organizationId={org.id} />
+          {userId && (
+            <AnnouncementSection
+              organizationId={org.id}
+              canCreate={role === 'admin' || role === 'member_active'}
+              currentUserId={userId}
+            />
+          )}
+        </div>
+        <StandingsCard organizationId={org.id} primaryColor={org.primary_color ?? '#1E5C38'} />
       </div>
     </main>
   )

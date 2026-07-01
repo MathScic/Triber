@@ -29,6 +29,16 @@ export async function POST(request: Request) {
 
   if (!mem) return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
 
+  // Vérifie que le template appartient bien à l'org de l'utilisateur
+  const { data: template } = await supabase
+    .from('contribution_templates')
+    .select('organization_id')
+    .eq('id', templateId)
+    .maybeSingle()
+  if (!template || (template.organization_id as string) !== (mem.organization_id as string)) {
+    return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
+  }
+
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '')
 
   const session = await stripe.checkout.sessions.create({
@@ -42,7 +52,7 @@ export async function POST(request: Request) {
       },
       quantity: 1,
     }],
-    success_url: `${appUrl}${returnUrl ?? `/finances/${templateId}`}?paid=1`,
+    success_url: `${appUrl}${returnUrl ?? `/finances/${templateId}`}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}${returnUrl ?? `/finances/${templateId}`}`,
     customer_email: user.email,
     metadata: {

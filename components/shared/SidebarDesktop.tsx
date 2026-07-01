@@ -25,28 +25,16 @@ const NAV = [
 ]
 
 const ROLE_RANK: Record<Role, number> = { member: 0, member_active: 1, admin: 2 }
+const canSee = (r: Role, min?: Role) => !min || ROLE_RANK[r] >= ROLE_RANK[min]
+const ROLE_LABEL: Record<Role, string> = { admin: 'Admin', member_active: 'Actif', member: 'Membre' }
 
-function canSee(userRole: Role, minRole: Role | undefined) {
-  if (!minRole) return true
-  return ROLE_RANK[userRole] >= ROLE_RANK[minRole]
-}
-
-interface Props {
-  orgName: string | null
-  orgLogo: string | null
-  userName: string | null
-  role: Role
-  primaryColor: string
-}
+interface Props { orgName: string | null; orgLogo: string | null; userName: string | null; role: Role; primaryColor: string }
 
 export function SidebarDesktop({ orgName, orgLogo, userName, role, primaryColor }: Props) {
   const path = usePathname()
   const router = useRouter()
-
-  const logout = async () => {
-    await createClient().auth.signOut()
-    router.push('/login')
-  }
+  const logout = async () => { await createClient().auth.signOut(); router.push('/login') }
+  const initials = (userName ?? 'U').split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2)
 
   return (
     <aside className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-56 z-40 bg-brand-dark">
@@ -79,8 +67,13 @@ export function SidebarDesktop({ orgName, orgLogo, userName, role, primaryColor 
 
       {userName && (
         <div className="px-4 py-3 border-t border-white/10 flex items-center gap-2.5">
-          <CircleUser className="w-4 h-4 text-white/40 flex-shrink-0" />
-          <p className="text-[11px] text-white/50 truncate flex-1 font-[family-name:var(--font-nunito)]">{userName}</p>
+          <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-[800] text-white/70 font-[family-name:var(--font-barlow)]">{initials}</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-white/90 truncate font-[family-name:var(--font-nunito)]">{userName}</p>
+            <p className="text-[10px] text-white/40 font-[family-name:var(--font-nunito)]">{ROLE_LABEL[role]}</p>
+          </div>
           <button onClick={() => void logout()} title="Se déconnecter"
             className="text-white/30 hover:text-white/70 transition-colors flex-shrink-0">
             <LogOut className="w-3.5 h-3.5" />

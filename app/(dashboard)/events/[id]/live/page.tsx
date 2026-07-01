@@ -1,7 +1,6 @@
-﻿import { notFound, redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { PageHeader } from '@/components/shared/PageHeader'
-import { LiveMatchManager } from '@/components/match/LiveMatchManager'
+import { LivePageWrapper } from '@/components/match/LivePageWrapper'
 import type { FullMember, LineupEntry } from '@/components/match/LineupEditor'
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +17,7 @@ export default async function LiveMatchPage({ params, searchParams }: { params: 
 
   const { data: ev } = await supabase
     .from('events')
-    .select('id, title, type, opponent, is_home, start_at, status, started_at, paused_at, total_paused_seconds, organization_id, organizations(name, primary_color, logo_url)')
+    .select('id, title, type, opponent, location, is_home, start_at, status, started_at, paused_at, total_paused_seconds, organization_id, organizations(name, logo_url)')
     .eq('id', id)
     .maybeSingle()
 
@@ -58,20 +57,19 @@ export default async function LiveMatchPage({ params, searchParams }: { params: 
     is_starter: l.is_starter as boolean,
   }))
 
-  type OrgData = { name: string; primary_color: string; logo_url: string | null }
-  const rawOrg = ev.organizations
-  const org = (Array.isArray(rawOrg) ? rawOrg[0] : rawOrg) as OrgData | null
+  const org = (Array.isArray(ev.organizations) ? ev.organizations[0] : ev.organizations) as { name: string; logo_url: string | null } | null
+  const d = new Date(ev.start_at as string)
+  const loc = ev.location as string | null
+  const subtitle = ev.opponent ? `vs ${ev.opponent as string} · ${d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}${loc ? ` · ${loc}` : ''}` : undefined
 
   return (
     <main className="min-h-screen bg-brand-bg px-4 py-8">
-      <div className="max-w-lg lg:max-w-4xl mx-auto space-y-4">
-        <PageHeader
-          title={ev.title as string}
-          subtitle={ev.opponent ? `vs ${ev.opponent as string}` : undefined}
-          backHref={from === 'home' ? '/home' : '/events'}
-        />
-        <LiveMatchManager
+      <div className="max-w-lg lg:max-w-[90%] mx-auto space-y-4">
+        <LivePageWrapper
           eventId={id}
+          title={ev.title as string}
+          subtitle={subtitle}
+          backHref={from === 'home' ? '/home' : '/events'}
           opponent={ev.opponent as string | null}
           isHome={ev.is_home as boolean | null}
           initialStatus={ev.status as 'upcoming' | 'ongoing' | 'half_time' | 'finished' | null}
