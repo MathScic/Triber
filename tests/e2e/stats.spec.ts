@@ -60,16 +60,13 @@ test.describe('Page Stats (/stats)', () => {
     await page.goto('/stats')
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
 
-    const victoire = page.getByText('Victoire').first()
-    if (await victoire.isVisible()) {
-      const scoreText = await page.locator('button').filter({ hasText: /victoire/i }).first()
-        .locator('span.tabular-nums, .tabular-nums').textContent().catch(() => null)
-      if (scoreText) {
-        const parts = scoreText.split(/—|–/).map(s => parseInt(s.trim()))
-        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-          expect(parts[0]).toBeGreaterThan(parts[1])
-        }
-      }
-    }
+    // Les résultats sont des lignes de tableau (<tr>), pas des boutons
+    const row = page.locator('tr').filter({ hasText: /victoire/i }).first()
+    if (!await row.isVisible().catch(() => false)) { test.skip(); return }
+
+    const scoreText = await row.locator('.tabular-nums').textContent()
+    const parts = (scoreText ?? '').split(/—|–/).map(s => parseInt(s.trim()))
+    expect(parts.length).toBe(2)
+    expect(parts[0]).toBeGreaterThan(parts[1])
   })
 })

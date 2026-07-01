@@ -1,5 +1,6 @@
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import { canAddMember } from '@/lib/utils/plan-limits'
 
 function getAdmin() {
   return createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -23,8 +24,6 @@ async function findOrgByCode(admin: AdminClient, code: string): Promise<OrgRow |
     .from('organizations').select('id, name, type, plan').eq('id', m.organization_id).single()
   return (orgData as OrgRow) ?? null
 }
-
-const PLAN_LIMITS: Record<string, number> = { free: 20, club: 999999 }
 
 async function resolveOrg(admin: AdminClient, code: string, orgId: string | null): Promise<OrgRow | null> {
   if (orgId) {
@@ -60,8 +59,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ code: s
   // Vérifie les limites de plan en comptant les membres actuels
   const { count } = await admin
     .from('organization_members').select('*', { count: 'exact', head: true }).eq('organization_id', org.id)
-  const limit = PLAN_LIMITS[org.plan] ?? 20
-  if ((count ?? 0) >= limit) {
+  if (!canAddMember(org.plan, count ?? 0)) {
     return NextResponse.json({ error: "Limite de membres atteinte. Contactez l'administrateur." }, { status: 403 })
   }
 

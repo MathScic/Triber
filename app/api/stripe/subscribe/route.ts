@@ -2,10 +2,18 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+
+  // Consentement à la commission de 1,5% — obligatoire, vérifié côté serveur
+  // (la case à cocher client ne suffit pas : sans ce contrôle, l'appel API
+  // pourrait être fait directement en contournant l'UI)
+  const body = await request.json().catch(() => null) as { consent?: boolean } | null
+  if (body?.consent !== true) {
+    return NextResponse.json({ error: 'Le consentement à la commission est obligatoire' }, { status: 400 })
+  }
 
   const { data: mem } = await supabase
     .from('organization_members')
@@ -15,6 +23,12 @@ export async function POST() {
     .maybeSingle()
 
   if (!mem) return NextResponse.json({ error: 'Organisation introuvable' }, { status: 403 })
+
+  // Trace horodatée du consentement — obligation légale (CLAUDE.md §1)
+  await supabase.from('commission_consents').insert({
+    organization_id: mem.organization_id,
+    user_id: user.id,
+  })
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '')
 

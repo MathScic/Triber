@@ -14,7 +14,11 @@ export function UpgradeSection() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/stripe/subscribe', { method: 'POST' })
+      const res = await fetch('/api/stripe/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consent }),
+      })
       const data = await res.json() as { url?: string; error?: string }
       if (data.url) {
         router.push(data.url)

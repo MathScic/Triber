@@ -1,7 +1,6 @@
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
-
-const PLAN_LIMITS: Record<string, number> = { free: 20, club: 999999, pro: 999999 }
+import { canAddMember, planLimitMessage } from '@/lib/utils/plan-limits'
 
 function getAdmin() {
   return createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -34,9 +33,9 @@ export async function POST(request: Request) {
   // Vérifie les limites de plan
   const { data: org } = await admin.from('organizations').select('plan').eq('id', orgId).single()
   const { count } = await admin.from('organization_members').select('*', { count: 'exact', head: true }).eq('organization_id', orgId)
-  const limit = PLAN_LIMITS[(org?.plan as string) ?? 'free'] ?? 20
-  if ((count ?? 0) >= limit) {
-    return NextResponse.json({ error: `Limite de ${limit} membres atteinte. Passez au plan Club.` }, { status: 403 })
+  const plan = (org?.plan as string) ?? 'free'
+  if (!canAddMember(plan, count ?? 0)) {
+    return NextResponse.json({ error: planLimitMessage(plan) }, { status: 403 })
   }
 
   // Cherche le profil par invite_code
