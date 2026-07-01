@@ -6,6 +6,7 @@ import { Nunito, Barlow_Condensed } from 'next/font/google'
 import { createClient } from '@/lib/supabase/client'
 import { ProfileForm } from '@/components/profile/ProfileForm'
 import { MyContributions } from '@/components/profile/MyContributions'
+import { PrivacySection } from '@/components/profile/PrivacySection'
 
 const nunito = Nunito({ subsets: ['latin'], variable: '--font-nunito' })
 const barlow = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-barlow' })
@@ -41,6 +42,7 @@ function ProfileContent() {
 
         {userId && <ProfileForm userId={userId} />}
         {userId && orgId && <MyContributions userId={userId} orgId={orgId} justPaid={justPaid} />}
+        <PrivacySection />
       </div>
     </main>
   )
