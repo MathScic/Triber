@@ -25,10 +25,14 @@ export async function POST(request: Request) {
   if (!mem) return NextResponse.json({ error: 'Organisation introuvable' }, { status: 403 })
 
   // Trace horodatée du consentement — obligation légale (CLAUDE.md §1)
-  await supabase.from('commission_consents').insert({
+  // Échec bloquant : impossible de garantir la conformité sans cette ligne
+  const { error: consentError } = await supabase.from('commission_consents').insert({
     organization_id: mem.organization_id,
     user_id: user.id,
   })
+  if (consentError) {
+    return NextResponse.json({ error: 'Impossible d\'enregistrer le consentement' }, { status: 500 })
+  }
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '')
 
