@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Claude Code agent worktrees (isolated agent sessions, never committed)
 .claude/worktrees/
+
+# Session Playwright e2e (contient un token d'auth réel — jamais committer)
+tests/e2e/.auth/user.json
