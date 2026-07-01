@@ -31,14 +31,14 @@ export function StepEnterprise({ onSubmit, onBack, loading }: Props) {
   return (
     <form onSubmit={handleSubmit(submit)} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="name">Nom de l'entreprise *</Label>
+        <Label htmlFor="name">Nom de l&apos;entreprise *</Label>
         <Input id="name" placeholder="Acme SAS"
           {...register('name', { required: 'Le nom est requis' })} />
         {errors.name && <p className="text-xs text-secondary">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="sector">Secteur d'activité</Label>
+        <Label htmlFor="sector">Secteur d&apos;activité</Label>
         <select id="sector" {...register('sector')} className={sel}>
           <option value="">Choisir un secteur</option>
           {SECTORS.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -51,7 +51,7 @@ export function StepEnterprise({ onSubmit, onBack, loading }: Props) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="sizeEstimate">Nombre d'employés</Label>
+        <Label htmlFor="sizeEstimate">Nombre d&apos;employés</Label>
         <select id="sizeEstimate" {...register('sizeEstimate')} className={sel}>
           <option value="">Sélectionner</option>
           {SIZES.map((s) => <option key={s} value={s}>{s}</option>)}

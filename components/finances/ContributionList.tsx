@@ -40,7 +40,7 @@ export function ContributionList({ contributions, loading }: Props) {
   }
 
   if (!contributions.length) {
-    return <p className="text-sm text-[#6B7280] text-center py-6">Aucune cotisation pour l'instant.</p>
+    return <p className="text-sm text-[#6B7280] text-center py-6">Aucune cotisation pour l&apos;instant.</p>
   }
 
   return (

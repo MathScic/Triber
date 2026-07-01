@@ -42,7 +42,7 @@ export function MemberList({ organizationId, currentUserId }: Props) {
   if (members.length === 0) {
     return (
       <p className="text-sm text-center text-[#6B7280] py-6">
-        Aucun membre pour l'instant.
+        Aucun membre pour l&apos;instant.
       </p>
     )
   }

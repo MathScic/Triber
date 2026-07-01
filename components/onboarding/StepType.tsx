@@ -31,7 +31,7 @@ export function StepType({ onSelect }: Props) {
           Bienvenue sur Triber
         </h2>
         <p className="text-sm text-[#6B7280]">
-          Quel type d'organisation gérez-vous ?
+          Quel type d&apos;organisation gérez-vous ?
         </p>
       </div>
 

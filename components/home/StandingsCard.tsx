@@ -50,7 +50,7 @@ export function StandingsCard({ organizationId, primaryColor = '#1E5C38' }: Prop
               className="flex items-center gap-1 text-[11px] text-[#6B7280] hover:text-success transition-colors font-[family-name:var(--font-nunito)]"
             >
               <ExternalLink className="w-3 h-3" />
-              Score'n'co
+              Score&apos;n&apos;co
             </a>
           )}
           <Link

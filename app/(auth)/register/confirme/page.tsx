@@ -35,7 +35,7 @@ export default function ConfirmePage() {
         <div className="bg-white rounded-2xl border border-[#D1D1D6] p-4 mb-6 text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">
           Pensez à vérifier vos{' '}
           <span className="font-semibold text-brand-dark">spams</span> si vous
-          ne voyez pas l'email.
+          ne voyez pas l&apos;email.
         </div>
 
         <Link

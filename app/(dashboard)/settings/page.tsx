@@ -73,10 +73,10 @@ export default async function SettingsPage() {
           <section className="bg-white rounded-xl border border-[#D1D1D6] shadow-sm p-4 space-y-3">
             <div>
               <h2 className="font-[700] text-brand-dark text-base uppercase tracking-tight font-[family-name:var(--font-barlow)]">
-                Classement Score'n'co
+                Classement Score&apos;n&apos;co
               </h2>
               <p className="text-xs text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
-                Connecte le classement officiel de ton championnat via Score'n'co. Il s'affichera automatiquement sur la page Stats et l'Accueil.
+                Connecte le classement officiel de ton championnat via Score&apos;n&apos;co. Il s&apos;affichera automatiquement sur la page Stats et l&apos;Accueil.
               </p>
             </div>
             <ScoreEncoSettings orgId={org.id} />

@@ -65,7 +65,7 @@ export function BrandingForm() {
 
       {/* Nom de l'organisation */}
       <div>
-        <p className="text-xs font-semibold text-[#6B7280] mb-1.5 font-[family-name:var(--font-nunito)]">Nom de l'organisation</p>
+        <p className="text-xs font-semibold text-[#6B7280] mb-1.5 font-[family-name:var(--font-nunito)]">Nom de l&apos;organisation</p>
         <input
           type="text" maxLength={80} value={orgName}
           onChange={e => setOrgName(e.target.value)}

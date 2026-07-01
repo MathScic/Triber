@@ -16,7 +16,7 @@ export function ScoreEncoWidget({ url }: Props) {
         <Trophy className="w-4 h-4 text-secondary" />
         <div>
           <p className="text-sm font-semibold text-brand-dark font-[family-name:var(--font-nunito)]">
-            Classement officiel Score'n'co
+            Classement officiel Score&apos;n&apos;co
           </p>
           <p className="text-[11px] text-[#6B7280] font-[family-name:var(--font-nunito)]">
             Ouvre la page du championnat

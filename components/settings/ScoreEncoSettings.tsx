@@ -59,7 +59,7 @@ export function ScoreEncoSettings({ orgId }: Props) {
     <div className="space-y-3">
       <div>
         <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">
-          URL Score'n'co de ton championnat
+          URL Score&apos;n&apos;co de ton championnat
         </label>
         <textarea
           value={url}
@@ -69,7 +69,7 @@ export function ScoreEncoSettings({ orgId }: Props) {
           className="mt-1.5 w-full text-sm border border-[#D1D1D6] rounded-xl px-3 py-2.5 bg-brand-bg focus:outline-none focus:border-success resize-none font-[family-name:var(--font-nunito)]"
         />
         <p className="text-[10px] text-[#6B7280] mt-1 font-[family-name:var(--font-nunito)]">
-          Colle l'URL publique de la page championnat. Sur l'accueil, c'est le classement saisi manuellement qui s'affiche — l'URL apparaît comme lien externe vers Score'n'co.
+          Colle l&apos;URL publique de la page championnat. Sur l&apos;accueil, c&apos;est le classement saisi manuellement qui s&apos;affiche — l&apos;URL apparaît comme lien externe vers Score&apos;n&apos;co.
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export function ScoreEncoSettings({ orgId }: Props) {
             className="flex items-center gap-1.5 text-xs text-success font-semibold hover:underline font-[family-name:var(--font-nunito)]"
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            Aller sur Score'n'co
+            Aller sur Score&apos;n&apos;co
           </a>
         )}
 

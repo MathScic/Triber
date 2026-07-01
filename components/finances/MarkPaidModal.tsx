@@ -135,7 +135,7 @@ export function MarkPaidModal({ memberName, isPaid, suggestedAmount, paidCents =
                   <div className="mt-2 flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
                     <AlertTriangle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
                     <p className="text-xs font-semibold text-red-600 font-[family-name:var(--font-nunito)]">
-                      Montant supérieur à l'attendu
+                      Montant supérieur à l&apos;attendu
                     </p>
                   </div>
                 )}

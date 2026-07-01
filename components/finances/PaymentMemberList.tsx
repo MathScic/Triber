@@ -129,7 +129,7 @@ export function PaymentMemberList({ members, manualMembers, onClickMember, onCli
   if (categories.length === 0 && !q) {
     return (
       <div className="bg-white rounded-2xl border border-[#D1D1D6] shadow-sm p-10 text-center">
-        <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">Aucun membre. Utilisez le bouton "+" pour ajouter des personnes.</p>
+        <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)]">Aucun membre. Utilisez le bouton &quot;+&quot; pour ajouter des personnes.</p>
       </div>
     )
   }
@@ -165,7 +165,7 @@ export function PaymentMemberList({ members, manualMembers, onClickMember, onCli
       </div>
 
       {q && categories.length === 0 && (
-        <p className="text-sm text-center text-[#9CA3AF] py-4 font-[family-name:var(--font-nunito)]">Aucun résultat pour "{search}"</p>
+        <p className="text-sm text-center text-[#9CA3AF] py-4 font-[family-name:var(--font-nunito)]">Aucun résultat pour &quot;{search}&quot;</p>
       )}
 
       {categories.map(cat => {

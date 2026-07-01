@@ -52,7 +52,7 @@ export function InviteForm({ organizationId, orgName, onClose }: Props) {
             Inviter un membre
           </h3>
           <p className="text-xs text-[#6B7280] mt-0.5 font-[family-name:var(--font-nunito)]">
-            Un email avec un lien d'accès direct sera envoyé
+            Un email avec un lien d&apos;accès direct sera envoyé
           </p>
         </div>
         {onClose && (

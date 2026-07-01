@@ -140,7 +140,7 @@ export function BuvetteEntryForm({ orgId, templateId, onClose, onSaved }: Props)
           {/* Date + Note */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Date de l'entrée</label>
+              <label className="text-xs font-semibold text-[#6B7280] font-[family-name:var(--font-nunito)]">Date de l&apos;entrée</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
                 className="mt-1.5 w-full h-10 px-3 rounded-xl border border-[#D1D1D6] text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
             </div>

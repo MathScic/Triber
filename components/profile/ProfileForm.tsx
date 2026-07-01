@@ -59,7 +59,7 @@ export function ProfileForm({ userId }: { userId: string }) {
           <Label>Email</Label>
           <Input value={email} disabled className="opacity-60 cursor-not-allowed" />
           <p className="text-xs text-[#9CA3AF] font-[family-name:var(--font-nunito)]">
-            L'email ne peut pas être modifié ici.
+            L&apos;email ne peut pas être modifié ici.
           </p>
         </div>
       </div>

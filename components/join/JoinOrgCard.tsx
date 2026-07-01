@@ -73,7 +73,7 @@ export default function JoinOrgCard({ code, orgId, confirmed }: Props) {
       <div className="bg-white rounded-xl border border-[#D1D1D6] p-8 text-center space-y-2">
         <AlertCircle className="w-8 h-8 text-secondary mx-auto mb-2" />
         <p className="font-semibold text-secondary">{loadErr}</p>
-        <p className="text-sm text-[#6B7280]">Ce lien d'invitation est invalide ou a expiré.</p>
+        <p className="text-sm text-[#6B7280]">Ce lien d&apos;invitation est invalide ou a expiré.</p>
       </div>
     )
   }

@@ -82,7 +82,7 @@ export function ContributionStep1({ onSubmit, onCancel, saving }: Props) {
             <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} className={`mt-1.5 ${input}`} />
           </div>
           <div>
-            <label className={`text-xs font-semibold text-brand-muted ${F}`}>Message d'avertissement</label>
+            <label className={`text-xs font-semibold text-brand-muted ${F}`}>Message d&apos;avertissement</label>
             <input value={warning} onChange={e => setWarning(e.target.value)} maxLength={200}
               placeholder="ex : Licence non payée = pas de match ni entraînement" className={`mt-1.5 ${input}`} />
           </div>

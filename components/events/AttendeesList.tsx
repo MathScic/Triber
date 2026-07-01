@@ -83,7 +83,7 @@ export function AttendeesList({ eventId, organizationId, isExpanded, onCounts, c
           </div>
         )
       })}
-      {merged.length === 0 && <p className="text-xs text-[#6B7280]">Aucune réponse pour l'instant.</p>}
+      {merged.length === 0 && <p className="text-xs text-[#6B7280]">Aucune réponse pour l&apos;instant.</p>}
     </div>
   )
 }

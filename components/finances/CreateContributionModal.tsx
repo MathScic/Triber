@@ -120,7 +120,7 @@ export function CreateContributionModal({ onClose, onCreate }: Props) {
                   className="mt-1.5 w-full h-10 px-3 rounded-xl border border-brand-border text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-brand-muted font-[family-name:var(--font-nunito)]">Message d'avertissement</label>
+                <label className="text-xs font-semibold text-brand-muted font-[family-name:var(--font-nunito)]">Message d&apos;avertissement</label>
                 <input value={warning} onChange={e => setWarning(e.target.value)} maxLength={200}
                   placeholder="ex : Licence non payée = pas de match ni entraînement"
                   className="mt-1.5 w-full h-10 px-3 rounded-xl border border-brand-border text-sm bg-brand-bg focus:outline-none focus:border-success font-[family-name:var(--font-nunito)]" />

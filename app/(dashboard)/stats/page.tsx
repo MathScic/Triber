@@ -68,7 +68,7 @@ export default function StatsPage() {
                 {scoreencoUrl && (
                   <a href={scoreencoUrl} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1 text-xs text-[#9CA3AF] hover:text-success transition-colors font-[family-name:var(--font-nunito)]">
-                    <ExternalLink className="w-3 h-3" /> Score'n'co
+                    <ExternalLink className="w-3 h-3" /> Score&apos;n&apos;co
                   </a>
                 )}
                 {!scoreencoUrl && canEdit && (
