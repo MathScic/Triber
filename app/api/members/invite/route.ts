@@ -1,12 +1,17 @@
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { canAddMember, planLimitMessage } from '@/lib/utils/plan-limits'
+import { rateLimitResponse, getClientIp } from '@/lib/utils/rate-limit'
 
 function getAdmin() {
   return createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
 export async function POST(request: Request) {
+  // invite_code deviné par force brute — limite les tentatives par IP
+  const limited = rateLimitResponse(`members-invite:${getClientIp(request)}`, 20, 5 * 60_000)
+  if (limited) return limited
+
   // Authentification par token Bearer — compatible app mobile et dashboard web
   const token = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
   if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })

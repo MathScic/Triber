@@ -1,6 +1,7 @@
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { canAddMember } from '@/lib/utils/plan-limits'
+import { rateLimitResponse, getClientIp } from '@/lib/utils/rate-limit'
 
 function getAdmin() {
   return createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -35,6 +36,10 @@ async function resolveOrg(admin: AdminClient, code: string, orgId: string | null
 }
 
 export async function GET(req: Request, { params }: { params: Promise<{ code: string }> }) {
+  // Code à 8 caractères devinable par force brute — limite les tentatives par IP
+  const limited = rateLimitResponse(`join:${getClientIp(req)}`, 20, 5 * 60_000)
+  if (limited) return limited
+
   const { code } = await params
   const orgId = new URL(req.url).searchParams.get('org')
   const admin = getAdmin()
@@ -44,6 +49,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ code: st
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ code: string }> }) {
+  const limited = rateLimitResponse(`join:${getClientIp(req)}`, 20, 5 * 60_000)
+  if (limited) return limited
+
   const { code } = await params
   const orgId = new URL(req.url).searchParams.get('org')
   const token = (req.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
