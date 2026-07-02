@@ -222,6 +222,23 @@ L'application doit être **utilisable par un président de club de 65 ans**. Cha
 - Modification du nom, téléphone, photo
 - Visualisation de ses propres cotisations
 - Code d'invitation unique (partageable pour rejoindre une org)
+- Section "Confidentialité" (RGPD, voir module dédié ci-dessous)
+
+### Module Confidentialité — RGPD (accessible depuis Mon profil)
+
+- **Droit à la portabilité** : `GET /api/account/export` — export JSON téléchargeable
+  de toutes les données personnelles de l'utilisateur connecté, à travers le vrai
+  schéma (profil, adhésions, présences, stats, médias, messages, actions de match,
+  annonces, cotisations, trésorerie, compositions). Filtré explicitement sur
+  l'utilisateur — certaines policies RLS autorisent une lecture au niveau
+  organisation, le filtre applicatif est donc indispensable, pas juste une
+  protection redondante.
+- **Droit à l'oubli** : `POST /api/account/delete` — suppression du compte de
+  l'appelant (jamais un id fourni par le client), confirmation explicite
+  obligatoire (`{ confirm: "SUPPRIMER" }`). Refuse l'action si l'utilisateur est
+  seul admin d'une organisation. Anonymise les références dans les tables sans
+  cascade FK (`lib/utils/gdpr-delete.ts`) avant `auth.admin.deleteUser()`.
+- UI : `components/profile/PrivacySection.tsx` + `DeleteAccountModal.tsx`.
 
 ### Page d'invitation (sans connexion)
 
@@ -256,7 +273,7 @@ Ce projet est initialisé depuis **MathScic/NextJs-Starter-kit** qui inclut déj
 - shadcn/ui (components.json configuré)
 - ESLint + Prettier + Husky (lint avant commit)
 - CI GitHub Actions — deux jobs :
-  - **`verify`** (push + PR) : `lint` → `typecheck` → `vitest run` (57 tests) → `build` (standalone)
+  - **`verify`** (push + PR) : `lint` → `typecheck` → `vitest run` (77 tests) → `build` (standalone)
   - **`e2e`** (PR vers main uniquement, dépend de `verify`) : Playwright Chromium headless ; rapport HTML uploadé en artifact si échec
 
 Ne jamais reconfigurer ce qui existe déjà dans le starter.
@@ -276,12 +293,24 @@ Ne jamais reconfigurer ce qui existe déjà dans le starter.
 | Paiements          | Stripe + Stripe Connect   | Cotisations → compte club    |
 | Emails             | Resend                    | Invitations, convocations    |
 | Push               | Expo Push Notifications   | Alertes mobiles              |
-| Tests unitaires    | Vitest                    | Logique métier (57 tests, lancés en CI) |
+| Tests unitaires    | Vitest                    | Logique métier (77 tests, lancés en CI) |
 | Tests E2E          | Playwright / Chromium     | Parcours web (lancés en CI sur PR)      |
 | CI                 | GitHub Actions            | verify (push+PR) + e2e (PR only)        |
 | Conteneurisation   | Docker multi-stage        | Image standalone ~150 MB (node:20-alpine) |
 | Déploiement web    | Vercel                    | Auto-deploy GitHub                      |
 | Déploiement mobile | Expo EAS Build            | App Store + Play Store                  |
+
+### Sécurité serveur
+
+- **Headers** (`next.config.ts`) : CSP, `Strict-Transport-Security`, `X-Frame-Options`,
+  `Referrer-Policy`, `Permissions-Policy`. CSP scindée dev/prod (`unsafe-eval`
+  nécessaire au HMR Next en dev uniquement, jamais en production).
+- **Rate-limiting** (`lib/utils/rate-limit.ts`) : limiteur en mémoire best-effort
+  (purge des entrées expirées), câblé sur `/api/join/[code]`, `/api/members/invite`
+  et `/api/account/delete`. **Limite connue** : pas de garantie distribuée entre
+  instances serverless Vercel à froid — protection réelle sur le déploiement
+  Docker (process long-lived). Migrer vers Upstash Redis (`@upstash/ratelimit`)
+  si un vrai rate-limit distribué devient nécessaire.
 
 ---
 
@@ -435,6 +464,9 @@ triber/
 │   │   └── mentions-legales/page.tsx       # Mentions légales
 │   └── api/
 │       ├── organizations/create/route.ts
+│       ├── account/
+│       │   ├── export/route.ts             # RGPD — export des données personnelles
+│       │   └── delete/route.ts             # RGPD — suppression de compte
 │       ├── members/
 │       │   ├── invite/route.ts             # Créer invitation (envoie email)
 │       │   └── send-invite/route.ts        # Renvoyer une invitation existante
@@ -442,10 +474,11 @@ triber/
 │       │   ├── match-result/route.ts
 │       │   └── player-stats/route.ts
 │       ├── contributions/
-│       │   ├── create/route.ts
-│       │   ├── pay/route.ts                # Initie paiement Stripe
+│       │   ├── pay/route.ts                # Initie paiement Stripe (cotisation)
+│       │   ├── notify-cash/route.ts        # Notifie l'admin d'un paiement en espèces
+│       │   ├── verify-payment/route.ts     # Vérifie un paiement au retour Stripe
 │       │   └── remind/route.ts             # Relance email cotisation impayée
-│       ├── stripe/subscribe/route.ts       # Abonnement plan Club
+│       ├── stripe/subscribe/route.ts       # Abonnement plan Club (+ consentement commission)
 │       ├── match/[id]/
 │       │   ├── lineup/route.ts             # Gestion composition
 │       │   ├── control/route.ts            # Contrôle chrono (start/pause/fin)
@@ -465,16 +498,18 @@ triber/
 │   ├── stats/           # PlayerRanking, PlayerStatsForm, PlayerStatsTable,
 │   │                    # MatchResultForm, MatchResultsTable, StandingsForm, StandingsTable,
 │   │                    # SeasonBilan, ScoreEncoWidget
-│   ├── finances/        # ContributionList, ContributionCard, CreateContributionModal,
-│   │                    # EditContributionModal, PaymentForm, PaymentMemberList,
-│   │                    # MarkPaidModal, AddManualMemberModal, TarifsEditor,
-│   │                    # BuvetteEntryForm, BuvetteList
+│   ├── finances/        # ContributionCard, ContributionStep1, ContributionStep2,
+│   │                    # CreateContributionInline, CreateContributionModal,
+│   │                    # EditContributionModal, PaymentMemberList, PaymentRow,
+│   │                    # PaymentSearchList, PaymentsTable, FinanceDetailHeader,
+│   │                    # RelanceModal, MarkPaidModal, AddManualMemberModal,
+│   │                    # TarifsEditor, BuvetteEntryForm, BuvetteList, BuvetteStatsGrid
 │   ├── match/           # LiveMatchManager, AddEventForm, EventTimeline, MatchLiveCard,
 │   │                    # ScoreCard, ScoreHeader, LiveScoreBoard, LiveTimer, LiveBand,
 │   │                    # MatchControls, MatchCompositionSection, LineupSection,
 │   │                    # LineupDisplay, LineupEditor, LineupModal, ActionRow, Timeline, MatchIcons
 │   ├── media/           # MediaGallery, MediaUploadButton
-│   ├── profile/         # ProfileForm, MyContributions
+│   ├── profile/         # ProfileForm, MyContributions, PrivacySection, DeleteAccountModal
 │   ├── join/            # JoinAuthForm, JoinOrgCard
 │   ├── settings/        # BrandingForm, ColorPicker, UploadZone, ScoreEncoSettings,
 │   │                    # UpgradeSection, LogoutButton
@@ -497,7 +532,8 @@ triber/
 │   │   ├── useMedia.ts
 │   │   ├── useContributions.ts
 │   │   ├── useContributionPayments.ts
-│   │   ├── useFinances.ts
+│   │   ├── useAllPayments.ts
+│   │   ├── useFinanceDetail.ts
 │   │   ├── useTreasury.ts
 │   │   ├── useBranding.ts
 │   │   ├── useAnnouncements.ts
@@ -505,8 +541,12 @@ triber/
 │   │   └── useLiveMatchPublic.ts
 │   └── utils/
 │       ├── plan-limits.ts
+│       ├── rate-limit.ts    # Rate-limiting en mémoire (voir §4 Sécurité serveur)
+│       ├── gdpr-export.ts   # collectUserData — export RGPD
+│       ├── gdpr-delete.ts   # anonymizeUserData, findBlockingSoleAdminOrg — suppression RGPD
 │       ├── theme.ts      # Application CSS variables branding (ex apply-theme)
 │       ├── finances.ts   # Helpers calcul/formatage finances
+│       ├── financeExport.ts # Export CSV/impression des paiements
 │       ├── match.ts      # Helpers match (pairActionsWithAssists…)
 │       └── avatar.ts     # avatarColor, initials
 │
@@ -519,8 +559,9 @@ triber/
 │   └── migrations/      # Une migration par feature
 │
 ├── tests/
-│   ├── unit/            # Vitest
-│   └── e2e/             # Playwright
+│   ├── unit/            # Vitest — inclut tests/unit/fake-supabase.ts (mock chaînable partagé)
+│   └── e2e/             # Playwright — helpers.ts : isVisibleSoon() (attente avec retry,
+│                         # toujours préférer à .isVisible() nu qui ne retry jamais)
 │
 ├── CLAUDE.md
 ├── .env.example
@@ -564,6 +605,10 @@ Toutes les tables ont RLS activé dès leur création.
                                   contribution_payments, treasury_entries
 023_member_own_payment_rls.sql ← membres peuvent lire/écrire leurs propres paiements
 024_performance_indexes.sql    ← indexes B-tree sur colonnes haute fréquence RLS
+025_announcements_realtime.sql ← Realtime sur announcements
+026_lineups_realtime.sql       ← Realtime sur match_lineups
+027_commission_consents.sql    ← table commission_consents (consentement horodaté,
+                                  obligation légale §1) — écriture admin only, append-only
 ```
 
 ### Schéma
@@ -797,6 +842,15 @@ create table match_lineups (
   organization_member_id uuid references organization_members on delete cascade,
   is_starter boolean not null default true,
   unique(event_id, organization_member_id)
+);
+
+-- Consentement horodaté à la commission de 1,5% (migration 027) — obligation
+-- légale §1. Table en ajout seul : un enregistrement par passage au plan Club.
+create table commission_consents (
+  id              uuid        primary key default gen_random_uuid(),
+  organization_id uuid        not null references organizations on delete cascade,
+  user_id         uuid        not null references auth.users on delete cascade,
+  consented_at    timestamptz not null default now()
 );
 ```
 
