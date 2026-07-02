@@ -44,6 +44,11 @@ export async function POST(request: Request) {
     cancel_url: `${appUrl}/settings`,
     customer_email: user.email,
     metadata: { userId: user.id, orgId: mem.organization_id },
+    // Le metadata de la session n'est PAS copié automatiquement sur l'objet
+    // Subscription créé par Stripe — sans subscription_data.metadata, le
+    // webhook customer.subscription.deleted (annulation) ne peut pas
+    // retrouver orgId et le club reste bloqué sur le plan payant
+    subscription_data: { metadata: { orgId: mem.organization_id } },
     consent_collection: { terms_of_service: 'required' },
   })
 

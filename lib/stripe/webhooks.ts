@@ -21,26 +21,6 @@ export function verifyWebhookSignature(body: string, signature: string): Stripe.
 export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
 
   switch (event.type) {
-    case 'payment_intent.succeeded': {
-      const pi = event.data.object as Stripe.PaymentIntent
-      await safeUpdate('payment_intent.succeeded',
-        admin.from('contributions')
-          .update({ status: 'paid', paid_at: new Date().toISOString() })
-          .eq('stripe_payment_id', pi.id)
-      )
-      break
-    }
-
-    case 'payment_intent.payment_failed': {
-      const pi = event.data.object as Stripe.PaymentIntent
-      await safeUpdate('payment_intent.failed',
-        admin.from('contributions')
-          .update({ status: 'failed' })
-          .eq('stripe_payment_id', pi.id)
-      )
-      break
-    }
-
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
       const { paymentId, templateId, orgId, userId } = session.metadata ?? {}
