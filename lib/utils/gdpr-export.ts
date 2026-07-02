@@ -55,26 +55,3 @@ export async function collectUserData(supabase: SupabaseClient, userId: string) 
     compositions_match: lineups.data ?? [],
   }
 }
-
-// RGPD — droit à l'oubli : anonymise les références à l'utilisateur dans les
-// tables sans cascade automatique (FK sans ON DELETE), à appeler AVANT
-// auth.admin.deleteUser() sinon la contrainte de clé étrangère bloque la
-// suppression. Les autres tables (profiles, organization_members,
-// event_attendees, player_stats, member_categories, match_lineups,
-// contribution_payments.user_id) ont déjà un ON DELETE CASCADE/SET NULL en base.
-export async function anonymizeUserData(admin: SupabaseClient, userId: string) {
-  await Promise.all([
-    admin.from('events').update({ created_by: null }).eq('created_by', userId),
-    admin.from('match_results').update({ entered_by: null }).eq('entered_by', userId),
-    admin.from('media').update({ uploader_id: null }).eq('uploader_id', userId),
-    admin.from('match_actions').update({ user_id: null }).eq('user_id', userId),
-    admin.from('match_actions').update({ player_in_id: null }).eq('player_in_id', userId),
-    admin.from('announcements').update({ author_id: null }).eq('author_id', userId),
-    admin.from('contribution_templates').update({ created_by: null }).eq('created_by', userId),
-    admin.from('contribution_payments').update({ paid_by: null }).eq('paid_by', userId),
-    admin.from('treasury_entries').update({ entered_by: null }).eq('entered_by', userId),
-    admin.from('treasury_entries').update({ reviewed_by: null }).eq('reviewed_by', userId),
-    // Contenu personnel sans valeur collective une fois l'auteur supprimé
-    admin.from('messages').delete().eq('sender_id', userId),
-  ])
-}

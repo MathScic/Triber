@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { collectUserData } from '@/lib/utils/gdpr'
+import { collectUserData } from '@/lib/utils/gdpr-export'
 
 // RGPD — droit à la portabilité : exporte toutes les données personnelles de
 // l'utilisateur connecté. Le client Supabase server (session cookie) applique

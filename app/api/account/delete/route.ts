@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
-import { anonymizeUserData } from '@/lib/utils/gdpr'
+import { anonymizeUserData, findBlockingSoleAdminOrg } from '@/lib/utils/gdpr-delete'
+import { rateLimitResponse } from '@/lib/utils/rate-limit'
 
 function getAdminClient() {
   return createAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -14,6 +15,10 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
+  // Par compte, pas par IP — limite les tentatives répétées sur une action irréversible
+  const limited = rateLimitResponse(`account-delete:${user.id}`, 5, 15 * 60_000)
+  if (limited) return limited
+
   const body = await request.json().catch(() => null) as { confirm?: string } | null
   if (body?.confirm !== 'SUPPRIMER') {
     return NextResponse.json({ error: 'Confirmation requise' }, { status: 400 })
@@ -21,28 +26,12 @@ export async function POST(request: Request) {
 
   const admin = getAdminClient()
 
-  // Garde-fou : impossible de supprimer si seul admin d'une organisation
-  const { data: adminOf } = await admin
-    .from('organization_members')
-    .select('organization_id')
-    .eq('user_id', user.id)
-    .eq('role', 'admin')
-
-  for (const { organization_id } of (adminOf ?? []) as { organization_id: string }[]) {
-    const { count } = await admin
-      .from('organization_members')
-      .select('*', { count: 'exact', head: true })
-      .eq('organization_id', organization_id)
-      .eq('role', 'admin')
-
-    if ((count ?? 0) <= 1) {
-      const { data: org } = await admin.from('organizations').select('name').eq('id', organization_id).single()
-      const orgName = (org as { name?: string } | null)?.name ?? 'votre club'
-      return NextResponse.json(
-        { error: `Vous êtes le seul admin de ${orgName} : transférez le rôle ou supprimez le club d'abord.` },
-        { status: 409 },
-      )
-    }
+  const blockingOrg = await findBlockingSoleAdminOrg(admin, user.id)
+  if (blockingOrg) {
+    return NextResponse.json(
+      { error: `Vous êtes le seul admin de ${blockingOrg} : transférez le rôle ou supprimez le club d'abord.` },
+      { status: 409 },
+    )
   }
 
   await anonymizeUserData(admin, user.id)
