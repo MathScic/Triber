@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { isVisibleSoon } from './helpers'
 
 const NEEDS_AUTH = !process.env.TEST_PASSWORD
 
@@ -36,25 +37,15 @@ test.describe('Page Stats (/stats)', () => {
     await page.goto('/stats')
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
     // "Résultats" n'apparaît que si des matchs ont été joués — acceptable de skiper
-    const hasResults = await page.getByText(/^Résultats$/i).isVisible().catch(() => false)
+    const hasResults = await isVisibleSoon(page.getByText(/^Résultats$/i))
     if (!hasResults) { test.skip(); return }
     await expect(page.getByText(/^Résultats$/i)).toBeVisible()
   })
 
-  test('cliquer sur un résultat ouvre le formulaire d\'édition du score', async ({ page }) => {
-    await page.goto('/stats')
-    await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
-
-    const resultCard = page.locator('button').filter({ hasText: /victoire|défaite|nul/i }).first()
-    if (!await resultCard.isVisible()) { test.skip(); return }
-
-    await resultCard.click()
-    await page.waitForTimeout(500)
-    await expect(
-      page.locator('input[type="number"]').first()
-        .or(page.getByText(/score|domicile|extérieur/i).first())
-    ).toBeVisible({ timeout: 5_000 })
-  })
+  // Note : la saisie/édition du score s'est déplacée sur la page de détail
+  // d'un événement (EventDetailView + MatchResultForm) — la table de résultats
+  // de /stats est en lecture seule depuis le refactor finances/home, il n'y a
+  // donc plus de formulaire d'édition à ouvrir ici (ancien test supprimé).
 
   test('Victoire/Défaite correctement calculée (is_home aware)', async ({ page }) => {
     await page.goto('/stats')
@@ -62,7 +53,7 @@ test.describe('Page Stats (/stats)', () => {
 
     // Les résultats sont des lignes de tableau (<tr>), pas des boutons
     const row = page.locator('tr').filter({ hasText: /victoire/i }).first()
-    if (!await row.isVisible().catch(() => false)) { test.skip(); return }
+    if (!await isVisibleSoon(row)) { test.skip(); return }
 
     const scoreText = await row.locator('.tabular-nums').textContent()
     const parts = (scoreText ?? '').split(/—|–/).map(s => parseInt(s.trim()))

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { isVisibleSoon } from './helpers'
 
 const NEEDS_AUTH = !process.env.TEST_PASSWORD
 
@@ -26,7 +27,7 @@ test.describe('Page Finances (/finances)', () => {
   test('formulaire de création de cotisation s\'ouvre au clic', async ({ page }) => {
     await page.goto('/finances')
     const btn = page.getByRole('button', { name: /nouvelle|créer|ajouter/i }).first()
-    if (!await btn.isVisible().catch(() => false)) { test.skip(); return }
+    if (!await isVisibleSoon(btn)) { test.skip(); return }
     await btn.click()
     // Le modal de création doit apparaître
     await expect(page.locator('input, textarea').first()).toBeVisible({ timeout: 5_000 })

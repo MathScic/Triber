@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { isVisibleSoon } from './helpers'
 
 const NEEDS_AUTH = !process.env.TEST_PASSWORD
 const ORG_ID = '8af9d20d-b93d-4af6-952d-1bc541b0943f'
@@ -11,7 +12,7 @@ test.describe('Page match en direct — admin (/events/[id]/live)', () => {
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
 
     const liveBtn = page.getByRole('link', { name: /gérer le direct|en direct/i })
-    if (await liveBtn.isVisible()) {
+    if (await isVisibleSoon(liveBtn)) {
       await liveBtn.click()
       await expect(page).toHaveURL(/events\/.*\/live/)
       await expect(page.locator('main')).toBeVisible()
@@ -45,7 +46,6 @@ test.describe('Page match en direct — publique (/match/[id])', () => {
     await expect(page).not.toHaveURL(/login/)
     await page.waitForTimeout(2_000)
 
-    const hasResult = await page.getByText(/dernier résultat|prochain événement/i).isVisible().catch(() => false)
     // La page peut être vide si aucun match ni événement — pas d'erreur quand même
     await expect(page.getByRole('main').first()).toBeVisible()
   })

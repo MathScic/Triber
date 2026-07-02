@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { isVisibleSoon } from './helpers'
 
 const NEEDS_AUTH = !process.env.TEST_PASSWORD
 let createdEventTitle = ''
@@ -35,7 +36,7 @@ test.describe('Page Événements (/events)', () => {
     await titleField.fill(createdEventTitle)
 
     const typeSelect = page.getByRole('combobox').or(page.getByLabel(/type/i)).first()
-    if (await typeSelect.isVisible()) {
+    if (await isVisibleSoon(typeSelect)) {
       await typeSelect.selectOption({ label: 'Match' }).catch(() => typeSelect.selectOption('match'))
     }
 
@@ -43,10 +44,10 @@ test.describe('Page Événements (/events)', () => {
     tomorrow.setDate(tomorrow.getDate() + 1)
     const dateStr = tomorrow.toISOString().split('T')[0]
     const dateField = page.locator('input[type="date"]').first()
-    if (await dateField.isVisible()) await dateField.fill(dateStr)
+    if (await isVisibleSoon(dateField)) await dateField.fill(dateStr)
 
     const timeField = page.locator('input[type="time"]').first()
-    if (await timeField.isVisible()) await timeField.fill('15:00')
+    if (await isVisibleSoon(timeField)) await timeField.fill('15:00')
 
     await page.getByRole('button', { name: /créer|ajouter|valider|sauvegarder/i }).last().click()
     await page.waitForTimeout(2_000)
@@ -60,7 +61,7 @@ test.describe('Page Événements (/events)', () => {
 
     // Le titre de chaque carte est un lien vers /events/[id]
     const firstEventLink = page.locator('a[href^="/events/"]').first()
-    if (await firstEventLink.isVisible().catch(() => false)) {
+    if (await isVisibleSoon(firstEventLink)) {
       await firstEventLink.click()
       await expect(page).toHaveURL(/events\/[a-z0-9-]+/, { timeout: 8_000 })
       await expect(page.locator('main').first()).toBeVisible()
@@ -74,7 +75,7 @@ test.describe('Page Événements (/events)', () => {
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
     // Les boutons de présence (Présent / Absent / Attente) doivent être visibles sur la liste
     const presentBtn = page.getByRole('button', { name: /présent/i }).first()
-    if (await presentBtn.isVisible().catch(() => false)) {
+    if (await isVisibleSoon(presentBtn)) {
       await expect(presentBtn).toBeVisible()
     } else {
       // Pas d'événement existant
@@ -87,7 +88,7 @@ test.describe('Page Événements (/events)', () => {
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
 
     const presentBtn = page.getByRole('button', { name: /présent/i }).first()
-    if (!await presentBtn.isVisible().catch(() => false)) { test.skip(); return }
+    if (!await isVisibleSoon(presentBtn)) { test.skip(); return }
 
     await presentBtn.click()
     await page.waitForTimeout(1_500)
@@ -100,7 +101,7 @@ test.describe('Page Événements (/events)', () => {
     await page.goto('/events')
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
 
-    if (!await page.getByText(createdEventTitle).first().isVisible().catch(() => false)) {
+    if (!await isVisibleSoon(page.getByText(createdEventTitle).first())) {
       test.skip(); return
     }
 

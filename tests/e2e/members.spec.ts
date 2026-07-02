@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { isVisibleSoon } from './helpers'
 
 const NEEDS_AUTH = !process.env.TEST_PASSWORD
 
@@ -27,7 +28,7 @@ test.describe('Page Membres (/members)', () => {
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
     // Clique sur le bouton "+" ou "Inviter" pour ouvrir la modal
     const inviteBtn = page.getByRole('button', { name: /inviter|\+|ajouter/i }).first()
-    if (!await inviteBtn.isVisible().catch(() => false)) { test.skip(); return }
+    if (!await isVisibleSoon(inviteBtn)) { test.skip(); return }
     await inviteBtn.click()
     // Le formulaire d'invitation doit apparaître dans la modal
     await expect(page.getByPlaceholder(/joueur@exemple\.fr/i)).toBeVisible({ timeout: 5_000 })
@@ -38,7 +39,7 @@ test.describe('Page Membres (/members)', () => {
     await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 8_000 })
 
     const inviteBtn = page.getByRole('button', { name: /inviter|\+|ajouter/i }).first()
-    if (!await inviteBtn.isVisible().catch(() => false)) { test.skip(); return }
+    if (!await isVisibleSoon(inviteBtn)) { test.skip(); return }
     await inviteBtn.click()
 
     const emailInput = page.getByPlaceholder(/joueur@exemple\.fr/i)

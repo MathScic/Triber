@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { isVisibleSoon } from './helpers'
 
 test.describe('Authentification', () => {
   test('page inscription : formulaire visible et soumission possible', async ({ page }) => {
@@ -26,7 +27,7 @@ test.describe('Authentification', () => {
     // Attend redirect vers confirme OU message de succès
     await page.waitForTimeout(3_000)
     const url = page.url()
-    const hasConfirmMessage = await page.getByText(/confirme|vérifiez|email envoyé/i).isVisible().catch(() => false)
+    const hasConfirmMessage = await isVisibleSoon(page.getByText(/confirme|vérifiez|email envoyé/i))
     expect(url.includes('confirme') || url.includes('onboarding') || hasConfirmMessage).toBeTruthy()
   })
 

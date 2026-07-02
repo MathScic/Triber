@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { isVisibleSoon } from './helpers'
 
 const NEEDS_AUTH = !process.env.TEST_PASSWORD
 
@@ -24,8 +25,8 @@ test.describe('Page Accueil (/home)', () => {
     await page.goto('/home')
     await page.waitForTimeout(3_000)
     // Soit un score visible, soit "Aucun résultat encore" — on vérifie juste que la page ne plante pas
-    const hasScore = await page.getByText(/[0-9]+ [–—-] [0-9]+|Aucun|Pas encore/i).first().isVisible().catch(() => false)
-    expect(typeof hasScore).toBe('boolean')
+    await isVisibleSoon(page.getByText(/[0-9]+ [–—-] [0-9]+|Aucun|Pas encore/i).first())
+    await expect(page.locator('main').first()).toBeVisible()
   })
 
   test('accès rapide aux pages depuis la nav', async ({ page }) => {
