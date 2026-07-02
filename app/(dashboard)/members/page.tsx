@@ -53,8 +53,8 @@ function MembersPageContent() {
     <main className={`${nunito.variable} ${barlow.variable} min-h-screen bg-brand-bg px-6 py-8`}>
       <div className="max-w-5xl lg:max-w-[90%] mx-auto space-y-6">
 
-        {/* En-tête page */}
-        <div className="flex items-center justify-between">
+        {/* En-tête page — empilé sur mobile pour ne pas comprimer le titre et le bouton */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-2xl font-[800] text-brand-dark uppercase tracking-tight font-[family-name:var(--font-barlow)]">
               Membres
@@ -66,7 +66,7 @@ function MembersPageContent() {
           {isAdmin && (
             <button
               onClick={() => setShowInvite(true)}
-              className="flex items-center gap-2 bg-secondary text-white font-semibold text-sm px-4 py-2.5 rounded-xl hover:bg-secondary/90 transition-colors font-[family-name:var(--font-nunito)]"
+              className="flex items-center justify-center gap-2 bg-secondary text-white font-semibold text-sm px-4 py-2.5 rounded-xl hover:bg-secondary/90 transition-colors font-[family-name:var(--font-nunito)] w-full sm:w-auto"
             >
               <span className="text-lg leading-none">+</span>
               Ajouter un membre

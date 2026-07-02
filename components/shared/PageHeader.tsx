@@ -10,7 +10,8 @@ interface Props {
 
 export function PageHeader({ title, subtitle, backHref = '/home', action }: Props) {
   return (
-    <div className="flex items-center justify-between mb-6">
+    // Empilé sur mobile (sinon le sous-titre se tronque à l'excès à côté d'une action large)
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div className="flex items-center gap-3 min-w-0">
         <Link
           href={backHref}
@@ -23,11 +24,11 @@ export function PageHeader({ title, subtitle, backHref = '/home', action }: Prop
             {title}
           </h1>
           {subtitle && (
-            <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)] mt-0.5 truncate">{subtitle}</p>
+            <p className="text-sm text-[#6B7280] font-[family-name:var(--font-nunito)] mt-0.5">{subtitle}</p>
           )}
         </div>
       </div>
-      {action && <div className="flex-shrink-0 ml-3">{action}</div>}
+      {action && <div className="flex-shrink-0 sm:ml-3">{action}</div>}
     </div>
   )
 }

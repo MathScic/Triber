@@ -43,7 +43,7 @@ export function SidebarMobile({ primaryColor, userName, role }: Props) {
     <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-brand-dark border-t border-white/10 flex flex-col">
       {userName && (
         <div className="flex items-center justify-between px-4 py-1 border-b border-white/5">
-          <p className="text-[9px] text-white/30 truncate font-[family-name:var(--font-nunito)]">{userName}</p>
+          <p className="text-[9px] text-white/60 truncate font-[family-name:var(--font-nunito)]">{userName}</p>
           <button onClick={() => void logout()} className="text-white/25 hover:text-white/60 transition-colors ml-2 flex-shrink-0">
             <LogOut className="w-3 h-3" />
           </button>

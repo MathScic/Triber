@@ -39,9 +39,9 @@ export function MemberTable({ members, isAdmin, onRoleChange, onRemove, onInvite
 
   return (
     <div className="bg-white rounded-2xl border border-brand-border shadow-sm overflow-hidden">
-      {/* Barre recherche + bouton */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-brand-sand">
-        <div className="flex-1 relative">
+      {/* Barre recherche + bouton — empilés sur mobile pour laisser assez de place au champ */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b border-brand-sand">
+        <div className="flex-1 relative min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted" />
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Rechercher un membre…"
@@ -49,7 +49,7 @@ export function MemberTable({ members, isAdmin, onRoleChange, onRemove, onInvite
         </div>
         {isAdmin && (
           <button onClick={onInvite}
-            className="flex items-center gap-2 h-10 px-4 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-secondary/90 transition-colors font-[family-name:var(--font-nunito)] whitespace-nowrap">
+            className="flex items-center justify-center gap-2 h-10 px-4 bg-secondary text-white text-sm font-semibold rounded-xl hover:bg-secondary/90 transition-colors font-[family-name:var(--font-nunito)] whitespace-nowrap w-full sm:w-auto">
             <UserPlus className="w-4 h-4" /> Ajouter un membre
           </button>
         )}
