@@ -545,6 +545,9 @@ triber/
 │       ├── rate-limit.ts    # Rate-limiting en mémoire (voir §4 Sécurité serveur)
 │       ├── gdpr-export.ts   # collectUserData — export RGPD
 │       ├── gdpr-delete.ts   # anonymizeUserData, findBlockingSoleAdminOrg — suppression RGPD
+│       ├── layout.ts     # MOBILE_NAV_HEIGHT_PX — partagée entre layout.tsx (Server
+│       │                 # Component) et SidebarMobile.tsx ('use client') ; ne jamais
+│       │                 # déplacer cette constante dans un fichier 'use client'
 │       ├── theme.ts      # Application CSS variables branding (ex apply-theme)
 │       ├── finances.ts   # Helpers calcul/formatage finances
 │       ├── financeExport.ts # Export CSV/impression des paiements
