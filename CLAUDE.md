@@ -273,7 +273,7 @@ Ce projet est initialisé depuis **MathScic/NextJs-Starter-kit** qui inclut déj
 - shadcn/ui (components.json configuré)
 - ESLint + Prettier + Husky (lint avant commit)
 - CI GitHub Actions — deux jobs :
-  - **`verify`** (push + PR) : `lint` → `typecheck` → `vitest run` (77 tests) → `build` (standalone)
+  - **`verify`** (push + PR) : `lint` → `typecheck` → `vitest run` (82 tests) → `build` (standalone)
   - **`e2e`** (PR vers main uniquement, dépend de `verify`) : Playwright Chromium headless ; rapport HTML uploadé en artifact si échec
 
 Ne jamais reconfigurer ce qui existe déjà dans le starter.
@@ -293,7 +293,7 @@ Ne jamais reconfigurer ce qui existe déjà dans le starter.
 | Paiements          | Stripe + Stripe Connect   | Cotisations → compte club    |
 | Emails             | Resend                    | Invitations, convocations    |
 | Push               | Expo Push Notifications   | Alertes mobiles              |
-| Tests unitaires    | Vitest                    | Logique métier (77 tests, lancés en CI) |
+| Tests unitaires    | Vitest                    | Logique métier (82 tests, lancés en CI) |
 | Tests E2E          | Playwright / Chromium     | Parcours web (lancés en CI sur PR)      |
 | CI                 | GitHub Actions            | verify (push+PR) + e2e (PR only)        |
 | Conteneurisation   | Docker multi-stage        | Image standalone ~150 MB (node:20-alpine) |
@@ -521,6 +521,7 @@ triber/
 │   │   └── server.ts    # Client server (cookies)
 │   ├── stripe/
 │   │   ├── client.ts
+│   │   ├── checkout-params.ts # buildSubscriptionCheckoutParams — pur, testable sans clé Stripe
 │   │   └── webhooks.ts
 │   ├── hooks/
 │   │   ├── useAuth.ts
