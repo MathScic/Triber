@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
+import { buildSubscriptionCheckoutParams } from '@/lib/stripe/checkout-params'
 
 export async function POST(request: Request) {
   const supabase = await createClient()
@@ -36,21 +37,9 @@ export async function POST(request: Request) {
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '')
 
-  const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
-    payment_method_types: ['card'],
-    line_items: [{ price: process.env.STRIPE_PRICE_CLUB!, quantity: 1 }],
-    success_url: `${appUrl}/settings?upgraded=true`,
-    cancel_url: `${appUrl}/settings`,
-    customer_email: user.email,
-    metadata: { userId: user.id, orgId: mem.organization_id },
-    // Le metadata de la session n'est PAS copié automatiquement sur l'objet
-    // Subscription créé par Stripe — sans subscription_data.metadata, le
-    // webhook customer.subscription.deleted (annulation) ne peut pas
-    // retrouver orgId et le club reste bloqué sur le plan payant
-    subscription_data: { metadata: { orgId: mem.organization_id } },
-    consent_collection: { terms_of_service: 'required' },
-  })
+  const session = await stripe.checkout.sessions.create(
+    buildSubscriptionCheckoutParams({ orgId: mem.organization_id, userId: user.id, userEmail: user.email, appUrl })
+  )
 
   return NextResponse.json({ url: session.url })
 }
