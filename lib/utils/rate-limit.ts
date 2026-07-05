@@ -7,11 +7,17 @@ import { NextResponse } from 'next/server'
 // limite sans purge — voir sweepExpired(). Pour un vrai rate-limit
 // distribué, migrer vers Upstash Redis (@upstash/ratelimit).
 const hits = new Map<string, { count: number; resetAt: number }>()
+let lastSweepAt = 0
+const SWEEP_INTERVAL_MS = 60_000
 
 // Purge les entrées expirées — déclenchée occasionnellement plutôt qu'à
-// chaque appel pour rester bon marché sur le chemin chaud
+// chaque appel pour rester bon marché sur le chemin chaud. Le debounce
+// temporel évite de rebalayer toute la map à chaque requête si elle reste
+// durablement au-dessus du seuil (beaucoup d'IP distinctes, peu expirées).
 function sweepExpired() {
   const now = Date.now()
+  if (now - lastSweepAt < SWEEP_INTERVAL_MS) return
+  lastSweepAt = now
   for (const [key, entry] of hits) {
     if (now > entry.resetAt) hits.delete(key)
   }
