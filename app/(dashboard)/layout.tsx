@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           custom property — évite que les deux divergent silencieusement si la
           nav mobile change de hauteur. */}
       <div
-        className="lg:ml-56 pb-[var(--mobile-nav-h)] lg:pb-0"
+        className="xl:ml-56 pb-[var(--mobile-nav-h)] xl:pb-0"
         style={{ '--mobile-nav-h': `${MOBILE_NAV_HEIGHT_PX}px` } as React.CSSProperties}
       >
         {children}

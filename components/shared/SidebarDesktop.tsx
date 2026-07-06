@@ -37,7 +37,7 @@ export function SidebarDesktop({ orgName, orgLogo, userName, role, primaryColor 
   const initials = (userName ?? 'U').split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2)
 
   return (
-    <aside className="hidden lg:flex flex-col fixed top-0 left-0 bottom-0 w-56 z-40 bg-brand-dark">
+    <aside className="hidden xl:flex flex-col fixed top-0 left-0 bottom-0 w-56 z-40 bg-brand-dark">
 
       <div className="px-5 py-5 flex items-center gap-2.5 border-b border-white/10">
         <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-white/10 flex items-center justify-center">
