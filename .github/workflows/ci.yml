@@ -69,6 +69,11 @@ jobs:
           # le build échoue systématiquement (constaté : 3 runs en échec avant ce fix).
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # lib/stripe/webhooks.ts crée son client admin en haut de fichier (pas dans
+          # une fonction) — évalué lui aussi pendant `next build`. "supabaseKey is
+          # required" sans cette variable, même si le secret existe dans le repo :
+          # un secret non référencé dans le bloc env: d'une étape n'y est pas injecté.
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
   # ------------------------------------------------------------------ #
   # Job E2E : tests Playwright — uniquement sur les PR vers main       #
@@ -109,6 +114,7 @@ jobs:
           # Voir le job "verify" ci-dessus — mêmes clés requises au chargement du module
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       # Lance les tests E2E — Playwright démarre automatiquement `next start`
       # (voir webServer.command dans playwright.config.ts avec process.env.CI)
