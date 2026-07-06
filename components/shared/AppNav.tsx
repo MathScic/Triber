@@ -22,10 +22,15 @@ export function AppNav() {
       s.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
         .then(({ data: p }) => setUserName((p?.full_name as string) ?? user.email ?? null))
       s.from('organization_members')
+        // .limit(1) plutôt que .maybeSingle() : évite un crash silencieux (et donc
+        // un rôle jamais mis à jour dans la sidebar) si un compte a plusieurs
+        // adhésions — voir lib/hooks/useHomeOrg.ts pour le même correctif.
         .select('organization_id, role')
         .eq('user_id', user.id)
-        .maybeSingle()
-        .then(({ data: mem }) => {
+        .order('joined_at', { ascending: false })
+        .limit(1)
+        .then(({ data }) => {
+          const mem = data?.[0]
           if (!mem) return
           setRole((mem.role as Role) ?? 'member')
           s.from('organizations')
