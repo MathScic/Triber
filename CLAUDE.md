@@ -613,6 +613,11 @@ Toutes les tables ont RLS activé dès leur création.
 026_lineups_realtime.sql       ← Realtime sur match_lineups
 027_commission_consents.sql    ← table commission_consents (consentement horodaté,
                                   obligation légale §1) — écriture admin only, append-only
+028_fix_organization_members_write_policies.sql ← corrige la récursion RLS sur
+                                  les policies INSERT/UPDATE/DELETE de
+                                  organization_members (même défaut que la 011,
+                                  jamais étendu à l'écriture) — changer le rôle
+                                  ou supprimer un membre échouait silencieusement
 ```
 
 ### Schéma
