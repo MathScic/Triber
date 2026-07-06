@@ -9,6 +9,7 @@ const barlow = Barlow_Condensed({ subsets: ["latin"], weight: ["700", "800"], va
 export const metadata = {
   title: "Triber",
   description: "La gestion de club tout-en-un",
+  icons: { icon: "/images/icon-triber.svg" },
 };
 
 export default function RootLayout({
