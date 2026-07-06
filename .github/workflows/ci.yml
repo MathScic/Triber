@@ -63,6 +63,12 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          # lib/stripe/client.ts et lib/email.ts lèvent une erreur au chargement du
+          # module si ces clés sont absentes — or les routes qui les importent sont
+          # évaluées pendant `next build`, pas seulement au runtime. Sans elles ici,
+          # le build échoue systématiquement (constaté : 3 runs en échec avant ce fix).
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
   # ------------------------------------------------------------------ #
   # Job E2E : tests Playwright — uniquement sur les PR vers main       #
@@ -100,6 +106,9 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          # Voir le job "verify" ci-dessus — mêmes clés requises au chargement du module
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
       # Lance les tests E2E — Playwright démarre automatiquement `next start`
       # (voir webServer.command dans playwright.config.ts avec process.env.CI)
